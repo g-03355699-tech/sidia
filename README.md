@@ -37,6 +37,8 @@ Pelayar log masuk dengan lebih daripada satu akaun Google. Buang `/a/<domain>` d
 | `appsscript.json` | Tetapan projek (zon waktu, kebenaran) |
 | `version.json` | Maklumat keluaran terkini untuk kemas kini satu klik |
 | `CHANGELOG.md` | Senarai perubahan setiap versi |
+| `tests/` | Ujian tempatan (simulasi Apps Script + Playwright): `cd tests && npm install && npm test` |
+| `CLAUDE.md` | Panduan projek untuk pembantu AI (Claude Code) |
 | `docs/` | Halaman pengenalan (GitHub Pages) |
 
 ## Pemasangan manual (tanpa templat)

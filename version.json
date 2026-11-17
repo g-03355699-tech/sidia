@@ -1,12 +1,9 @@
 {
   "version": "1.1.1",
-  "ref": "c76857280e054af091ab232cfc7683f0ac15b9ac",
+  "ref": "bda89a4b012c0a6f5a7c8c76f2b56eb223bb356a",
   "tarikh": "2026-11-17",
   "nota": [
-    "Kemas kini satu klik: menu SiDIA › Semak kemas kini",
-    "142 kesalahan standard (Ringan / Sederhana / Berat) dan pemilih kesalahan baharu",
-    "Mod taip di telefon: senarai tidak dilindungi papan kekunci",
-    "Baiki No. KP murid jadi 1.30927E+11 semasa muat naik Excel",
-    "Baiki medan tarikh bertindih di iPhone"
+    "Keluaran ujian kemas kini satu klik (tiada perubahan pada web app)",
+    "Jika anda nampak mesej ini, kemas kini automatik berfungsi ✅"
   ]
 }

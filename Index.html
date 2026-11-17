@@ -133,6 +133,28 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .loading{position:fixed;inset:0;z-index:70;background:rgba(255,255,255,.7);display:grid;place-items:center;font-weight:600;color:var(--pri)}
 .spin{width:34px;height:34px;border:4px solid var(--pri-soft);border-top-color:var(--pri);border-radius:50%;animation:sp 0.8s linear infinite;margin:0 auto 10px}
 @keyframes sp{to{transform:rotate(360deg)}}
+.admgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.admbtn{border:1px solid var(--line);background:#fff;border-radius:var(--radius);padding:14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-height:108px}
+.admbtn .i{font-size:24px;line-height:1;margin-bottom:6px}
+.admbtn b{font-size:15px}
+.admbtn small{color:var(--muted);font-size:12px;line-height:1.3}
+.admbtn.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;gap:12px}
+.admbtn.wide .i{margin:0}
+.badge{display:inline-block;background:#d92d20;color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;margin-left:6px;vertical-align:middle}
+.backbar{display:flex;align-items:center;gap:6px;margin:-4px 0 10px}
+.backbar .btn.link{font-weight:700;padding-left:0}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.statgrid div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.statgrid b{display:block;font-size:20px;color:var(--pri)}
+.statgrid span{font-size:11px;color:var(--muted)}
+.pinrow{display:grid;grid-template-columns:1fr 110px;gap:8px;align-items:end}
+.pinrow input{font-size:20px;letter-spacing:.2em;font-variant-numeric:tabular-nums}
+#qrBox{width:200px;height:200px;margin:10px auto;padding:10px;background:#fff;border:1px solid var(--line);border-radius:12px}
+#qrBox img,#qrBox canvas{width:178px!important;height:178px!important}
+.wabtn{display:flex;align-items:center;gap:12px;background:#25d366;color:#fff;border-radius:10px;padding:10px 14px;margin-bottom:8px;text-decoration:none}
+.wabtn>span:first-child{font-size:22px}
+.wabtn b{display:block;font-size:15px}
+.wabtn small{opacity:.9;font-size:12px}
 .kbd{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--muted)}
 </style>
 </head>
@@ -159,8 +181,9 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
         <select id="inPeranan"></select>
       </div>
       <div id="loginPinWrap" class="hidden">
-        <label class="f" for="inPin">Kod akses sekolah</label>
-        <input type="password" id="inPin" inputmode="numeric" autocomplete="off">
+        <label class="f" for="inPin">PIN</label>
+        <input type="password" id="inPin" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="••••">
+        <div class="muted" style="margin-top:4px">PIN berbeza mengikut peranan: <b>Guru/Warden</b>, <b>Pengawas</b> atau <b>Admin</b>. Dapatkan PIN daripada pentadbir sistem.</div>
       </div>
       <div class="actions"><button class="btn pri" id="btnLogin">Masuk</button></div>
     </div>
@@ -218,16 +241,30 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
   </section>
 
   <!-- LAPORAN -->
-  <section id="vLaporan" class="hidden">
+  <section id="vAdmin" class="hidden">
     <div class="card" id="adminGate">
-      <h2>Laporan (admin)</h2>
-      <label class="f" for="inAdminPin">Kod admin</label>
-      <input type="password" id="inAdminPin" autocomplete="off">
+      <h2>🛡️ Admin</h2>
+      <p class="muted" style="margin:0">Masukkan PIN Admin untuk membuka laporan dan tetapan.</p>
+      <label class="f" for="inAdminPin">PIN Admin</label>
+      <input type="password" id="inAdminPin" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="••••">
       <div class="actions"><button class="btn pri" id="btnAdmin">Buka</button></div>
     </div>
-    <div id="reportArea" class="hidden">
+
+    <div id="adminHome" class="hidden">
+      <div class="admgrid">
+        <button class="admbtn" data-sub="subLaporan"><span class="i">📊</span><b>Laporan</b><small>Mata rumah, kelas, kesalahan & murid · eksport CSV</small></button>
+        <button class="admbtn" data-sub="subPin"><span class="i">🔐</span><b>PIN akses</b><small>Tukar PIN Guru/Warden, Murid & Admin</small></button>
+        <button class="admbtn" data-sub="subTetapan"><span class="i">⚙️</span><b>Tetapan sekolah</b><small>Nama sekolah, lokasi, had padam rekod</small></button>
+        <button class="admbtn" data-sub="subKongsi"><span class="i">🔗</span><b>Kongsi pautan</b><small>Kod QR & mesej WhatsApp untuk guru dan pengawas</small></button>
+        <button class="admbtn wide" data-sub="subSistem"><span class="i">ℹ️</span><span><b>Sistem</b> <span id="updBadge"></span><br><small>Versi, kemas kini SiDIA, buka Google Sheet</small></span></button>
+      </div>
+      <div class="statgrid" id="admStats"></div>
+    </div>
+
+    <div id="subLaporan" class="adsub hidden">
+      <div class="backbar"><button class="btn link" data-back>‹ Menu Admin</button></div>
       <div class="card">
-        <h2>Laporan mata rumah</h2>
+        <h2>📊 Laporan mata rumah</h2>
         <div class="row">
           <div><label class="f" for="rFrom">Dari</label><input type="date" id="rFrom"></div>
           <div><label class="f" for="rTo">Hingga</label><input type="date" id="rTo"></div>
@@ -240,6 +277,48 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
         </div>
       </div>
       <div id="reportOut"></div>
+    </div>
+
+    <div id="subPin" class="adsub hidden">
+      <div class="backbar"><button class="btn link" data-back>‹ Menu Admin</button></div>
+      <div class="card">
+        <h2>🔐 PIN akses</h2>
+        <p class="muted" style="margin:0 0 4px">Setiap peranan mempunyai PIN sendiri (4–8 digit). Selepas PIN ditukar, semua pengguna dalam kumpulan itu perlu log masuk semula dengan PIN baharu.</p>
+        <div id="pinListNote"></div>
+        <div class="pinrow"><div><label class="f" for="pinGuru">PIN Guru & Warden</label><input type="text" id="pinGuru" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off"></div><button class="btn sm" data-gen="pinGuru">🎲 Jana</button></div>
+        <div class="pinrow"><div><label class="f" for="pinMurid">PIN Murid (Pengawas)</label><input type="text" id="pinMurid" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off"></div><button class="btn sm" data-gen="pinMurid">🎲 Jana</button></div>
+        <div class="pinrow"><div><label class="f" for="pinAdmin">PIN Admin</label><input type="text" id="pinAdmin" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off"></div><button class="btn sm" data-gen="pinAdmin">🎲 Jana</button></div>
+        <div class="alert warn" style="margin-top:12px">Simpan PIN Admin di tempat selamat. Jika terlupa, pemilik Google Sheet boleh melihatnya dalam tab <b>TETAPAN</b> (KOD_ADMIN).</div>
+        <div class="actions"><button class="btn pri" id="btnSavePin">Simpan PIN</button></div>
+      </div>
+    </div>
+
+    <div id="subTetapan" class="adsub hidden">
+      <div class="backbar"><button class="btn link" data-back>‹ Menu Admin</button></div>
+      <div class="card">
+        <h2>⚙️ Tetapan sekolah</h2>
+        <label class="f" for="tNama">Nama sekolah</label><input type="text" id="tNama">
+        <label class="f" for="tLokasi">Lokasi (satu setiap baris)</label><textarea id="tLokasi" rows="6"></textarea>
+        <label class="f" for="tHad">Guru & pengawas boleh padam rekod sendiri dalam tempoh (jam)</label><input type="text" id="tHad" inputmode="numeric">
+        <p class="muted">Senarai murid dan senarai kesalahan diurus dalam Google Sheet: menu <b>SiDIA › 🚀 Mula di sini</b>.</p>
+        <div class="actions"><button class="btn pri" id="btnSaveTetapan">Simpan tetapan</button></div>
+      </div>
+    </div>
+
+    <div id="subKongsi" class="adsub hidden">
+      <div class="backbar"><button class="btn link" data-back>‹ Menu Admin</button></div>
+      <div class="card">
+        <h2>🔗 Kongsi pautan SiDIA</h2>
+        <div id="kongsiBody"></div>
+      </div>
+    </div>
+
+    <div id="subSistem" class="adsub hidden">
+      <div class="backbar"><button class="btn link" data-back>‹ Menu Admin</button></div>
+      <div class="card">
+        <h2>ℹ️ Sistem</h2>
+        <div id="sistemBody"></div>
+      </div>
     </div>
   </section>
 </main>
@@ -256,7 +335,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 <nav class="tabs hidden" id="tabs">
   <button data-v="vRekod" class="on"><span class="ic">✎</span>Rekod</button>
   <button data-v="vTerkini"><span class="ic">🕘</span>Terkini</button>
-  <button data-v="vLaporan"><span class="ic">📊</span>Laporan</button>
+  <button data-v="vAdmin" id="tabAdmin"><span class="ic">🛡️</span>Admin</button>
 </nav>
 
 <div class="modal hidden" id="modal"><div class="sheet" id="modalBody"></div></div>
@@ -370,26 +449,28 @@ function highlight(name, q) {
 
 /* ============ LOG MASUK ============ */
 function showView(v) {
-  ['vLogin', 'vRekod', 'vTerkini', 'vLaporan'].forEach(function (x) { $(x).classList.toggle('hidden', x !== v); });
+  ['vLogin', 'vRekod', 'vTerkini', 'vAdmin'].forEach(function (x) { $(x).classList.toggle('hidden', x !== v); });
   S.view = v;
   document.querySelectorAll('nav.tabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === v); });
   $('saveBar').classList.toggle('hidden', v !== 'vRekod');
   if (v === 'vTerkini') loadRecent();
-  if (v === 'vLaporan') initReport();
+  if (v === 'vAdmin') initAdmin();
   window.scrollTo(0, 0);
 }
 
 function renderLogin(msg) {
   var c = S.cfg;
   $('tabs').classList.add('hidden');
+  $('hdrWho').innerHTML = '';
   $('loginMsg').innerHTML = msg ? '<div class="alert err">' + esc(msg) + '</div>' : '';
   $('loginNameWrap').classList.toggle('hidden', c.userListMode);
   $('loginPinWrap').classList.toggle('hidden', !c.needPin);
   $('inPeranan').innerHTML = c.peranan.map(function (p) { return '<option>' + esc(p) + '</option>'; }).join('');
-  var saved = LS.get('ctx', null) || S.ctx || {};
+  // utamakan percubaan semasa (S.ctx) supaya peranan/nama tidak bertukar selepas PIN salah
+  var saved = (S.ctx && S.ctx.nama) ? S.ctx : (LS.get('ctx', null) || {});
   $('inNama').value = saved.nama || $('inNama').value || '';
   if (saved.peranan) $('inPeranan').value = saved.peranan;
-  $('inPin').value = msg && /kod/i.test(msg) ? '' : (saved.pin || '');
+  $('inPin').value = msg && /kod|pin/i.test(msg) ? '' : (saved.pin || '');
   showView('vLogin');
   setTimeout(function () {
     if (c.userListMode) return;
@@ -399,7 +480,8 @@ function renderLogin(msg) {
 }
 
 $('btnLogin').onclick = function () {
-  var ctx = LS.get('ctx', {});
+  // sesi baharu setiap kali log masuk: jangan bawa PIN Admin / PIN pengguna sebelumnya
+  var ctx = {};
   if (!S.cfg.userListMode) {
     var nama = $('inNama').value.trim();
     if (nama.length < 3) { $('loginMsg').innerHTML = '<div class="alert err">Sila isi nama penuh anda.</div>'; return; }
@@ -414,6 +496,8 @@ $('inPin').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('
 $('hdrWho').onclick = function () {
   if (!S.cfg || S.cfg.userListMode) return;
   if (S.sel.size && !confirm('Pilihan murid akan dikosongkan. Teruskan?')) return;
+  delete S.ctx.adminPin; delete S.ctx.pin; LS.set('ctx', S.ctx);
+  S.user = null; A = null;
   renderLogin();
 };
 
@@ -435,6 +519,10 @@ function boot() {
       Object.keys(rumah).sort().map(function (k) { return '<option>' + esc(k) + '</option>'; }).join('');
     $('hdrWho').innerHTML = esc(S.user.nama || S.user.email) + '<br><span style="opacity:.8">' + esc(S.user.peranan || '') + (S.cfg.userListMode ? '' : ' · tukar') + '</span>';
     $('tabs').classList.remove('hidden');
+    var isMurid = S.user.group === 'murid' && !S.user.isAdmin;
+    $('tabAdmin').classList.toggle('hidden', isMurid);          // pengawas tiada menu Admin
+    $('onlyMine').closest('label').classList.toggle('hidden', isMurid);
+    A = null;
     if (d.warnings && d.warnings.length) toast('Amaran: ' + d.warnings[0], true);
     initRekod();
     showView('vRekod');
@@ -850,26 +938,157 @@ function loadRecent() {
 }
 
 /* ============ LAPORAN ============ */
-var reportInit = false, lastReport = null;
-function initReport() {
+/* ============ ADMIN ============ */
+var adminInit = false, lastReport = null, A = null;
+function initAdmin() {
   var isAdmin = S.user && S.user.isAdmin;
   $('adminGate').classList.toggle('hidden', isAdmin);
-  $('reportArea').classList.toggle('hidden', !isAdmin);
-  if (reportInit) return;
-  reportInit = true;
+  if (!isAdmin) { $('adminHome').classList.add('hidden'); showSub('none'); }
+  else if (!A) loadAdmin(); else showSub(null);
+  if (adminInit) return;
+  adminInit = true;
   setRange('month');
   document.querySelectorAll('[data-range]').forEach(function (b) { b.onclick = function () { setRange(b.dataset.range); runReport(); }; });
   $('btnReport').onclick = runReport;
   $('btnAdmin').onclick = function () {
     S.ctx.adminPin = $('inAdminPin').value.trim();
-    loading(true, 'Menyemak…');
-    api('getReport', S.ctx, $('rFrom').value, $('rTo').value).then(function (r) {
-      loading(false); S.user.isAdmin = true; LS.set('ctx', S.ctx);
-      $('adminGate').classList.add('hidden'); $('reportArea').classList.remove('hidden');
-      renderReport(r);
-    }).catch(function (e) { loading(false); delete S.ctx.adminPin; toast(errMsg(e), true); });
+    loadAdmin(function () { S.user.isAdmin = true; LS.set('ctx', S.ctx); $('adminGate').classList.add('hidden'); $('inAdminPin').value = ''; },
+      function () { delete S.ctx.adminPin; });
   };
   $('inAdminPin').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnAdmin').click(); });
+  document.querySelectorAll('[data-sub]').forEach(function (b) { b.onclick = function () { showSub(b.dataset.sub); }; });
+  document.querySelectorAll('[data-back]').forEach(function (b) { b.onclick = function () { showSub(null); }; });
+  document.querySelectorAll('[data-gen]').forEach(function (b) {
+    b.onclick = function () { $(b.dataset.gen).value = String(Math.floor(1000 + Math.random() * 9000)); };
+  });
+  $('btnSavePin').onclick = savePins;
+  $('btnSaveTetapan').onclick = saveTetapan;
+}
+function loadAdmin(onOk, onFail) {
+  loading(true, 'Memuatkan…');
+  api('getAdminInfo', S.ctx).then(function (a) {
+    loading(false); A = a; if (onOk) onOk();
+    renderAdminHome(); showSub(null);
+  }).catch(function (e) { loading(false); if (onFail) onFail(); toast(errMsg(e), true); });
+}
+function renderAdminHome() {
+  var st = A.stat;
+  $('admStats').innerHTML = [[st.murid, 'murid'], [st.kelas, 'kelas'], [st.kesalahan, 'kesalahan'], [st.rekod, 'rekod']]
+    .map(function (x) { return '<div><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join('');
+  $('updBadge').innerHTML = A.versiTerkini && cmpVer(A.versiTerkini, A.versi) > 0 ? '<span class="badge">Baharu</span>' : '';
+}
+function showSub(id) {
+  $('adminHome').classList.toggle('hidden', !!id || !(S.user && S.user.isAdmin));
+  document.querySelectorAll('.adsub').forEach(function (e) { e.classList.toggle('hidden', e.id !== id); });
+  if (id === 'subPin') renderPin();
+  if (id === 'subTetapan') renderTetapan();
+  if (id === 'subKongsi') renderKongsi();
+  if (id === 'subSistem') renderSistem();
+  window.scrollTo(0, 0);
+}
+function cmpVer(a, b) {
+  var pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number);
+  for (var i = 0; i < 3; i++) { var d = (pa[i] || 0) - (pb[i] || 0); if (d) return d; }
+  return 0;
+}
+/* ---- PIN ---- */
+function renderPin() {
+  $('pinGuru').value = A.pins.guru || ''; $('pinMurid').value = A.pins.murid || ''; $('pinAdmin').value = A.pins.admin || '';
+  $('pinListNote').innerHTML = A.userListMode ? '<div class="alert warn">Tab PENGGUNA sedang digunakan: pengguna log masuk dengan emel, jadi PIN Guru & Murid tidak digunakan. PIN Admin masih membuka menu Admin.</div>' : '';
+}
+function savePins() {
+  var p = { guru: $('pinGuru').value.trim(), murid: $('pinMurid').value.trim(), admin: $('pinAdmin').value.trim() };
+  var changed = ['guru', 'murid', 'admin'].filter(function (k) { return p[k] !== (A.pins[k] || ''); });
+  if (!changed.length) { toast('Tiada perubahan'); return; }
+  if (!confirm('Tukar PIN ' + changed.map(function (k) { return { guru: 'Guru & Warden', murid: 'Murid', admin: 'Admin' }[k]; }).join(', ') + '?\n\nPengguna kumpulan itu perlu log masuk semula dengan PIN baharu.')) return;
+  loading(true, 'Menyimpan PIN…');
+  api('tukarPin', S.ctx, p).then(function (pins) {
+    loading(false);
+    // kemas kini PIN sesi ini supaya admin tidak terkeluar
+    if (S.user.group === 'admin') S.ctx.pin = pins.admin;
+    if (S.ctx.adminPin) S.ctx.adminPin = pins.admin;
+    if (S.user.group === 'guru' && changed.indexOf('guru') >= 0 && !S.cfg.userListMode) S.ctx.pin = pins.guru;
+    S.cfg.needPin = true;
+    LS.set('ctx', S.ctx); A.pins = pins;
+    toast('PIN disimpan. Maklumkan PIN baharu kepada pengguna.');
+    showSub('subKongsi');
+  }).catch(function (e) { loading(false); toast(errMsg(e), true); });
+}
+/* ---- Tetapan ---- */
+function renderTetapan() {
+  var t = A.tetapan;
+  $('tNama').value = t.NAMA_SEKOLAH || '';
+  $('tLokasi').value = String(t.LOKASI || '').split(',').map(function (x) { return x.trim(); }).filter(String).join('\n');
+  $('tHad').value = t.HAD_PADAM_JAM || '24';
+}
+function saveTetapan() {
+  var o = { NAMA_SEKOLAH: $('tNama').value.trim(), LOKASI: $('tLokasi').value.split(/\n|,/).map(function (x) { return x.trim(); }).filter(String).join(','), HAD_PADAM_JAM: $('tHad').value.trim() };
+  loading(true, 'Menyimpan…');
+  api('saveTetapanSekolah', S.ctx, o).then(function () {
+    loading(false); A.tetapan = o;
+    S.cfg.namaSekolah = o.NAMA_SEKOLAH; $('hdrSchool').textContent = o.NAMA_SEKOLAH;
+    S.cfg.lokasi = o.LOKASI.split(',');
+    var cur = $('inLokasi').value;
+    $('inLokasi').innerHTML = '<option value="">— Lokasi —</option>' + S.cfg.lokasi.map(function (l) { return '<option>' + esc(l) + '</option>'; }).join('');
+    $('inLokasi').value = cur;
+    toast('Tetapan disimpan');
+    showSub(null);
+  }).catch(function (e) { loading(false); toast(errMsg(e), true); });
+}
+/* ---- Kongsi ---- */
+function shareUrl() { return String(A.webAppUrl || '').replace(/\/a\/(macros\/)?[^/]+\/(macros\/)?(?=s\/)/, '/macros/'); }
+function waMsg(kumpulan, pin) {
+  var sek = A.tetapan.NAMA_SEKOLAH || 'sekolah kita';
+  return 'Assalamualaikum & salam sejahtera. Pautan SiDIA (rekod disiplin murid) ' + sek + ' untuk ' + kumpulan + ':\n' + shareUrl() +
+    (pin ? '\nPIN: ' + pin : '') + '\nBuka di telefon › pilih peranan anda › masukkan PIN. Tambah ke skrin utama (Add to Home Screen) supaya mudah dibuka.';
+}
+function renderKongsi() {
+  var url = shareUrl();
+  if (!url) {
+    $('kongsiBody').innerHTML = '<div class="alert warn">Pautan web app belum disimpan. Buka Google Sheet › <b>SiDIA › 🚀 Mula di sini › Aktifkan & kongsi</b> dan simpan pautan web app.</div>';
+    return;
+  }
+  var p = A.pins;
+  $('kongsiBody').innerHTML =
+    '<div class="urlbox" style="display:flex;gap:8px"><input type="text" id="shareUrl" readonly value="' + esc(url) + '"><button class="btn sm" id="btnCopyUrl">Salin</button></div>' +
+    '<div id="qrBox"></div><p class="muted" style="text-align:center;margin:0 0 12px">Imbas kod QR dengan kamera telefon</p>' +
+    waBtn('Guru & warden', p.guru, waMsg('guru & warden', p.guru)) + waBtn('Pengawas', p.murid, waMsg('pengawas', p.murid)) +
+    '<div class="alert info" style="margin-top:12px">PIN Admin <b>tidak</b> dimasukkan dalam mesej. Kongsi secara peribadi sahaja.</div>';
+  $('btnCopyUrl').onclick = function () { $('shareUrl').select(); try { navigator.clipboard.writeText(url); } catch (e) { document.execCommand('copy'); } toast('Pautan disalin'); };
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js', function () {
+    $('qrBox').innerHTML = '';
+    if (window.QRCode) new QRCode($('qrBox'), { text: url, width: 178, height: 178, correctLevel: QRCode.CorrectLevel.M });
+    else $('qrBox').innerHTML = '<div class="muted">Kod QR tidak dapat dimuatkan.</div>';
+  });
+}
+function waBtn(label, pin, msg) {
+  return '<a class="wabtn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent(msg) + '"><span>💬</span><span><b>WhatsApp: ' + esc(label) + '</b><small>' + (pin ? 'Termasuk PIN ' + esc(pin) : 'Tiada PIN ditetapkan') + '</small></span></a>';
+}
+function loadScript(src, cb) {
+  if (window.QRCode) { cb(); return; }
+  var sc = document.createElement('script'); sc.src = src; sc.onload = cb; sc.onerror = cb; document.head.appendChild(sc);
+}
+/* ---- Sistem ---- */
+function renderSistem() {
+  var baru = A.versiTerkini && cmpVer(A.versiTerkini, A.versi) > 0;
+  $('sistemBody').innerHTML =
+    '<p style="margin:0 0 6px">Versi SiDIA: <b>' + esc(A.versi) + '</b>' + (A.versiTerkini ? (baru ? ' · <span style="color:#b42318;font-weight:700">versi ' + esc(A.versiTerkini) + ' tersedia</span>' : ' · terkini ✓') : '') + '</p>' +
+    (baru ? '<div class="alert info">Kemas kini memasang kod baharu dan mengemas kini web app. Pautan web app kekal sama, dan data tidak diubah. Memerlukan suis <b>Google Apps Script API</b> dihidupkan oleh pemilik Google Sheet.</div>' +
+      '<div class="actions" style="justify-content:flex-start"><button class="btn pri" id="btnUpdate">⬆️ Kemas kini ke ' + esc(A.versiTerkini) + '</button></div>' : '') +
+    '<div id="updMsg"></div>' +
+    '<hr style="border:0;border-top:1px solid var(--line);margin:14px 0">' +
+    '<p style="margin:0 0 4px"><b>Google Sheet SiDIA</b></p><p class="muted" style="margin:0 0 8px">Senarai murid, senarai kesalahan, semua rekod dan tetapan lanjut.</p>' +
+    '<a class="btn" style="text-decoration:none" target="_blank" href="' + esc(A.sheetUrl) + '">Buka Google Sheet ↗</a>' +
+    '<p class="muted" style="margin-top:14px">Rumah: ' + esc((A.stat.rumah || []).join(', ') || '—') + '</p>';
+  if (baru) $('btnUpdate').onclick = function () {
+    if (!confirm('Kemas kini SiDIA ke versi ' + A.versiTerkini + '?')) return;
+    loading(true, 'Mengemas kini SiDIA… (±30 saat)');
+    api('adminKemasKini', S.ctx).then(function (r) {
+      loading(false);
+      $('updMsg').innerHTML = '<div class="alert ok">✅ SiDIA dikemas kini ke versi ' + esc(r.versi) + '. Tutup dan buka semula web app untuk menggunakan versi baharu.</div>';
+      $('btnUpdate').remove();
+    }).catch(function (e) { loading(false); $('updMsg').innerHTML = '<div class="alert err" style="white-space:pre-line">' + esc(errMsg(e)) + '</div>'; });
+  };
 }
 function setRange(k) {
   var d = new Date(), from;

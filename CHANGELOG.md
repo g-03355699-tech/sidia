@@ -1,5 +1,14 @@
 # Senarai Perubahan SiDIA
 
+## 1.2.0 (17 Nov 2026)
+- **PIN berbeza mengikut peranan:** Guru & Warden, Murid (Pengawas) dan Admin. Pengawas tidak boleh log masuk sebagai guru
+- **Tab Admin** (menggantikan tab Laporan) dengan submenu: Laporan, **PIN akses** (tukar PIN), **Tetapan sekolah**, **Kongsi pautan** (kod QR & mesej WhatsApp berasingan untuk guru dan pengawas), **Sistem** (versi & kemas kini dari telefon)
+- Pengawas hanya melihat rekod sendiri, dan tab Admin disorok untuk mereka
+- Wizard: tiga medan PIN dan dua butang WhatsApp
+- **Panduan pengguna PDF**: Guru, Warden, Pengawas dan Admin (`docs/panduan/`)
+- Baiki (keselamatan): PIN Admin sesi sebelumnya tidak lagi dibawa apabila pengguna lain log masuk pada telefon yang sama
+- Baiki: peranan tidak lagi bertukar sendiri selepas PIN salah; tajuk dikosongkan di skrin log masuk
+
 ## 1.1.1 (17 Nov 2026)
 - Keluaran ujian untuk kemas kini satu klik (tiada perubahan fungsi web app)
 - Halaman pengenalan dikemas kini: pemilih kesalahan, ciri mesra telefon & kemas kini satu klik

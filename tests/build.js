@@ -23,7 +23,8 @@ for (let i = 0; i < 800; i++) {
 const seedScript = `<script>
 ensureSetup_();
 _ss.sheets.MURID = new MockSheet('MURID'); _ss.sheets.MURID.d = ${JSON.stringify(rows)};
-_ss.sheets.TETAPAN.d.forEach(function (r) { if (r[0] === 'KOD_AKSES') r[1] = '1234'; if (r[0] === 'KOD_ADMIN') r[1] = '9999'; if (r[0] === 'NAMA_SEKOLAH') r[1] = 'SMK Ujian'; });
+_ss.sheets.TETAPAN.d.forEach(function (r) { if (r[0] === 'KOD_GURU') r[1] = '1234'; if (r[0] === 'KOD_MURID') r[1] = '5678'; if (r[0] === 'KOD_ADMIN') r[1] = '9999';
+  if (r[0] === 'WEB_APP_URL') r[1] = 'https://script.google.com/a/sekolah.edu.my/macros/s/AKfyUJIAN/exec'; if (r[0] === 'NAMA_SEKOLAH') r[1] = 'SMK Contoh'; });
 </script>`;
 const head = '<script src="mock-gas.js"></script>\n<script src="code.js"></script>\n';
 

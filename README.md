@@ -7,7 +7,9 @@ Sistem rekod disiplin murid sekolah berasaskan Google Sheet + Google Apps Script
 - Pilih ikut kelas/dorm, atau tampal senarai nama dari WhatsApp/Excel
 - Simpan ratusan rekod sekali tekan; rekod berganda dihalang
 - Laporan mata rumah, kelas, kesalahan, murid + eksport CSV
-- Mod kod akses atau senarai emel DELIMa
+- PIN berbeza untuk Guru/Warden, Murid (Pengawas) dan Admin; admin boleh menukar PIN dari telefon
+- Menu Admin di telefon: laporan, PIN, tetapan sekolah, kongsi pautan (QR & WhatsApp), kemas kini
+- Panduan pengguna PDF untuk guru, warden, pengawas dan admin
 - Boleh digunakan oleh mana-mana sekolah (salin templat)
 
 🌐 **Halaman pengenalan: https://g-03355699-tech.github.io/sidia/**
@@ -17,7 +19,7 @@ Sistem rekod disiplin murid sekolah berasaskan Google Sheet + Google Apps Script
 ## Cara mula (untuk sekolah)
 1. Buka halaman pengenalan dan klik **Buat salinan SiDIA**. Google Sheet SiDIA akan disalin ke Drive anda.
 2. Dalam Google Sheet itu, klik menu **SiDIA › 🚀 Mula di sini**. Wizard akan membantu anda:
-   - isi nama sekolah, kod akses dan kod admin
+   - isi nama sekolah dan tiga PIN (Guru & Warden, Murid/Pengawas, Admin)
    - muat naik senarai murid (Excel/CSV/ODS; satu fail, satu tab setiap kelas, atau satu fail setiap kelas)
    - semak senarai kesalahan & mata demerit
    - aktifkan web app (**Deploy › New deployment › Web app**, sekali sahaja), kemudian dapatkan pautan + kod QR untuk dikongsi
@@ -37,6 +39,7 @@ Pelayar log masuk dengan lebih daripada satu akaun Google. Buang `/a/<domain>` d
 | `appsscript.json` | Tetapan projek (zon waktu, kebenaran) |
 | `version.json` | Maklumat keluaran terkini untuk kemas kini satu klik |
 | `CHANGELOG.md` | Senarai perubahan setiap versi |
+| `panduan/` | Penjana panduan PDF (`node panduan/jana.js` → `docs/panduan/*.pdf`) |
 | `tests/` | Ujian tempatan (simulasi Apps Script + Playwright): `cd tests && npm install && npm test` |
 | `CLAUDE.md` | Panduan projek untuk pembantu AI (Claude Code) |
 | `docs/` | Halaman pengenalan (GitHub Pages) |
@@ -103,16 +106,32 @@ SiDIA disertakan dengan **142 kesalahan standard** (Ringan / Sederhana / Berat),
 - Menu **SiDIA › Guna senarai kesalahan standard SiDIA** menggantikan tab KESALAHAN dengan senarai standard. Rekod lama tidak terjejas.
 
 ## Laporan & markah rumah
-Buka tab **Laporan** (perlukan kod admin) dan pilih tempoh. Paparan menunjukkan:
+Buka tab **🛡️ Admin › Laporan** (perlukan PIN Admin) dan pilih tempoh. Paparan menunjukkan:
 - Jumlah kes dan **mata demerit mengikut rumah**
 - Mengikut kesalahan, kelas dan murid (murid yang paling kerap)
 - Eksport **CSV** (dibuka dalam Excel/Sheets) atau **Tulis ke tab LAPORAN** dalam Google Sheet
 
 Jumlah mata ditolak bagi setiap rumah = jumlah lajur *Mata* dalam tab KESALAHAN. Ubah nilai mata dalam tab itu mengikut dasar sekolah.
 
-## Dua mod keselamatan
-- **Mod mudah** (tab PENGGUNA kosong): sesiapa yang mempunyai pautan dan `KOD_AKSES` boleh merekod. Pengguna mengisi nama dan peranan sekali sahaja.
-- **Mod senarai emel**: isi tab PENGGUNA (Emel, Nama, Peranan). Hanya emel dalam senarai boleh masuk, dan peranan *Admin / Guru Disiplin* boleh melihat laporan.
+## PIN & peranan
+| Peranan | PIN | Boleh |
+|---|---|---|
+| Guru, Warden, Guru Disiplin | **PIN Guru & Warden** (`KOD_GURU`) | Rekod, lihat semua rekod terkini, padam rekod sendiri |
+| Pengawas / murid bertugas | **PIN Murid** (`KOD_MURID`) | Rekod, lihat & padam **rekod sendiri** sahaja. Tiada menu Admin |
+| Admin | **PIN Admin** (`KOD_ADMIN`) | Semua, termasuk menu **🛡️ Admin**: laporan, tukar PIN, tetapan sekolah, kongsi pautan, kemas kini |
+
+- PIN ialah 4–8 digit, dan setiap peranan mesti mempunyai PIN berbeza. Guru boleh membuka menu Admin dengan memasukkan PIN Admin.
+- **Tukar PIN:** admin buka **🛡️ Admin › PIN akses** di telefon. Pengguna kumpulan itu perlu log masuk semula dengan PIN baharu.
+- **Mod senarai emel (pilihan):** isi tab PENGGUNA (Emel, Nama, Peranan). Hanya emel dalam senarai boleh masuk, dan PIN Guru/Murid tidak digunakan.
+- Sekolah yang menggunakan `KOD_AKSES` (sebelum v1.2) tidak terjejas: kod itu kekal sah sehingga admin menetapkan PIN baharu.
+
+## Panduan pengguna (PDF)
+- [Panduan Guru](https://github.com/g-03355699-tech/sidia/raw/main/docs/panduan/Panduan-SiDIA-Guru.pdf)
+- [Panduan Warden](https://github.com/g-03355699-tech/sidia/raw/main/docs/panduan/Panduan-SiDIA-Warden.pdf)
+- [Panduan Murid (Pengawas)](https://github.com/g-03355699-tech/sidia/raw/main/docs/panduan/Panduan-SiDIA-Pengawas.pdf)
+- [Panduan Admin](https://github.com/g-03355699-tech/sidia/raw/main/docs/panduan/Panduan-SiDIA-Admin.pdf)
+
+Panduan dijana daripada web app sebenar. Selepas paparan berubah, jana semula dengan `node panduan/jana.js` (perlu `cd tests && npm install` sekali).
 
 ## Privasi
 Setiap sekolah menyimpan data dalam salinan Google Sheet sendiri, dalam Google Drive sekolah masing-masing. Pembangun SiDIA tidak boleh mengakses data mana-mana sekolah.

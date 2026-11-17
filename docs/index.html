@@ -82,6 +82,11 @@ h2{font-size:clamp(28px,3.6vw,40px);line-height:1.15;margin:0 0 14px;letter-spac
 .way .ic{width:44px;height:44px;border-radius:12px;background:var(--pri-soft);display:grid;place-items:center;font-size:22px;margin-bottom:14px}
 .way h3{margin:0 0 6px;font-size:18px}
 .way p{margin:0;color:var(--muted);font-size:15.5px}
+.way.pdf{text-decoration:none;color:inherit;display:block;transition:transform .12s}
+.way.pdf:hover{transform:translateY(-2px);border-color:var(--pri)}
+.way .dl{display:inline-block;margin-top:12px;font-weight:700;color:var(--pri);font-size:14px}
+@media(max-width:860px){#panduan .ways{grid-template-columns:1fr 1fr!important}}
+@media(max-width:520px){#panduan .ways{grid-template-columns:1fr!important}}
 .way code{font-size:14px;background:var(--bg2);padding:2px 6px;border-radius:6px;border:1px solid var(--line)}
 .showcase{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-top:56px}
 @media(max-width:860px){.showcase{grid-template-columns:1fr}}
@@ -129,6 +134,7 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
       <a href="#masalah">Kenapa SiDIA</a>
       <a href="#ciri">Ciri</a>
       <a href="#mula">Cara mula</a>
+      <a href="#panduan">Panduan</a>
       <a href="#soalan">Soalan lazim</a>
       <a class="gh" href="https://github.com/g-03355699-tech/sidia">GitHub</a>
     </div>
@@ -149,7 +155,7 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
         <span>Tiada bayaran</span><span>Guna akaun DELIMa / Google</span><span>Data dalam Drive sekolah sendiri</span>
       </div>
     </div>
-    <div class="phone"><img src="img/app-rekod.png" alt="Skrin SiDIA: 35 murid kelas 4 Bestari dipilih untuk kesalahan tidak hadir solat Subuh" width="390" height="780"></div>
+    <div class="phone"><img src="img/app-rekod.png" alt="Skrin SiDIA: 35 murid kelas 4 Bestari dipilih untuk kesalahan tidak hadir solat Subuh" width="390" height="664"></div>
   </div>
 </header>
 
@@ -205,13 +211,13 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
           <div><b>📋 Guna senarai sekolah anda</b><span>Gunakan senarai standard, atau tampal senarai kesalahan & mata demerit sekolah anda terus dari Excel.</span></div>
         </div>
       </div>
-      <div style="display:flex;justify-content:center"><div class="phone"><img src="img/app-kesalahan.png" alt="Pemilih kesalahan SiDIA: tab Pantas, Ringan, Sederhana dan Berat" width="390" height="780"></div></div>
+      <div style="display:flex;justify-content:center"><div class="phone"><img src="img/app-kesalahan.png" alt="Pemilih kesalahan SiDIA: tab Pantas, Ringan, Sederhana dan Berat" width="390" height="664"></div></div>
     </div>
 
     <div class="showcase">
       <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap">
-        <div class="phone small"><img src="img/app-cari.png" alt="Carian nama murid 'mohd' menunjukkan Mohd, Muhammad dan Muhd" width="390" height="780" ></div>
-        <div class="phone small"><img src="img/app-laporan.png" alt="Laporan mata demerit mengikut rumah" width="390" height="780" ></div>
+        <div class="phone small"><img src="img/app-cari.png" alt="Carian nama murid 'mohd' menunjukkan Mohd, Muhammad dan Muhd" width="390" height="664" ></div>
+        <div class="phone small"><img src="img/app-laporan.png" alt="Laporan mata demerit mengikut rumah" width="390" height="664" ></div>
       </div>
       <div>
         <h2 style="font-size:30px">Semua yang diperlukan oleh unit disiplin & HEM</h2>
@@ -219,7 +225,7 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
           <div><b>📊 Laporan mata rumah</b><span>Jumlah kes dan mata ditolak bagi setiap rumah, kelas, kesalahan dan murid.</span></div>
           <div><b>⬇️ Eksport ke Excel</b><span>Muat turun CSV, atau tulis laporan terus ke Google Sheet.</span></div>
           <div><b>👥 Ramai pengguna serentak</b><span>Warden, guru dan pengawas boleh merekod pada masa yang sama.</span></div>
-          <div><b>🔐 Kod akses & kod admin</b><span>Hanya yang tahu kod boleh merekod. Laporan hanya untuk admin.</span></div>
+          <div><b>🔐 PIN ikut peranan</b><span>PIN berbeza untuk Guru/Warden, Pengawas dan Admin. Admin boleh menukar PIN terus dari telefon.</span></div>
           <div><b>↩️ Boleh dibatalkan</b><span>Rekod yang tersilap boleh dibatalkan serta-merta atau dipadam dalam tempoh 24 jam.</span></div>
           <div><b>⚙️ Ikut peraturan sekolah</b><span>Senarai kesalahan, mata demerit dan lokasi boleh diubah sendiri.</span></div>
           <div><b>📱 Mesra telefon</b><span>Kotak carian dan senarai murid tidak dilindungi papan kekunci. Boleh ditambah ke skrin utama.</span></div>
@@ -252,7 +258,7 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
         <div>
           <h3>Isi maklumat sekolah & muat naik senarai murid</h3>
           <p>Dalam Google Sheet, klik menu <b>SiDIA › 🚀 Mula di sini</b>. Wizard akan membantu anda:</p>
-          <p>• isi nama sekolah, kod akses dan kod admin<br>• muat naik fail Excel/CSV senarai murid. Satu fail, satu tab setiap kelas, atau satu fail setiap kelas semuanya boleh.<br>• semak 142 kesalahan standard, atau tampal senarai kesalahan sekolah anda dari Excel</p>
+          <p>• isi nama sekolah dan tiga PIN (Guru & Warden, Pengawas, Admin)<br>• muat naik fail Excel/CSV senarai murid. Satu fail, satu tab setiap kelas, atau satu fail setiap kelas semuanya boleh.<br>• semak 142 kesalahan standard, atau tampal senarai kesalahan sekolah anda dari Excel</p>
           <span class="time">5 minit</span>
         </div>
         <div class="shot"><img src="img/wizard-murid.png" alt="Wizard: fail Excel dengan tab setiap kelas dikenal pasti secara automatik" width="920" height="660" ></div>
@@ -272,13 +278,27 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
   </div>
 </section>
 
+<section id="panduan" class="alt">
+  <div class="wrap">
+    <div class="eyebrow">Panduan pengguna</div>
+    <h2>Panduan PDF untuk setiap peranan</h2>
+    <p class="sub">Langkah demi langkah dengan tangkapan skrin. Cetak atau kongsikan dalam kumpulan WhatsApp guru, warden dan pengawas.</p>
+    <div class="ways" style="grid-template-columns:repeat(4,1fr)">
+      <a class="way pdf" href="panduan/Panduan-SiDIA-Guru.pdf" target="_blank"><div class="ic">👩‍🏫</div><h3>Guru</h3><p>Log masuk, pilih kesalahan, tiga cara pilih murid, simpan & semak.</p><span class="dl">Muat turun PDF ↓</span></a>
+      <a class="way pdf" href="panduan/Panduan-SiDIA-Warden.pdf" target="_blank"><div class="ic">🕌</div><h3>Warden</h3><p>Semakan solat berjemaah & asrama: pilih kelas, buang yang hadir.</p><span class="dl">Muat turun PDF ↓</span></a>
+      <a class="way pdf" href="panduan/Panduan-SiDIA-Pengawas.pdf" target="_blank"><div class="ic">🎖️</div><h3>Pengawas</h3><p>Amanah pengawas, tugasan di pintu pagar, semak rekod sendiri.</p><span class="dl">Muat turun PDF ↓</span></a>
+      <a class="way pdf" href="panduan/Panduan-SiDIA-Admin.pdf" target="_blank"><div class="ic">🛡️</div><h3>Admin</h3><p>Persediaan, PIN, laporan mata rumah, kongsi pautan, kemas kini.</p><span class="dl">Muat turun PDF ↓</span></a>
+    </div>
+  </div>
+</section>
+
 <section id="soalan">
   <div class="wrap faq">
     <div class="eyebrow">Soalan lazim</div>
     <h2>Ada soalan?</h2>
     <details><summary>Adakah SiDIA percuma?</summary><p>Ya, sepenuhnya. SiDIA menggunakan Google Sheet dan Google Apps Script yang sudah tersedia dalam akaun Google sekolah. Kodnya juga sumber terbuka (lesen MIT).</p></details>
     <details><summary>Di manakah data murid disimpan? Selamatkah?</summary><p>Semua data (senarai murid dan rekod) disimpan dalam Google Sheet di <b>Google Drive anda sendiri</b>. Pembangun SiDIA tidak boleh melihat data sekolah anda. Pengguna web app hanya boleh merekod dan melihat rekod terkini, dan tidak boleh membuka Google Sheet itu.</p></details>
-    <details><summary>Pengawas tiada akaun DELIMa. Bolehkah mereka guna?</summary><p>Boleh. Semasa Deploy, pilih <b>Who has access: Anyone</b> dan tetapkan <b>Kod akses</b> dalam wizard. Hanya mereka yang tahu kod itu boleh merekod.</p></details>
+    <details><summary>Pengawas tiada akaun DELIMa. Bolehkah mereka guna?</summary><p>Boleh. Semasa Deploy, pilih <b>Who has access: Anyone</b> dan tetapkan <b>PIN Murid (Pengawas)</b> dalam wizard. Pengawas hanya boleh merekod dan melihat rekod sendiri, tanpa laporan.</p></details>
     <details><summary>Keluar mesej "Sorry, unable to open the file at present"?</summary><p>Pelayar anda log masuk dengan beberapa akaun Google, dan akaun lalai bukan akaun sekolah yang dibenarkan. Penyelesaian:</p><ul><li>Buang bahagian <code>/a/nama-domain</code> daripada pautan, cth <code>https://script.google.com/macros/s/…/exec</code></li><li>Buka dalam tetingkap Incognito dengan akaun sekolah sahaja, atau</li><li>Tukar <b>Deploy › Manage deployments › Who has access</b> kepada <b>Anyone</b> dan tetapkan kod akses (pautan kekal sama).</li></ul></details>
     <details><summary>Format fail senarai murid yang bagaimana diperlukan?</summary><p>Hampir apa-apa fail Excel (.xlsx/.xls), CSV atau Google Sheet. Wizard mengenal pasti lajur <b>Nama</b>, <b>Kelas</b>, <b>Rumah / Rumah Sukan</b> dan <b>No. MyKid / No. KP</b> secara automatik, walaupun ada baris judul di atas. Jika setiap kelas berada dalam tab atau fail berasingan, nama tab atau fail itu digunakan sebagai kelas.</p></details>
     <details><summary>Bolehkah kami guna senarai kesalahan & mata demerit sekolah sendiri?</summary><p>Boleh. SiDIA disertakan dengan 142 kesalahan standard (Ringan / Sederhana / Berat). Dalam wizard (langkah 3), anda boleh mengubah mata, menyahaktifkan kesalahan, menandakan ⭐ Pantas, atau <b>menampal terus</b> jadual kesalahan sekolah anda dari Excel (lajur Kod, Kesalahan, Kategori 1/2/3 dan Mata).</p></details>
@@ -301,7 +321,7 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
 
 <footer>
   <div class="wrap">
-    <span>SiDIA · Sistem Rekod Disiplin Murid · Versi 1.1.1 · <a href="https://github.com/g-03355699-tech/sidia/blob/main/CHANGELOG.md">Senarai perubahan</a> · Sumber terbuka (MIT)</span>
+    <span>SiDIA · Sistem Rekod Disiplin Murid · Versi 1.2.0 · <a href="https://github.com/g-03355699-tech/sidia/blob/main/CHANGELOG.md">Senarai perubahan</a> · Sumber terbuka (MIT)</span>
     <a href="https://github.com/g-03355699-tech/sidia">github.com/g-03355699-tech/sidia</a>
   </div>
 </footer>

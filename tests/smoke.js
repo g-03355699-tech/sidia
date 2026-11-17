@@ -9,10 +9,12 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
 
   // ---------- web app (iPhone) ----------
   const ctx = await b.newContext({ ...devices['iPhone 13'] }); const p = await ctx.newPage();
+  // cdnjs mungkin disekat dalam sesi awan: hidangkan pustaka QR dari salinan tempatan
+  await ctx.route('**/qrcodejs/**', r => r.fulfill({ path: path.join(out, 'qrcode.min.js'), contentType: 'text/javascript' }));
   p.on('pageerror', e => errs.push('app: ' + e.message));
   await p.goto(url('app.html')); await p.waitForSelector('#vLogin:not(.hidden)');
   await p.fill('#inNama', 'Cikgu Ujian'); await p.fill('#inPin', '0000'); await p.click('#btnLogin'); await p.waitForTimeout(300);
-  ok(/Kod akses/.test(await p.textContent('#loginMsg')), 'kod akses salah ditolak');
+  ok(/PIN tidak sah/.test(await p.textContent('#loginMsg')), 'PIN salah ditolak');
   await p.fill('#inPin', '1234'); await p.click('#btnLogin'); await p.waitForSelector('#vRekod:not(.hidden)'); await p.waitForTimeout(200);
   ok(await p.evaluate(() => S.students.length) === 800, '800 murid dimuatkan');
   await p.fill('#offQ', 'lewat surau'); await p.press('#offQ', 'Enter');
@@ -28,9 +30,38 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   await p.selectOption('#fKelas', '3 CEMERLANG'); await p.click('[data-act=all]'); await p.click('#btnSave'); await p.click('#btnDoSave'); await p.waitForTimeout(400);
   ok(/0 rekod disimpan/.test(await p.textContent('#modalBody')), 'rekod berganda dihalang');
   await p.click('text=Rekod seterusnya');
-  await p.click('nav.tabs button[data-v=vLaporan]'); await p.fill('#inAdminPin', '9999'); await p.click('#btnAdmin'); await p.waitForTimeout(400);
+  // ---------- menu Admin ----------
+  await p.click('nav.tabs button[data-v=vAdmin]'); await p.fill('#inAdminPin', '1111'); await p.click('#btnAdmin'); await p.waitForTimeout(300);
+  ok(await p.isVisible('#adminGate'), 'PIN Admin salah ditolak');
+  await p.fill('#inAdminPin', '9999'); await p.click('#btnAdmin'); await p.waitForTimeout(400);
+  ok(await p.isVisible('#adminHome'), 'menu Admin dibuka dengan PIN Admin');
+  await p.screenshot({ path: path.join(out, 'app-admin.png') });
+  await p.click('[data-sub=subLaporan]'); await p.click('#btnReport'); await p.waitForTimeout(400);
   ok(/Mata demerit mengikut rumah/.test(await p.textContent('#reportOut')), 'laporan mata rumah dijana');
-  await p.screenshot({ path: path.join(out, 'app-laporan.png') });
+  await p.click('#subLaporan [data-back]');
+  await p.click('[data-sub=subTetapan]'); await p.fill('#tNama', 'SMK Ujian Baharu'); await p.click('#btnSaveTetapan'); await p.waitForTimeout(300);
+  ok(await p.textContent('#hdrSchool') === 'SMK Ujian Baharu', 'tetapan sekolah disimpan');
+  await p.click('[data-sub=subKongsi]'); await p.waitForTimeout(200);
+  ok((await p.inputValue('#shareUrl')).indexOf('/a/') < 0 && /PIN 5678/.test(await p.textContent('#kongsiBody')), 'kongsi: pautan bersih + PIN pengawas');
+  await p.click('#subKongsi [data-back]');
+  p.on('dialog', d => d.accept());
+  await p.click('[data-sub=subPin]'); await p.fill('#pinMurid', '1234'); await p.click('#btnSavePin'); await p.waitForTimeout(300);
+  ok(await p.evaluate(() => getSettings_().KOD_MURID) === '5678', 'PIN sama untuk Guru & Murid ditolak');
+  await p.fill('#pinMurid', '2468'); await p.click('#btnSavePin'); await p.waitForTimeout(400);
+  ok(await p.evaluate(() => getSettings_().KOD_MURID) === '2468', 'admin tukar PIN Murid');
+  await p.screenshot({ path: path.join(out, 'app-kongsi.png') });
+
+  // ---------- pengawas ----------
+  await p.click('#hdrWho'); await p.waitForSelector('#vLogin:not(.hidden)');
+  await p.fill('#inNama', 'Haziq Pengawas'); await p.selectOption('#inPeranan', 'Pengawas');
+  await p.fill('#inPin', '5678'); await p.click('#btnLogin'); await p.waitForTimeout(300);
+  ok(/PIN tidak sah/.test(await p.textContent('#loginMsg')), 'PIN Murid lama tidak sah selepas ditukar');
+  await p.fill('#inPin', '1234'); await p.click('#btnLogin'); await p.waitForTimeout(300);
+  ok(/PIN tidak sah/.test(await p.textContent('#loginMsg')) && await p.inputValue('#inPeranan') === 'Pengawas', 'pengawas tidak boleh guna PIN Guru (peranan kekal)');
+  await p.fill('#inPin', '2468'); await p.click('#btnLogin'); await p.waitForSelector('#vRekod:not(.hidden)'); await p.waitForTimeout(200);
+  ok(!(await p.isVisible('#tabAdmin')), 'tab Admin disorok untuk pengawas');
+  await p.click('nav.tabs button[data-v=vTerkini]'); await p.waitForTimeout(400);
+  ok(/Belum ada rekod/.test(await p.textContent('#recentList')), 'pengawas hanya melihat rekod sendiri');
 
   // ---------- wizard ----------
   const w = await b.newPage({ viewport: { width: 920, height: 660 } }); w.on('pageerror', e => errs.push('wizard: ' + e.message));

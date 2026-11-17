@@ -21,6 +21,7 @@ Pengguna dan penyelenggara berbahasa Melayu. **Semua teks UI, mesej ralat, dokum
 | `CHANGELOG.md` | Senarai perubahan |
 | `docs/` | Halaman pengenalan GitHub Pages (`docs/index.html`, `docs/img/`). `TEMPLATE_ID` = ID Google Sheet templat untuk butang "Buat salinan" |
 | `tests/` | Ujian tempatan: simulasi Apps Script + Playwright |
+| `panduan/` | Penjana panduan PDF: `node panduan/jana.js` → `docs/panduan/Panduan-SiDIA-{Guru,Warden,Pengawas,Admin}.pdf`. Tangkapan skrin diambil daripada web app simulasi (`tangkap.js`) |
 
 ### Tab Google Sheet
 `MULA`, `TETAPAN` (kunci/nilai), `MURID` (ID, Nama, Kelas, Rumah), `KESALAHAN` (Kod, Kesalahan, Kategori, Mata, Aktif, Pantas), `PENGGUNA` (pilihan: senarai emel), `REKOD`, `LAPORAN`.
@@ -32,7 +33,9 @@ Pengguna dan penyelenggara berbahasa Melayu. **Semua teks UI, mesej ralat, dokum
 ## Konvensyen kod
 - Gaya ES5 (`var`, `function`) dalam `Code.gs` dan skrip klien, untuk konsisten dan selamat di pelayar lama.
 - Fungsi peribadi pelayan berakhir dengan `_` (tidak boleh dipanggil dari klien). Fungsi yang dipanggil melalui `google.script.run` tidak mempunyai `_`.
-- Pengesahan: setiap fungsi web app memanggil `auth_(ctx)` (kod akses / senarai PENGGUNA / kod admin).
+- Pengesahan: setiap fungsi web app memanggil `auth_(ctx)`. Peranan → kumpulan melalui `groupOf_()`: `admin`, `murid` (Pengawas/murid/ketua…), `guru` (lain-lain). PIN setiap kumpulan: `KOD_ADMIN`, `KOD_MURID`, `KOD_GURU` (`KOD_AKSES` lama menjadi PIN guru/murid jika kosong; `savePins_` mengosongkannya). PIN 4–8 digit dan mesti berbeza. Fungsi khas admin memanggil `requireAdmin_(ctx)`.
+- Klien: setiap log masuk/tukar pengguna mesti bermula dengan `ctx` bersih (tiada `adminPin`/`pin` lama). Pernah menjadi pepijat keselamatan: pengawas mewarisi akses Admin.
+- Web app ada 3 tab bawah: Rekod, Terkini, **Admin** (submenu: Laporan, PIN akses, Tetapan sekolah, Kongsi pautan, Sistem). Tab Admin disorok untuk kumpulan `murid`, dan pengawas hanya melihat rekod sendiri dalam Terkini.
 - Pustaka luar hanya dari cdnjs, dengan versi tetap: `xlsx@0.18.5` dan `qrcodejs@1.0.0` (dalam `Setup.html`).
 - Tulisan ke Sheet guna `LockService` + `setValues` pukal.
 
@@ -50,10 +53,10 @@ Tiada clasp dan tiada akses Google sebenar dalam sesi awan. Gunakan simulasi:
 cd tests && npm install && node build.js && node smoke.js
 ```
 - `tests/mock-gas.js`: SpreadsheetApp/Session/LockService/ScriptApp/UrlFetchApp dalam memori, dan `google.script.run` yang memanggil fungsi `Code.gs` terus.
-- `tests/build.js`: menjana `tests/out/app.html` (800 murid rawak, kod akses `1234`, kod admin `9999`), `tests/out/setup.html` dan `tests/out/murid.xlsx`.
+- `tests/build.js`: menjana `tests/out/app.html` (800 murid rawak, PIN Guru `1234`, PIN Murid `5678`, PIN Admin `9999`), `tests/out/setup.html` dan `tests/out/murid.xlsx`.
 - `tests/smoke.js`: ujian hujung-ke-hujung dengan Chromium (Playwright sudah dipasang, jangan pasang semula). Untuk paparan telefon, guna `devices['iPhone 13']`. WebKit tidak tersedia, jadi kelakuan khusus Safari tidak dapat diuji.
 - cdnjs disekat dalam sesi awan; `build.js` mengambil pustaka yang sama dari npm.
-- Selepas mengubah UI, ambil tangkapan skrin dan semak secara visual. Kemas kini `docs/img/` jika paparan berubah ketara.
+- Selepas mengubah UI, ambil tangkapan skrin dan semak secara visual. Kemas kini `docs/img/` dan **jana semula panduan PDF** (`node panduan/jana.js`) jika paparan berubah ketara. Semak PDF dengan `pdftoppm -r 45` sebelum push.
 
 ## Menerbitkan versi baharu
 1. Ubah kod dan jalankan ujian.

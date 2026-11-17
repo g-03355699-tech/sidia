@@ -24,6 +24,7 @@ label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:1
 input[type=text],input[type=password],input[type=number],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;min-height:38px}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:-1px}
 .hint{font-size:12px;color:var(--muted);margin-top:3px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 .btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;min-height:38px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap}
 .btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
@@ -97,18 +98,22 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
       <p class="lead">Maklumat ini dipaparkan di web app. Anda boleh mengubahnya bila-bila masa dalam tab TETAPAN.</p>
       <label class="f" for="namaSekolah">Nama sekolah *</label>
       <input type="text" id="namaSekolah" placeholder="cth: SMKA Sheikh Abdul Malek">
-      <div class="grid2">
+      <label class="f" style="margin-top:16px">PIN akses (4–8 digit, setiap peranan berbeza)</label>
+      <div class="grid3">
         <div>
-          <label class="f" for="kodAkses">Kod akses (untuk semua pengguna)</label>
-          <input type="text" id="kodAkses" placeholder="cth: 4821" autocomplete="off">
-          <div class="hint">Diperlukan jika web app dibuka kepada <b>Anyone</b>, cth pengawas tiada akaun DELIMa. Kosongkan jika tidak perlu.</div>
+          <label class="f" for="kodGuru">PIN Guru & Warden</label>
+          <input type="text" id="kodGuru" inputmode="numeric" maxlength="8" placeholder="cth: 4821" autocomplete="off">
         </div>
         <div>
-          <label class="f" for="kodAdmin">Kod admin (laporan & padam rekod)</label>
-          <input type="text" id="kodAdmin" placeholder="cth: 7390" autocomplete="off">
-          <div class="hint">Untuk Guru Disiplin / PK HEM. Jika kosong, semua pengguna boleh melihat laporan.</div>
+          <label class="f" for="kodMurid">PIN Murid (Pengawas)</label>
+          <input type="text" id="kodMurid" inputmode="numeric" maxlength="8" placeholder="cth: 2650" autocomplete="off">
+        </div>
+        <div>
+          <label class="f" for="kodAdmin">PIN Admin</label>
+          <input type="text" id="kodAdmin" inputmode="numeric" maxlength="8" placeholder="cth: 7390" autocomplete="off">
         </div>
       </div>
+      <div class="hint">Pengawas hanya boleh merekod dan melihat rekod sendiri. Admin (Guru Disiplin / PK HEM) membuka laporan, tetapan dan boleh menukar PIN dari web app (tab <b>Admin</b>). PIN boleh dibiarkan kosong jika web app hanya dibuka kepada akaun sekolah, tetapi PIN Admin sangat disyorkan.</div>
       <label class="f" for="lokasi">Lokasi (pisahkan dengan koma)</label>
       <input type="text" id="lokasi">
     </section>
@@ -201,7 +206,8 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
         <div class="share">
           <div id="qr"></div>
           <div style="flex:1">
-            <a class="btn" id="btnWa" href="#" style="background:#25d366;border-color:#25d366;color:#fff">Kongsi di WhatsApp</a>
+            <a class="btn" id="btnWa" href="#" style="background:#25d366;border-color:#25d366;color:#fff">WhatsApp: guru & warden</a>
+            <a class="btn" id="btnWa2" href="#" style="background:#25d366;border-color:#25d366;color:#fff;margin-top:6px">WhatsApp: pengawas</a>
             <div class="alert info" style="margin-top:12px" id="codeInfo"></div>
             <div class="hint" style="margin-bottom:8px"><b>Keluar "Sorry, unable to open the file"?</b> Pelayar sedang log masuk dengan akaun Google lain. Buka pautan dalam Incognito, atau tukar <b>Who has access</b> kepada <b>Anyone</b> (dilindungi kod akses).</div>
             <div class="hint">Jika anda mengubah kod Apps Script kemudian, pilih <b>Deploy › Manage deployments › ✎ Edit › Version: New version</b> supaya pautan kekal sama.</div>
@@ -261,7 +267,7 @@ $('btnNext').onclick = function () {
 
 /* ---------- 1. sekolah ---------- */
 function saveSchool() {
-  var o = { NAMA_SEKOLAH: $('namaSekolah').value.trim(), KOD_AKSES: $('kodAkses').value.trim(), KOD_ADMIN: $('kodAdmin').value.trim(), LOKASI: $('lokasi').value.trim() };
+  var o = { NAMA_SEKOLAH: $('namaSekolah').value.trim(), KOD_GURU: $('kodGuru').value.trim(), KOD_MURID: $('kodMurid').value.trim(), KOD_ADMIN: $('kodAdmin').value.trim(), LOKASI: $('lokasi').value.trim() };
   if (!o.NAMA_SEKOLAH) { $('namaSekolah').focus(); return Promise.reject(new Error('Sila isi nama sekolah.')); }
   loading(true, 'Menyimpan…');
   return api('wizSaveSchool', o).then(function () { loading(false); Object.assign(W.state.tetapan, o); });
@@ -570,20 +576,25 @@ function renderDeploy() {
   $('deployYes').classList.toggle('hidden', !url);
   $('lnkScript').href = W.state.scriptUrl;
   var dom = (W.state.email.split('@')[1] || '');
-  var hasPin = !!(W.state.tetapan.KOD_AKSES || '').trim();
+  var hasPin = !!((W.state.tetapan.KOD_GURU || '') + (W.state.tetapan.KOD_MURID || '')).trim();
   $('accessHint').innerHTML = dom && !/gmail\.com$/.test(dom)
-    ? '<code>Anyone within ' + esc(dom) + '</code> jika semua pengguna ada akaun ' + esc(dom) + ', <b>atau</b> <code>Anyone</code> jika pengawas tiada akaun sekolah' + (hasPin ? '' : ' <span style="color:var(--danger)">(isi Kod akses di langkah 1 dahulu!)</span>')
-    : '<code>Anyone</code>' + (hasPin ? ' (dilindungi oleh kod akses anda)' : ' <span style="color:var(--danger)">— sila isi Kod akses di langkah 1 dahulu!</span>');
+    ? '<code>Anyone within ' + esc(dom) + '</code> jika semua pengguna ada akaun ' + esc(dom) + ', <b>atau</b> <code>Anyone</code> jika pengawas tiada akaun sekolah' + (hasPin ? '' : ' <span style="color:var(--danger)">(isi PIN Guru & Murid di langkah 1 dahulu!)</span>')
+    : '<code>Anyone</code>' + (hasPin ? ' (dilindungi oleh PIN anda)' : ' <span style="color:var(--danger)">— sila isi PIN Guru & Murid di langkah 1 dahulu!</span>');
   if (!url) return;
   url = url.replace(/\/a\/(macros\/)?[^/]+\/(macros\/)?(?=s\/)/, '/macros/'); // pautan tanpa /a/domain/ mengelakkan ralat akaun berganda
   $('appUrl').value = url;
   $('btnOpen').href = url;
   var sek = W.state.tetapan.NAMA_SEKOLAH || 'sekolah kita';
   var t = W.state.tetapan;
-  var msg = 'Assalamualaikum & salam sejahtera. Pautan SiDIA (rekod disiplin murid) ' + sek + ':\n' + url + (t.KOD_AKSES ? '\nKod akses: ' + t.KOD_AKSES : '') + '\nBuka di telefon > Add to Home Screen.';
-  $('btnWa').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
-  $('codeInfo').innerHTML = (t.KOD_AKSES ? 'Kod akses pengguna: <b>' + esc(t.KOD_AKSES) + '</b><br>' : 'Tiada kod akses ditetapkan.<br>') +
-    (t.KOD_ADMIN ? 'Kod admin (rahsia, untuk laporan): <b>' + esc(t.KOD_ADMIN) + '</b>' : 'Tiada kod admin. Semua pengguna boleh melihat laporan.');
+  var msg = function (siapa, pin) {
+    return 'Assalamualaikum & salam sejahtera. Pautan SiDIA (rekod disiplin murid) ' + sek + ' untuk ' + siapa + ':\n' + url +
+      (pin ? '\nPIN: ' + pin : '') + '\nBuka di telefon › pilih peranan › masukkan PIN. Tambah ke skrin utama (Add to Home Screen).';
+  };
+  $('btnWa').href = 'https://wa.me/?text=' + encodeURIComponent(msg('guru & warden', t.KOD_GURU));
+  $('btnWa').textContent = 'WhatsApp: guru & warden';
+  $('btnWa2').href = 'https://wa.me/?text=' + encodeURIComponent(msg('pengawas', t.KOD_MURID));
+  $('codeInfo').innerHTML = 'PIN Guru & Warden: <b>' + esc(t.KOD_GURU || '—') + '</b><br>PIN Murid (Pengawas): <b>' + esc(t.KOD_MURID || '—') + '</b><br>' +
+    'PIN Admin (rahsia): <b>' + esc(t.KOD_ADMIN || '—') + '</b><br><small>PIN boleh ditukar oleh admin dalam web app: tab <b>Admin › PIN akses</b>.</small>';
   $('qr').innerHTML = '';
   if (typeof QRCode !== 'undefined') new QRCode($('qr'), { text: url, width: 178, height: 178, correctLevel: QRCode.CorrectLevel.M });
   else $('qr').innerHTML = '<div class="hint">Kod QR tidak dapat dijana (tiada internet).</div>';
@@ -643,7 +654,8 @@ api('wizGetState').then(function (st) {
   W.state = st;
   var t = st.tetapan;
   $('namaSekolah').value = t.NAMA_SEKOLAH || '';
-  $('kodAkses').value = t.KOD_AKSES || '';
+  $('kodGuru').value = t.KOD_GURU || '';
+  $('kodMurid').value = t.KOD_MURID || '';
   $('kodAdmin').value = t.KOD_ADMIN || '';
   $('lokasi').value = t.LOKASI || '';
   if (t.NAMA_SEKOLAH) W.done[1] = 1;

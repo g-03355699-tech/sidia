@@ -10,6 +10,8 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   // ---------- web app (iPhone) ----------
   const ctx = await b.newContext({ ...devices['iPhone 13'] }); const p = await ctx.newPage();
   // cdnjs mungkin disekat dalam sesi awan: hidangkan pustaka QR dari salinan tempatan
+  await ctx.route('**/jspdf.umd.min.js', r => r.fulfill({ path: path.join(__dirname, 'node_modules/jspdf/dist/jspdf.umd.min.js'), contentType: 'text/javascript' }));
+  await ctx.route('**/jspdf.plugin.autotable.min.js', r => r.fulfill({ path: path.join(__dirname, 'node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.min.js'), contentType: 'text/javascript' }));
   await ctx.route('**/qrcodejs/**', r => r.fulfill({ path: path.join(out, 'qrcode.min.js'), contentType: 'text/javascript' }));
   p.on('pageerror', e => errs.push('app: ' + e.message));
   await p.goto(url('app.html')); await p.waitForSelector('#vLogin:not(.hidden)');
@@ -46,8 +48,27 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   await p.fill('#inAdminPin', '9999'); await p.click('#btnAdmin'); await p.waitForTimeout(400);
   ok(await p.isVisible('#adminHome'), 'menu Admin dibuka dengan PIN Admin');
   await p.screenshot({ path: path.join(out, 'app-admin.png') });
+  // data realistik: ~300 rekod rawak dalam bulan ini
+  await p.evaluate(() => {
+    const off = readOffenses_(), st = readStudents_().students, d = new Date();
+    let seed = 3; const rnd = n => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    const pick = () => off[[0, 0, 0, 1, 2, 5, 10, 13, 15, 20, 30, 70, 90, 100, 120][rnd(15)] % off.length];
+    for (let k = 0; k < 40; k++) {
+      const day = 1 + rnd(Math.max(1, d.getDate())), o = pick();
+      const ids = Array.from({ length: 1 + rnd(14) }, () => st[rnd(st.length)][0]);
+      const tg = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + day).slice(-2);
+      saveRecords({ nama: ['Ustaz Hakim', 'Cikgu Aminah', 'Haziq (Pengawas)'][rnd(3)], peranan: 'Guru', pin: '1234' }, { kod: o.kod, tarikh: tg, masa: '07:15', lokasi: 'Surau', ids: ids });
+    }
+  });
   await p.click('[data-sub=subLaporan]'); await p.click('#btnReport'); await p.waitForTimeout(400);
   ok(/Mata demerit mengikut rumah/.test(await p.textContent('#reportOut')), 'laporan mata rumah dijana');
+  await p.fill('#pdfJawatan', 'Guru Disiplin'); await p.check('#pdfLampiran');
+  const [dl] = await Promise.all([p.waitForEvent('download', { timeout: 20000 }), p.click('#btnPdf')]);
+  const pdfPath = path.join(out, 'laporan.pdf'); await dl.saveAs(pdfPath);
+  const txt = require('child_process').execFileSync('pdftotext', ['-layout', pdfPath, '-']).toString();
+  const nPages = (txt.match(/\f/g) || []).length;
+  ok(/LAPORAN DISIPLIN MURID/.test(txt) && /Kedudukan Rumah/.test(txt) && /Lampiran/.test(txt), 'PDF: tajuk, bahagian & lampiran ada');
+  ok(nPages >= 3 && (txt.match(/SULIT/g) || []).length === nPages && new RegExp('Halaman ' + nPages + ' / ' + nPages).test(txt), 'PDF: header/footer & nombor halaman pada setiap halaman (' + nPages + ' halaman)');
   await p.click('#subLaporan [data-back]');
   await p.click('[data-sub=subTetapan]'); await p.fill('#tNama', 'SMK Ujian Baharu'); await p.click('#btnSaveTetapan'); await p.waitForTimeout(300);
   ok(await p.textContent('#hdrSchool') === 'SMK Ujian Baharu', 'tetapan sekolah disimpan');

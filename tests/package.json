@@ -2,6 +2,13 @@
   "name": "sidia-tests",
   "private": true,
   "description": "Ujian tempatan SiDIA (simulasi Apps Script + Playwright)",
-  "scripts": { "test": "node build.js && node smoke.js" },
-  "devDependencies": { "xlsx": "0.18.5", "qrcodejs2": "0.0.2" }
+  "scripts": {
+    "test": "node build.js && node smoke.js"
+  },
+  "devDependencies": {
+    "xlsx": "0.18.5",
+    "qrcodejs2": "0.0.2",
+    "jspdf": "2.5.1",
+    "jspdf-autotable": "3.8.2"
+  }
 }

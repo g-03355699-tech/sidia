@@ -109,6 +109,7 @@ SiDIA disertakan dengan **142 kesalahan standard** (Ringan / Sederhana / Berat),
 Buka tab **🛡️ Admin › Laporan** (perlukan PIN Admin) dan pilih tempoh. Paparan menunjukkan:
 - Jumlah kes dan **mata demerit mengikut rumah**
 - Mengikut kesalahan, kelas dan murid (murid yang paling kerap)
+- **📄 Laporan PDF rasmi**: header & footer pada setiap halaman (logo, nama sekolah, tempoh, SULIT, nombor halaman), kotak ringkasan, kedudukan rumah dengan carta, tahap kesalahan, kesalahan, kelas, murid paling kerap, ruang tandatangan, dan lampiran rekod penuh (pilihan)
 - Eksport **CSV** (dibuka dalam Excel/Sheets) atau **Tulis ke tab LAPORAN** dalam Google Sheet
 
 Jumlah mata ditolak bagi setiap rumah = jumlah lajur *Mata* dalam tab KESALAHAN. Ubah nilai mata dalam tab itu mengikut dasar sekolah.

@@ -1,5 +1,11 @@
 # Senarai Perubahan SiDIA
 
+## 1.3.0 (17 Nov 2026)
+- **Laporan PDF rasmi** (Admin › Laporan › 📄 Muat turun PDF), dijana dalam pelayar:
+  - header SiDIA (logo, nama sekolah, tempoh) dan footer (penyedia, tarikh, SULIT, Halaman X / Y) pada setiap halaman
+  - ringkasan, kedudukan rumah dengan carta bar, tahap kesalahan, kesalahan, kelas, murid paling kerap
+  - ruang tandatangan "Disediakan oleh" & "Disahkan oleh"; lampiran pilihan: senarai penuh rekod
+
 ## 1.2.3 (17 Nov 2026)
 - Baiki (iPhone): menekan kotak carian murid tidak lagi menolak paparan ke atas sehingga skrin kosong
 - Telefon: **skrin carian penuh**. Kotak carian sentiasa di bahagian atas skrin, senarai murid terus di bawahnya, dengan kiraan murid dipilih dan butang **Selesai**

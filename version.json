@@ -1,9 +1,12 @@
 {
-  "version": "1.1.1",
-  "ref": "bda89a4b012c0a6f5a7c8c76f2b56eb223bb356a",
+  "version": "1.2.0",
+  "ref": "5f23e1b5a0ec28c653f52aaf0947ea972b344b8e",
   "tarikh": "2026-11-17",
   "nota": [
-    "Keluaran ujian kemas kini satu klik (tiada perubahan pada web app)",
-    "Jika anda nampak mesej ini, kemas kini automatik berfungsi ✅"
+    "PIN berbeza untuk Guru & Warden, Pengawas dan Admin",
+    "Tab Admin baharu: Laporan, Tukar PIN, Tetapan sekolah, Kongsi pautan (QR & WhatsApp), Sistem",
+    "Pengawas hanya melihat rekod sendiri",
+    "Panduan PDF untuk guru, warden, pengawas dan admin",
+    "Selepas kemas kini: buka Admin › PIN akses dan tetapkan PIN untuk setiap peranan"
   ]
 }

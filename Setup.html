@@ -451,7 +451,7 @@ function renderDeploy() {
     ? '<code>Anyone within ' + esc(dom) + '</code> jika semua pengguna ada akaun ' + esc(dom) + ', <b>atau</b> <code>Anyone</code> jika pengawas tiada akaun sekolah' + (hasPin ? '' : ' <span style="color:var(--danger)">(isi Kod akses di langkah 1 dahulu!)</span>')
     : '<code>Anyone</code>' + (hasPin ? ' (dilindungi oleh kod akses anda)' : ' <span style="color:var(--danger)">— sila isi Kod akses di langkah 1 dahulu!</span>');
   if (!url) return;
-  url = url.replace(/\/a\/[^/]+\/macros\//, '/macros/'); // pautan tanpa /a/domain/ mengelakkan ralat akaun berganda
+  url = url.replace(/\/a\/(macros\/)?[^/]+\/(macros\/)?(?=s\/)/, '/macros/'); // pautan tanpa /a/domain/ mengelakkan ralat akaun berganda
   $('appUrl').value = url;
   $('btnOpen').href = url;
   var sek = W.state.tetapan.NAMA_SEKOLAH || 'sekolah kita';

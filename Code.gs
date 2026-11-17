@@ -48,26 +48,149 @@ var DEFAULT_TETAPAN = [
 ];
 
 var DEFAULT_KESALAHAN = [
-  ['S01', 'Tidak hadir solat Subuh berjemaah', 'Ibadah', 2, 'Ya'],
-  ['S02', 'Tidak hadir solat Zohor berjemaah', 'Ibadah', 2, 'Ya'],
-  ['S03', 'Tidak hadir solat Asar berjemaah', 'Ibadah', 2, 'Ya'],
-  ['S04', 'Tidak hadir solat Maghrib berjemaah', 'Ibadah', 2, 'Ya'],
-  ['S05', 'Tidak hadir solat Isyak berjemaah', 'Ibadah', 2, 'Ya'],
-  ['S06', 'Lewat ke surau', 'Ibadah', 1, 'Ya'],
-  ['A01', 'Tidak hadir prep malam', 'Asrama', 2, 'Ya'],
-  ['A02', 'Bising selepas waktu tidur', 'Asrama', 2, 'Ya'],
-  ['A03', 'Dorm / katil tidak kemas', 'Asrama', 1, 'Ya'],
-  ['A04', 'Lewat masuk dewan makan', 'Asrama', 1, 'Ya'],
-  ['K01', 'Lewat ke sekolah', 'Kehadiran', 1, 'Ya'],
-  ['K02', 'Ponteng kelas', 'Kehadiran', 5, 'Ya'],
-  ['K03', 'Tidak hadir perhimpunan', 'Kehadiran', 2, 'Ya'],
-  ['P01', 'Pakaian tidak kemas / tidak lengkap', 'Kekemasan', 1, 'Ya'],
-  ['P02', 'Rambut panjang / tidak kemas', 'Kekemasan', 2, 'Ya'],
-  ['P03', 'Kuku panjang', 'Kekemasan', 1, 'Ya'],
-  ['L01', 'Membuang sampah merata-rata', 'Kebersihan', 2, 'Ya'],
-  ['L02', 'Membawa telefon bimbit tanpa kebenaran', 'Disiplin', 5, 'Ya'],
-  ['L03', 'Berkelakuan biadab / kurang sopan', 'Disiplin', 5, 'Ya'],
-  ['L04', 'Bergaduh', 'Disiplin', 10, 'Ya']
+  // [Kod, Kesalahan, Kategori, Mata, Aktif, Pantas]
+  ["W01", "TIDAK HADIR SOLAT SUBUH BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
+  ["W02", "TIDAK HADIR SOLAT ZOHOR BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
+  ["W03", "TIDAK HADIR SOLAT ASAR BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
+  ["W04", "TIDAK HADIR SOLAT MAGHRIB BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
+  ["W05", "TIDAK HADIR SOLAT ISYAK BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
+  ["111", "BERJUDI", "Berat", 9, "Ya", ""],
+  ["114", "MELAWAN/MENGANCAM/MEMUKUL/MENCEDERAKAN PENGAWAS", "Berat", 9, "Ya", ""],
+  ["115", "MEMERAS UGUT", "Berat", 9, "Ya", ""],
+  ["116", "MEMBULI/PELACOAN", "Berat", 9, "Ya", ""],
+  ["117", "MENGANGOTAI KUMPULAN HARAM/KONGSI GELAP", "Berat", 9, "Ya", ""],
+  ["118", "MENYALAHGUNAKAN DADAH", "Berat", 9, "Ya", ""],
+  ["119", "MEMBAWA SENJATA BERBAHAYA", "Berat", 9, "Ya", ""],
+  ["120", "MENCABUL KEHORMATAN", "Berat", 9, "Ya", ""],
+  ["121", "MENGANCAM/MEMUKUL/MENCEDERAKAN PELAJAR LAIN", "Berat", 9, "Ya", ""],
+  ["122", "MENCEROBOH BILIK KHAS/KEDAI KOPERASI/PEJABAT SEKOLAH ATAU ASRAMA", "Berat", 9, "Ya", ""],
+  ["124", "MENUNJUK PERASAAN/BERPIKET/MENGGANGGU KETENTERAMAN SEKOLAH", "Berat", 9, "Ya", ""],
+  ["125", "BERTARUH SECARA BESAR-BESARAN", "Berat", 9, "Ya", ""],
+  ["221", "BERCUMBU-CUMBUAN", "Berat", 9, "Ya", ""],
+  ["222", "BERKHALWAT", "Berat", 9, "Ya", ""],
+  ["223", "MEMBAWA BAHAN LUCAH KE SEKOLAH", "Berat", 9, "Ya", ""],
+  ["224", "MENGINTAI PELAJAR-PELAJAR PEREMPUAN", "Berat", 9, "Ya", ""],
+  ["225", "MENGGUNAKAN KATA/PERBUATAN LUCAH", "Berat", 9, "Ya", ""],
+  ["226", "MELUKIS DAN MENULIS KATA-KATA DAN GAMBAR-GAMBAR LUCAH", "Berat", 9, "Ya", ""],
+  ["551", "BERKELAKUAN KASAR TERHADAP GURU", "Berat", 9, "Ya", ""],
+  ["555", "MENYIMPAN ROKOK", "Berat", 9, "Ya", ""],
+  ["556", "MENGHISAP ROKOK", "Berat", 9, "Ya", ""],
+  ["560", "MEMINUM MINUMAN KERAS", "Berat", 9, "Ya", ""],
+  ["662", "MEROSAKKAN HARTA BENDA PENGETUA/GURU BESAR DAN GURU-GURU", "Berat", 9, "Ya", ""],
+  ["663", "MEROSAKKAN HARTA BENDA KANTIN", "Berat", 9, "Ya", ""],
+  ["911", "BERGADUH/BERKELAHI", "Berat", 9, "Ya", ""],
+  ["913", "KESALAHAN SIBER", "Berat", 9, "Ya", ""],
+  ["A11", "PENGLIBATAN DALAM POLITIK", "Berat", 9, "Ya", ""],
+  ["B01", "MELAKUKAN MANA - MANA KESALAHAN SEDERHANA KALI KE 3", "Berat", 30, "Ya", ""],
+  ["B02", "MENYIMPAN, MEMBAWA, MENGHISAP ATAU TERBABIT DALAM KEGIATAN DADAH", "Berat", 30, "Ya", ""],
+  ["B03", "MEMBAWA, MENYIMPAN, MENGHISAP ATAU MENGEDARKAN BAHAN TEMBAKAU/VAPE/ROKOK ELEKTRONIK", "Berat", 30, "Ya", ""],
+  ["B04", "MEMBAWA MEMINUM, MENYIMPAN ATAU MENGEDAR MINUMAN KERAS ATAU SEBARANG BENDA YANG MEMABUKKAN /MENGKHAYALKAN.", "Berat", 30, "Ya", ""],
+  ["B05", "MENYEBABKAN / MELAKUKAN PERGADUHAN ATAU KEKERASAN.", "Berat", 30, "Ya", ""],
+  ["B06", "MELAWAN, MENGANCAM, MEMUKUL, MENGUGUT ATAU MENCEDERAKAN GURU / PENGAWAS MURID.", "Berat", 30, "Ya", ""],
+  ["B07", "BIADAP TERHADAP GURU/PENGAWAS/MURID.", "Berat", 30, "Ya", ""],
+  ["B08", "MEMERAS UGUT GURU/ PENGAWAS/ MURID.", "Berat", 30, "Ya", ""],
+  ["B09", "MEMBAWA/ MENGGUNAKAN SENJATA ATAU ALAT BERBAHAYA.", "Berat", 30, "Ya", ""],
+  ["B10", "MELAKUKAN BULI (PELANCOAN), PENDERAAN ATAU PAKSAAN TERHADAP MURID LAIN.", "Berat", 30, "Ya", ""],
+  ["B11", "MENCURI, MEROMPAK, MEMECAH MASUK DAN MENCEROBOH KAWASAN LARANGAN.", "Berat", 30, "Ya", ""],
+  ["B12", "MELAKUKAN PERJUDIAN ATAU MEMBABITKAN DIRI DALAM PERTARUHAN.", "Berat", 30, "Ya", ""],
+  ["B13", "MENCETAK, MENERBIT, MEMPAMER, MENGEDAR ATAU MENYIMPAN RENCANA, MAJALAH ATAU PITA RAKAMAN DAN MULTIMEDIA TERLARANG.", "Berat", 30, "Ya", ""],
+  ["B14", "MEMBABITKAN DIRI DALAM KUMPULAN HARAM", "Berat", 30, "Ya", ""],
+  ["B15", "MENCABUL KEHORMATAN GURU/ MURID.", "Berat", 30, "Ya", ""],
+  ["B16", "MELAKUKAN ZINA, LIWAT, HUBUNGAN LUAR TABII.", "Berat", 30, "Ya", ""],
+  ["B17", "MELACUR/MENJADI BOHSIA/BOHJAN/PONDAN.", "Berat", 30, "Ya", ""],
+  ["B18", "BERSEKEDUDUKAN ATAU MEMBABITKAN DIRI DALAM KEGIATAN TIDAK BERMORAL.", "Berat", 30, "Ya", ""],
+  ["B19", "MENGINTAI MURID PEREMPUAN/LELAKI", "Berat", 30, "Ya", ""],
+  ["B20", "MENULIS ATAU MENGELUARKAN KENYATAAN AKHBAR YANG MENCEMARKAN.", "Berat", 30, "Ya", ""],
+  ["B21", "MEROSAKKAN HARTA BENDA SEKOLAH/GURU", "Berat", 30, "Ya", ""],
+  ["B22", "MEMBAWA ATAU MENGGUNAKAN BAHAN LETUPAN.", "Berat", 30, "Ya", ""],
+  ["B23", "MENULIS/MELUKIS PERKATAAN ATAU GAMBAR LUCAH ATAU MELAKUKAN PERBUATAN LUCAH.", "Berat", 30, "Ya", ""],
+  ["B24", "MEMBABITKAN DIRI DALAM TUNJUK PERASAAN,PERHIMPUNAN HARAM ATAU RUSUHAN.", "Berat", 30, "Ya", ""],
+  ["B25", "MENYALAHGUNAKAN ALAT PERMAINAN,ELEKTRONIK ATAU BAHAN-BAHAN MULTIMEDIA.", "Berat", 30, "Ya", ""],
+  ["B26", "MEMBAWA ATAU MENGGUNAKAN ALAT YANG MENYEBABKAN KECEDERAAN ATAU MENGGANGGU PENGAJARAN DAN PEMBELAJARAN/PEPERIKAAN ATAU UJIAN.", "Berat", 30, "Ya", ""],
+  ["B27", "MENGGANGGU ATAU MEMBABITKAN DIRI DALAM ACARA KEBUDAYAAN YANG BERTENTANGAN DENGAN MASYARAKAT MALAYSIA.", "Berat", 30, "Ya", ""],
+  ["B28", "MENGANJUR ATAU MEMBABITKAN DIRI DALAM ACARA KEBUDAYAAN TANPA KEBENARAN PIHAK SEKOLAH, JABATAN PENDIDIKAN NEGERI DAN KEMENTERIAN PENDIDIKAN MALAYSIA.", "Berat", 30, "Ya", ""],
+  ["B29", "MELAKUKAN PONTENG SEKOLAH BERTERUSAN (BERTURUT-TURUT) SELAMA 30 HARI ATAU BERKALA TERUS (TIDAK BRTURUT-TURUT) SELAMA 60 HARI SELAMA 1 TAHUN SESI PERSEKOLAHAN.", "Berat", 30, "Ya", ""],
+  ["B30", "MENGGANGGU/MENJEJASKAN KUASA GURU BESAR, PENGETUA ATAU GURU YANG MENJALANKAN TUGAS.", "Berat", 30, "Ya", ""],
+  ["B31", "MEMBAWA MASUK TETAMU DARI LUAR KE KAWASAN SEKOLAH TANPA KEBENARAN.", "Berat", 30, "Ya", ""],
+  ["B32", "MENGEDAR, MEMILIKI, MEMBAWA, MELUKIS DAN MEMPAMERKAN BAHAN LUCAH.", "Berat", 30, "Ya", ""],
+  ["B33", "MENGELUARKAN KATA-KATA LUCAH DAN KESAT.", "Berat", 30, "Ya", ""],
+  ["B34", "MELAKUKAN HUBUNGAN YANG DICURIGAI.", "Berat", 30, "Ya", ""],
+  ["B35", "KESALAHAN-KESALAHAN LAIN YANG DIFIKIRKAN TERMASUK DALAM KATEGORI INI.", "Berat", 30, "Ya", ""],
+  ["B36", "BERKHALAWAT/BERDUA-DUAAN DI TEMPAT YANG TIDAK SEPATUTNYA", "Berat", 30, "Ya", ""],
+  ["L03", "LAIN-LAIN KES DALAM KATEGORI INI", "Berat", 9, "Ya", ""],
+  ["112", "MENCURI", "Sederhana", 3, "Ya", ""],
+  ["331", "RAMBUT PANJANG/ FESYEN RAMBUT KETERLALUAN", "Sederhana", 3, "Ya", ""],
+  ["551-2", "BERKELAKUAN KASAR TERHADAP PELAJAR LAIN", "Sederhana", 3, "Ya", ""],
+  ["552", "BERKELAKUAN KASAR TERHADAP PENGAWAS", "Sederhana", 3, "Ya", ""],
+  ["554", "BERBAHASA KESAT", "Sederhana", 3, "Ya", ""],
+  ["557", "MENGGANGGU PROSES PENGAJARAN DAN PEMBELAJARAN", "Sederhana", 3, "Ya", ""],
+  ["558", "TIDAK MENGHORMATI GURU", "Sederhana", 3, "Ya", ""],
+  ["559", "TIDAK MENGHORMATI PENGAWAS", "Sederhana", 3, "Ya", ""],
+  ["661", "MEROSAKKAN HARTA BENDA SEKOLAH", "Sederhana", 3, "Ya", ""],
+  ["664", "MEROSAKKAN HARTA BAENADA MURID", "Sederhana", 3, "Ya", ""],
+  ["771", "MENIPU YANG MELIBATKAN WANG", "Sederhana", 3, "Ya", ""],
+  ["772", "MENIPU YANG MELIBATKAN KEPERCAYAAN", "Sederhana", 3, "Ya", ""],
+  ["881", "PONTENG KELAS", "Sederhana", 3, "Ya", ""],
+  ["882", "PONTENG SEKOLAH", "Sederhana", 3, "Ya", ""],
+  ["884", "PONTENG KEGIATAN LUAR BILIK DARJAH/KO-KURIKULUM", "Sederhana", 3, "Ya", ""],
+  ["885", "PONTENG UJIAN", "Sederhana", 3, "Ya", ""],
+  ["886", "PONTENG PEPERIKSAAN", "Sederhana", 3, "Ya", ""],
+  ["887", "PONTENG UNTUK KELAS TAMBAHAN/ KELAS PERSEDIAAN", "Sederhana", 3, "Ya", ""],
+  ["888", "PONTENG ASRAMA", "Sederhana", 3, "Ya", ""],
+  ["912", "KENAKALAN/HOOLIGANISM", "Sederhana", 3, "Ya", ""],
+  ["L02", "LAIN-LAIN KES DALAM KATEGORI INI", "Sederhana", 3, "Ya", ""],
+  ["S01", "MELAKUKAN MANA-MANA KESALAHAN RINGAN MELEBIHI 3 KALI.", "Sederhana", 10, "Ya", ""],
+  ["S02", "MENYALAHGUNAKAN/MENGGUNAKAN PERALATAN/SUMBER BEKALAN ELEKTRIK SEKOLAH TANPA KEBENARAN.", "Sederhana", 10, "Ya", ""],
+  ["S03", "KELUAR DARI KAWASAN TANPA KEBENARAN.", "Sederhana", 10, "Ya", ""],
+  ["S04", "TIDAK AMANAH, MENIPU, MEMBOHONG DAN MENIRU KETIKA UJIAN PEPERIKSAAN", "Sederhana", 10, "Ya", ""],
+  ["S05", "PONTENG SEBARANG ACARA RASMI SEKOLAH.", "Sederhana", 10, "Ya", ""],
+  ["S06", "TIDAK MENGHORMATI LAGU-LAGU/BENDERA/JATA SEKOLAH, NEGERI DAN KEBANGSAAN.", "Sederhana", 10, "Ya", ""],
+  ["S07", "FESYEN RAMBUT KETERLALUAN SEPERTI PUNK/ SKINHEAD ATAU BERWARNA.", "Sederhana", 10, "Ya", ""],
+  ["S08", "MENCONTENG PADA HARTA SEKOLAH.", "Sederhana", 10, "Ya", ""],
+  ["S09", "MEMAKAI BARANG KEMAS KETERLALUAN, SEPERTI MENINDIK TELINGA DAN MEMAKAI SUBANG BERLEBIHAN DARIPADA SATU PADA SATU CUPING TELINGA.", "Sederhana", 10, "Ya", ""],
+  ["S10", "KESALAHAN LAIN YANG DIFIKIR TERMASUK DALAM KATEGORI INI.", "Sederhana", 10, "Ya", ""],
+  ["S11", "MEMBAWA TELEFON BIMBIT KE SEKOLAH", "Sederhana", 10, "Ya", "Ya"],
+  ["332", "BERKUKU PANJANG", "Ringan", 1, "Ya", ""],
+  ["333", "BERMISAI/ BERJANGGUT PANJANG", "Ringan", 1, "Ya", ""],
+  ["334", "MEMAKAI PAKAIAN TIDAK MENGIKUT PERATURAN SEKOLAH", "Ringan", 1, "Ya", ""],
+  ["335", "MEMAKAI BARANG-BARANG PERHIASAN YANG DILARANG KE SEKOLAH", "Ringan", 1, "Ya", ""],
+  ["441", "BERKELIARAN DI KAWASAN SEKOLAH", "Ringan", 1, "Ya", ""],
+  ["442", "DATANG LEWAT KE SEKOLAH", "Ringan", 1, "Ya", ""],
+  ["443", "LEWAT KE PERHIMPUNAN", "Ringan", 1, "Ya", ""],
+  ["444", "MAKAN DI KANTIN DI LUAR WAKTU REHAT YANG DITETAPKAN", "Ringan", 1, "Ya", ""],
+  ["445", "LEWAT PULANG KE ASRAMA", "Ringan", 1, "Ya", ""],
+  ["883", "PONTENG PERHIMPUNAN", "Ringan", 1, "Ya", ""],
+  ["L01", "LAIN-LAIN KES", "Ringan", 1, "Ya", ""],
+  ["R01", "MENYIMPAN MISAI, JANGGUT ATAU JAMBANG.", "Ringan", 3, "Ya", ""],
+  ["R02", "BERAMBUT PANJANG ATAU MENYERUPAI KUMPULAN TERTENTU.", "Ringan", 3, "Ya", "Ya"],
+  ["R03", "BERMAIN DALAM BILIK DARJAH, KORIDOR ATAU KAWASAN YANG DILARANG.", "Ringan", 3, "Ya", ""],
+  ["R04", "MENGGUNAKAN DAN MEMBAWA KELUAR SEBARANG PERALATAN BILIK DARJAH DAN SEKOLAH TANPA KEBENARAN", "Ringan", 3, "Ya", ""],
+  ["R05", "KELUAR DARI BILIK DARJAH TANPA KEBENARAN.", "Ringan", 3, "Ya", ""],
+  ["R06", "BERADA DI KANTIN PADA WAKTU PERSEKOLAHAN (KECUALI WAKTU REHAT) TANPA KEBENARAN.", "Ringan", 3, "Ya", ""],
+  ["R07", "MENYIMPAN ATAU MENGGUNAKAN ALAT PERMAINAN KEPUNYAAN SEKOLAH TANPA KEBENARAN.", "Ringan", 3, "Ya", ""],
+  ["R08", "MENGGUNAKAN ALAT HIBURAN ATAU ELEKTRONIK SEKOLAH TANPA KEBENARAN.", "Ringan", 3, "Ya", ""],
+  ["R09", "MEMASUKI ATAU TIDAK MEMATUHI ARAHAN MAKMAL /BENGKEL /BILIK KHAS.", "Ringan", 3, "Ya", ""],
+  ["R10", "MEMAKAI BARANG KEMAS ATAU PERHIASAN ATAU ALAT SOLEK KECUALI JAM.", "Ringan", 3, "Ya", ""],
+  ["R11", "MEMASUKI BILIK KHAS TANPA KEBENARAN.", "Ringan", 3, "Ya", ""],
+  ["R12", "MAKAN ATAU MINUM DI BILIK DARJAH.", "Ringan", 3, "Ya", ""],
+  ["R13", "MELAKUKAN PEMBAZIRAN AIR/ELEKTRIK", "Ringan", 3, "Ya", ""],
+  ["R14", "TIDAK MEMAKAI PAKAIAN SEKOLAH YANG LENGKAP.", "Ringan", 3, "Ya", "Ya"],
+  ["R15", "SEMUA KESALAHAN BERSABIT DENGAN PEMBELAJARAN (TIDAK MEMBAWA BUKU, TIDAK MEMBUAT KERJA RUMAH, TIDAK MEMBERI PERHATIAN DAN LAIN-LAIN)", "Ringan", 3, "Ya", ""],
+  ["R16", "DATANG LEWAT KE SEKOLAH.", "Ringan", 3, "Ya", "Ya"],
+  ["R17", "LEWAT BERGERAK KE PERHIMPUNAN/ BENGKEL/ MAKMAL.", "Ringan", 3, "Ya", ""],
+  ["R18", "BISING DALAM BILIK DARJAH SEHINGGA MENGGANGU KELAS LAIN.", "Ringan", 3, "Ya", ""],
+  ["R19", "MENUNGANG ATAU MEMANDU KENDERAAN DALAM KAWASAN SEKOLAH", "Ringan", 3, "Ya", ""],
+  ["R20", "BERJALAN-JALAN TANPA KEBENARAN.", "Ringan", 3, "Ya", ""],
+  ["R21", "TIDAK MEMBUAT GERAKERJA YANG DITUGASKAN.", "Ringan", 3, "Ya", ""],
+  ["R22", "MENGGANGU KAWASAN.", "Ringan", 3, "Ya", ""],
+  ["R23", "MENGGANGU GURU.", "Ringan", 3, "Ya", ""],
+  ["R24", "LEWAT MASUK KELAS.", "Ringan", 3, "Ya", "Ya"],
+  ["R25", "MENGOTORKAN KELAS.", "Ringan", 3, "Ya", ""],
+  ["R26", "TIDAK DUDUK SETEMPAT.", "Ringan", 3, "Ya", ""],
+  ["R27", "KESALAHAN LAIN YANG DIFIKIRKAN TERMASUK DALAM KATEGORI INI.", "Ringan", 3, "Ya", ""],
+  ["R28", "LEWAT KE SURAU/MASJID", "Ringan", 3, "Ya", "Ya"],
+  ["R29", "MEMAKAI PAKAIAN YANG TIDAK LENGKAP", "Ringan", 3, "Ya", ""],
+  ["R30", "PONTENG KELAS.", "Ringan", 3, "Ya", "Ya"]
 ];
 
 /* =========================================================
@@ -80,6 +203,7 @@ function onOpen() {
     .addSeparator()
     .addItem('Semak senarai murid', 'semakMuridMenu')
     .addItem('Jana laporan mata rumah…', 'janaLaporanMenu')
+    .addItem('Guna senarai kesalahan standard SiDIA…', 'gunaKesalahanStandard')
     .addItem('Baiki / cipta semula tab sistem', 'setupSistem')
     .addToUi();
   try {
@@ -108,11 +232,9 @@ function ensureSetup_() {
     DEFAULT_TETAPAN.forEach(function (row) { if (have.indexOf(row[0]) < 0) t.appendRow(row); });
   }
 
-  var k = ensureSheet_(ss, SH.KESALAHAN, ['Kod', 'Kesalahan', 'Kategori', 'Mata', 'Aktif']);
-  if (k.getLastRow() < 2) {
-    k.getRange(2, 1, DEFAULT_KESALAHAN.length, 5).setValues(DEFAULT_KESALAHAN);
-    k.setColumnWidth(2, 340);
-  }
+  var k = ensureSheet_(ss, SH.KESALAHAN, ['Kod', 'Kesalahan', 'Kategori', 'Mata', 'Aktif', 'Pantas']);
+  if (k.getLastRow() < 2) writeOffenses_(DEFAULT_KESALAHAN);
+  else if (!k.getRange(1, 6).getValue()) k.getRange(1, 6).setValue('Pantas').setFontWeight('bold').setBackground('#e6f4f2');
 
   var tabMurid = getSettings_().TAB_MURID || SH.MURID;
   if (!getSettings_().ID_SPREADSHEET_MURID && !ss.getSheetByName(tabMurid)) {
@@ -177,7 +299,7 @@ function wizGetState() {
     murid = { count: st.length, kelas: Object.keys(k).length, rumah: Object.keys(r).sort(), error: '' };
   } catch (e) { murid.error = e.message; }
   var kes = SpreadsheetApp.getActive().getSheetByName(SH.KESALAHAN);
-  var offenses = kes.getLastRow() > 1 ? kes.getRange(2, 1, kes.getLastRow() - 1, 5).getDisplayValues()
+  var offenses = kes.getLastRow() > 1 ? kes.getRange(2, 1, kes.getLastRow() - 1, 6).getDisplayValues()
     .filter(function (r) { return r[0] || r[1]; }) : [];
   return {
     tetapan: {
@@ -247,22 +369,50 @@ function autoId_(nama) {
   return 'N' + hex.toUpperCase();
 }
 
-/** rows = [[kod, kesalahan, kategori, mata, aktif], ...] */
+/** rows = [[kod, kesalahan, kategori, mata, aktif, pantas], ...] */
 function wizSaveOffenses(rows) {
   rows = (rows || []).filter(function (r) { return String(r[1] || '').trim(); });
   if (!rows.length) throw new Error('Sekurang-kurangnya satu kesalahan diperlukan.');
   var seen = {}, out = [];
   rows.forEach(function (r, i) {
     var kod = String(r[0] || '').trim().toUpperCase() || ('X' + ('0' + (i + 1)).slice(-2));
-    if (seen[kod]) throw new Error('Kod kesalahan berulang: ' + kod);
+    if (seen[kod]) throw new Error('Kod kesalahan berulang: ' + kod + '. Setiap kod mesti unik.');
     seen[kod] = 1;
-    out.push([kod, String(r[1]).trim(), String(r[2] || '').trim(), parseFloat(r[3]) || 0, r[4] === false || /^(tidak|no)$/i.test(r[4]) ? 'Tidak' : 'Ya']);
+    out.push([kod, String(r[1]).trim(), String(r[2] || '').trim(), parseFloat(r[3]) || 0,
+      isNo_(r[4]) ? 'Tidak' : 'Ya', isYes_(r[5]) ? 'Ya' : '']);
   });
-  var sh = SpreadsheetApp.getActive().getSheetByName(SH.KESALAHAN);
-  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 5).clearContent();
-  sh.getRange(2, 1, out.length, 5).setValues(out);
+  writeOffenses_(out);
   return { disimpan: out.length };
 }
+
+function wizDefaultOffenses() { return DEFAULT_KESALAHAN; }
+
+/** Menu: gantikan tab KESALAHAN dengan senarai standard. Rekod lama tidak terjejas. */
+function gunaKesalahanStandard() {
+  var ui = SpreadsheetApp.getUi();
+  var r = ui.alert('Guna senarai kesalahan standard?',
+    'Tab KESALAHAN akan diganti dengan ' + DEFAULT_KESALAHAN.length + ' kesalahan standard SiDIA ' +
+    '(Ringan / Sederhana / Berat). Rekod sedia ada dalam tab REKOD tidak diubah.\n\nTeruskan?', ui.ButtonSet.YES_NO);
+  if (r !== ui.Button.YES) return;
+  ensureSetup_();
+  writeOffenses_(DEFAULT_KESALAHAN);
+  ui.alert('Selesai: ' + DEFAULT_KESALAHAN.length + ' kesalahan dimasukkan. Tandakan lajur "Pantas" untuk kesalahan yang kerap digunakan.');
+}
+
+function writeOffenses_(rows) {
+  var sh = SpreadsheetApp.getActive().getSheetByName(SH.KESALAHAN);
+  var last = sh.getLastRow();
+  if (last > 1) sh.getRange(2, 1, last - 1, Math.max(6, sh.getLastColumn())).clearContent();
+  sh.getRange(1, 1, 1, 6).setValues([['Kod', 'Kesalahan', 'Kategori', 'Mata', 'Aktif', 'Pantas']]).setFontWeight('bold').setBackground('#e6f4f2');
+  sh.getRange(2, 1, rows.length, 1).setNumberFormat('@'); // kod seperti 111 / 551 kekal sebagai teks
+  sh.getRange(2, 1, rows.length, 6).setValues(rows.map(function (r) {
+    return [String(r[0]), r[1], r[2], r[3], r[4] || 'Ya', r[5] || ''];
+  }));
+  sh.setColumnWidth(2, 460);
+}
+
+function isYes_(v) { return v === true || /^(ya|yes|y|1|true|✓|x)$/i.test(String(v == null ? '' : v).trim()); }
+function isNo_(v) { return v === false || /^(tidak|no|n|0|false)$/i.test(String(v == null ? '' : v).trim()); }
 
 function wizCheckDeploy(manualUrl) {
   if (manualUrl) {
@@ -681,10 +831,13 @@ function readUsers_() {
 function readOffenses_() {
   var sh = SpreadsheetApp.getActive().getSheetByName(SH.KESALAHAN);
   if (!sh || sh.getLastRow() < 2) throw new Error('Tab KESALAHAN kosong. Jalankan menu SiDIA > Sediakan sistem.');
-  return sh.getRange(2, 1, sh.getLastRow() - 1, 5).getDisplayValues()
+  return sh.getRange(2, 1, sh.getLastRow() - 1, 6).getDisplayValues()
     .filter(function (r) { return String(r[0]).trim() && String(r[1]).trim() && !/^(tidak|no|n|x|0)$/i.test(String(r[4]).trim()); })
     .map(function (r) {
-      return { kod: String(r[0]).trim(), kesalahan: String(r[1]).trim(), kategori: String(r[2]).trim(), mata: parseFloat(r[3]) || 0 };
+      return {
+        kod: String(r[0]).trim(), kesalahan: String(r[1]).trim(), kategori: String(r[2]).trim(),
+        mata: parseFloat(r[3]) || 0, pantas: /^(ya|yes|y|1|true|✓|x)$/i.test(String(r[5]).trim())
+      };
     });
 }
 

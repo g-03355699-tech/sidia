@@ -58,6 +58,12 @@ th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03
 .offtbl input{min-height:30px;padding:4px 6px;border-radius:6px}
 .offtbl td{padding:3px 4px}
 .offtbl .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px}
+.offwrap{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.offwrap thead th{position:sticky;top:0;background:#fff;z-index:1;box-shadow:0 1px 0 var(--line)}
+.offtbl select{min-height:30px;padding:2px 4px;border-radius:6px;font-size:13px}
+.offtools{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.offtools input{flex:1;min-width:180px}
+#offPaste{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--bg)}
 ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:10px 0}
 ol.steps li{counter-increment:s;position:relative;padding:8px 0 8px 38px;border-bottom:1px solid var(--line)}
 ol.steps li:before{content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;background:var(--pri-soft);color:var(--pri);font-weight:700;display:grid;place-items:center}
@@ -136,12 +142,29 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
     <!-- 3 -->
     <section id="s3" class="hidden">
       <h2>Kesalahan & mata demerit</h2>
-      <p class="lead">Senarai ini ialah cadangan. Ubah mata, padam, atau tambah kesalahan mengikut peraturan sekolah. Kesalahan yang tidak <b>Aktif</b> tidak dipaparkan di web app.</p>
+      <p class="lead">Ubah mata, padam, atau tambah kesalahan mengikut peraturan sekolah. Tandakan <b>⭐ Pantas</b> untuk kesalahan yang kerap direkod (cth solat, lewat) supaya dipaparkan paling atas di web app.</p>
+      <div class="offtools">
+        <input type="text" id="offFilter" placeholder="Cari dalam senarai…">
+        <button class="btn sm" id="btnPasteOff">📋 Tampal dari Excel</button>
+        <button class="btn sm" id="btnStdOff">Senarai standard</button>
+        <button class="btn sm" id="btnAddOff">＋ Tambah</button>
+      </div>
+      <div id="offPaste" class="hidden">
+        <div class="hint" style="margin:0 0 6px">Salin jadual kesalahan dari Excel / Google Sheet (termasuk baris tajuk) dan tampal di sini. Lajur dikenal pasti: <b>Kod/Code</b>, <b>Kesalahan/Description</b>, <b>Kategori/Category</b> (1/2/3 atau Ringan/Sederhana/Berat), <b>Mata/Demerit</b>.</div>
+        <textarea id="offPasteTxt" rows="6" placeholder="Bil&#9;Code&#9;Description&#9;Category&#9;Demerit&#10;1&#9;R16&#9;DATANG LEWAT KE SEKOLAH&#9;1&#9;3"></textarea>
+        <div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <select id="offPasteMode" style="width:auto"><option value="ganti">Ganti senarai sekarang</option><option value="tambah">Tambah kepada senarai sekarang</option></select>
+          <button class="btn sm pri" id="btnPasteOffGo">Masukkan</button>
+          <span id="offPasteMsg" class="hint"></span>
+        </div>
+      </div>
+      <div class="offwrap">
       <table class="offtbl">
-        <thead><tr><th style="width:70px">Kod</th><th>Kesalahan</th><th style="width:130px">Kategori</th><th style="width:70px">Mata</th><th style="width:50px">Aktif</th><th style="width:30px"></th></tr></thead>
+        <thead><tr><th style="width:70px">Kod</th><th>Kesalahan</th><th style="width:118px">Kategori</th><th style="width:62px">Mata</th><th style="width:44px" title="Aktif">Aktif</th><th style="width:50px" title="Pantas">⭐</th><th style="width:28px"></th></tr></thead>
         <tbody id="offBody"></tbody>
       </table>
-      <div style="margin-top:8px"><button class="btn sm" id="btnAddOff">＋ Tambah kesalahan</button></div>
+      </div>
+      <div class="hint" id="offCount" style="margin-top:6px"></div>
     </section>
 
     <!-- 4 -->
@@ -416,27 +439,115 @@ function saveStudents() {
 }
 
 /* ---------- 3. kesalahan ---------- */
+var CATS = ['Ringan', 'Sederhana', 'Berat'];
+function catName(c) {
+  c = String(c == null ? '' : c).trim();
+  if (/^1$|ringan/i.test(c)) return 'Ringan';
+  if (/^2$|sederhana/i.test(c)) return 'Sederhana';
+  if (/^3$|berat/i.test(c)) return 'Berat';
+  return c;
+}
 function renderOffenses() {
   $('offBody').innerHTML = W.state.offenses.map(offRow).join('');
+  offCount();
 }
 function offRow(r) {
-  r = r || ['', '', '', 1, 'Ya'];
-  var aktif = !/^(tidak|no|n|x|0)$/i.test(String(r[4]).trim());
-  return '<tr><td><input type="text" value="' + esc(r[0]) + '"></td><td><input type="text" value="' + esc(r[1]) + '"></td><td><input type="text" value="' + esc(r[2]) + '"></td>' +
+  r = r || ['', '', 'Ringan', 1, 'Ya', ''];
+  var aktif = !/^(tidak|no|n|0|false)$/i.test(String(r[4]).trim());
+  var pantas = /^(ya|yes|y|1|true|✓|x)$/i.test(String(r[5] == null ? '' : r[5]).trim());
+  var cat = catName(r[2]);
+  var opts = CATS.concat(cat && CATS.indexOf(cat) < 0 ? [cat] : []);
+  return '<tr><td><input type="text" value="' + esc(r[0]) + '"></td><td><input type="text" value="' + esc(r[1]) + '"></td>' +
+    '<td><select>' + opts.map(function (c) { return '<option' + (c === cat ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select></td>' +
     '<td><input type="number" min="0" step="1" value="' + esc(r[3]) + '"></td><td style="text-align:center"><input type="checkbox"' + (aktif ? ' checked' : '') + '></td>' +
+    '<td style="text-align:center"><input type="checkbox"' + (pantas ? ' checked' : '') + '></td>' +
     '<td><button class="x" title="Padam">×</button></td></tr>';
 }
-$('offBody').addEventListener('click', function (e) { if (e.target.classList.contains('x')) e.target.closest('tr').remove(); });
+function readOffTable() {
+  return Array.prototype.map.call($('offBody').querySelectorAll('tr'), function (tr) {
+    var i = tr.querySelectorAll('input'), sel = tr.querySelector('select');
+    return [i[0].value.trim(), i[1].value.trim(), sel.value, i[2].value, i[3].checked ? 'Ya' : 'Tidak', i[4].checked ? 'Ya' : ''];
+  }).filter(function (r) { return r[1]; });
+}
+function offCount() {
+  var rows = readOffTable();
+  var c = { Ringan: 0, Sederhana: 0, Berat: 0 }, aktif = 0, pantas = 0;
+  rows.forEach(function (r) { if (c[r[2]] != null) c[r[2]]++; if (r[4] === 'Ya') aktif++; if (r[5]) pantas++; });
+  $('offCount').textContent = rows.length + ' kesalahan (Ringan ' + c.Ringan + ', Sederhana ' + c.Sederhana + ', Berat ' + c.Berat + ') · ' + aktif + ' aktif · ' + pantas + ' pantas';
+}
+$('offBody').addEventListener('click', function (e) { if (e.target.classList.contains('x')) { e.target.closest('tr').remove(); offCount(); } });
+$('offBody').addEventListener('change', offCount);
 $('btnAddOff').onclick = function () {
-  $('offBody').insertAdjacentHTML('beforeend', offRow());
-  $('offBody').lastElementChild.querySelectorAll('input')[1].focus();
+  $('offFilter').value = ''; filterOff();
+  $('offBody').insertAdjacentHTML('afterbegin', offRow());
+  $('offBody').firstElementChild.querySelectorAll('input')[1].focus();
+  offCount();
 };
-function saveOffenses() {
-  var rows = Array.prototype.map.call($('offBody').querySelectorAll('tr'), function (tr) {
+$('offFilter').oninput = filterOff;
+function filterOff() {
+  var q = $('offFilter').value.trim().toLowerCase();
+  $('offBody').querySelectorAll('tr').forEach(function (tr) {
     var i = tr.querySelectorAll('input');
-    return [i[0].value, i[1].value, i[2].value, i[3].value, i[4].checked ? 'Ya' : 'Tidak'];
-  }).filter(function (r) { return r[1].trim(); });
-  loading(true, 'Menyimpan…');
+    var t = (i[0].value + ' ' + i[1].value + ' ' + tr.querySelector('select').value).toLowerCase();
+    tr.style.display = !q || t.indexOf(q) >= 0 ? '' : 'none';
+  });
+}
+$('btnStdOff').onclick = function () {
+  if (!confirm('Gantikan senarai dalam jadual dengan senarai kesalahan standard SiDIA? (Belum disimpan sehingga anda klik "Simpan & teruskan")')) return;
+  loading(true, 'Memuatkan…');
+  api('wizDefaultOffenses').then(function (rows) {
+    loading(false); W.state.offenses = rows; $('offFilter').value = ''; renderOffenses();
+    foot('Senarai standard dimuatkan (' + rows.length + '). Klik "Simpan & teruskan" untuk menyimpan.');
+  }).catch(function (e) { loading(false); foot(e.message, true); });
+};
+$('btnPasteOff').onclick = function () { $('offPaste').classList.toggle('hidden'); $('offPasteTxt').focus(); };
+$('btnPasteOffGo').onclick = function () {
+  var r = parseOffPaste($('offPasteTxt').value);
+  if (!r.rows.length) { $('offPasteMsg').innerHTML = '<span style="color:var(--danger)">' + esc(r.error || 'Tiada data dikenal pasti.') + '</span>'; return; }
+  var cur = $('offPasteMode').value === 'tambah' ? readOffTable() : [];
+  var seen = {}; cur.forEach(function (x) { seen[x[0].toUpperCase()] = 1; });
+  var renamed = [];
+  r.rows.forEach(function (x) {
+    var k = x[0].toUpperCase(), base = k, n = 2;
+    while (!k || seen[k]) k = (base || 'X') + '-' + (n++);
+    if (k !== x[0].toUpperCase()) renamed.push(base + ' → ' + k);
+    seen[k] = 1; x[0] = k; cur.push(x);
+  });
+  W.state.offenses = cur; $('offFilter').value = ''; renderOffenses();
+  $('offPaste').classList.add('hidden'); $('offPasteTxt').value = '';
+  foot(r.rows.length + ' kesalahan dimasukkan' + (renamed.length ? ' · kod berulang ditukar: ' + renamed.join(', ') : '') + '. Klik "Simpan & teruskan" untuk menyimpan.');
+};
+function parseOffPaste(txt) {
+  var lines = String(txt || '').split(/\r?\n/).filter(function (l) { return l.trim(); });
+  if (!lines.length) return { rows: [] };
+  var sep = lines[0].indexOf('\t') >= 0 ? '\t' : (lines[0].indexOf(';') >= 0 ? ';' : ',');
+  var aoa = lines.map(function (l) { return l.split(sep).map(function (c) { return c.trim(); }); });
+  function find(h, pats) { for (var i = 0; i < h.length; i++) for (var j = 0; j < pats.length; j++) if (pats[j].test(String(h[i]).toLowerCase())) return i; return -1; }
+  var h = aoa[0];
+  var map = {
+    kod: find(h, [/^kod/, /^code/]),
+    kes: find(h, [/^kesalahan/, /^description/, /^keterangan/, /^perkara/, /^jenis/]),
+    kat: find(h, [/^kategori/, /^category/, /^tahap/, /^jenis kesalahan/]),
+    mata: find(h, [/^mata/, /^demerit/, /^markah/, /^point/])
+  };
+  var start = 1;
+  if (map.kes < 0) {
+    // tiada tajuk: anggap [Bil?] Kod, Kesalahan, Kategori, Mata
+    start = 0;
+    var off = /^\d+$/.test(aoa[0][0]) && aoa[0].length >= 5 ? 1 : 0;
+    map = { kod: off, kes: off + 1, kat: off + 2, mata: off + 3 };
+  }
+  var rows = aoa.slice(start).map(function (r) {
+    return [map.kod >= 0 ? r[map.kod] || '' : '', r[map.kes] || '', catName(map.kat >= 0 ? r[map.kat] : ''), parseFloat(map.mata >= 0 ? r[map.mata] : '') || 0, 'Ya', ''];
+  }).filter(function (r) { return r[1] && r[1].length > 1; });
+  return { rows: rows };
+}
+function saveOffenses() {
+  var rows = readOffTable();
+  var seen = {}, dup = [];
+  rows.forEach(function (r) { var k = r[0].toUpperCase(); if (k && seen[k]) dup.push(k); seen[k] = 1; });
+  if (dup.length) return Promise.reject(new Error('Kod berulang: ' + dup.join(', ') + '. Setiap kod mesti unik.'));
+  loading(true, 'Menyimpan ' + rows.length + ' kesalahan…');
   return api('wizSaveOffenses', rows).then(function () { loading(false); W.state.offenses = rows; });
 }
 

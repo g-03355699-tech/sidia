@@ -38,13 +38,26 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-off
 .muted{color:var(--muted);font-size:13px}
 /* kesalahan */
 .offsearch{margin-bottom:8px}
-.offlist{display:flex;flex-wrap:wrap;gap:6px;max-height:210px;overflow:auto;padding:2px}
-.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;font-size:14px;text-align:left}
-.chip b{font-weight:600;color:var(--muted);font-size:12px;margin-right:4px}
-.chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
-.chip.on b{color:#d6f0ec}
-.selected-off{display:flex;align-items:center;gap:8px;background:var(--pri-soft);border-radius:10px;padding:10px 12px;font-weight:600}
-.selected-off .pts{margin-left:auto;font-size:13px;color:var(--pri-d);white-space:nowrap}
+.offtabs{display:flex;gap:6px;overflow-x:auto;margin:0 -2px 8px;padding:2px;scrollbar-width:none}
+.offtabs::-webkit-scrollbar{display:none}
+.offtabs button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer;font-weight:600;color:var(--muted)}
+.offtabs button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.offtabs button .c{font-weight:400;opacity:.7;margin-left:4px}
+.offtabs.dim{opacity:.45}
+.offlist{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:10px;-webkit-overflow-scrolling:touch}
+.offgrp{position:sticky;top:0;z-index:1;background:#f7f9fa;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:6px 12px;border-bottom:1px solid var(--line)}
+.off{display:flex;gap:10px;align-items:flex-start;width:100%;border:0;border-bottom:1px solid var(--line);background:#fff;padding:11px 12px;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.off:last-child{border-bottom:0}
+.off:hover,.off.first{background:#f2f9f8}
+.off.first{box-shadow:inset 3px 0 0 var(--pri)}
+.kd{flex:0 0 auto;font-size:11px;font-weight:700;border-radius:6px;padding:2px 6px;min-width:42px;text-align:center;margin-top:1px;font-variant-numeric:tabular-nums}
+.off .tx{flex:1;font-size:14.5px;line-height:1.35}
+.off .pt{flex:0 0 auto;font-size:12px;color:var(--muted);white-space:nowrap;margin-top:2px}
+.sev-r{background:#e3f5e8;color:#146c36}.sev-s{background:#fff0d4;color:#8a4b00}.sev-b{background:#fde3df;color:#b42318}.sev-x{background:#eef1f4;color:#5f6b78}
+.selected-off{display:flex;align-items:center;gap:10px;background:var(--pri-soft);border-radius:10px;padding:10px 12px;font-weight:600}
+.selected-off .tx{flex:1;min-width:0;line-height:1.3}
+.selected-off .tx small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.selected-off .btn.link{flex:0 0 auto}
 /* murid */
 .searchwrap{position:relative}
 .searchwrap input{font-size:18px;padding-right:44px}
@@ -147,7 +160,8 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
       <h2><span class="step">1</span> Kesalahan</h2>
       <div id="offChosen" class="hidden"></div>
       <div id="offPicker">
-        <input type="search" class="offsearch" id="offQ" placeholder="Cari kesalahan… (cth: subuh, lewat, rambut)">
+        <input type="search" class="offsearch" id="offQ" autocomplete="off" placeholder="Cari kesalahan atau kod… (cth: lewat, rokok, R16)">
+        <div class="offtabs" id="offTabs"></div>
         <div class="offlist" id="offList"></div>
       </div>
       <div class="row" style="margin-top:6px">
@@ -439,7 +453,7 @@ function initRekod() {
 
   $('offQ').addEventListener('input', renderOffList);
   $('offQ').addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') { var f = $('offList').querySelector('.chip'); if (f) f.click(); }
+    if (e.key === 'Enter') { e.preventDefault(); var f = $('offList').querySelector('.off'); if (f) f.click(); }
   });
   $('q').addEventListener('input', function () { renderList(); });
   $('q').addEventListener('keydown', function (e) {
@@ -479,17 +493,92 @@ function initRekod() {
   $('inLokasi').onchange = saveDraft;
 }
 
-function renderOffList() {
-  var q = tokens($('offQ').value);
-  var list = S.offenses.filter(function (o) {
-    if (!q.length) return true;
-    var t = tokens(o.kesalahan + ' ' + o.kod + ' ' + o.kategori);
-    return q.every(function (x) { return t.some(function (w) { return w.indexOf(x) === 0; }); });
+/* ---- pemilih kesalahan ---- */
+var SEVNAME = { r: 'Ringan', s: 'Sederhana', b: 'Berat', x: 'Lain-lain' };
+function sevOf(o) {
+  var k = String(o.kategori || '').toLowerCase();
+  if (/ringan|^1$/.test(k)) return 'r';
+  if (/sederhana|^2$/.test(k)) return 's';
+  if (/berat|^3$/.test(k)) return 'b';
+  return 'x';
+}
+/** Teks HURUF BESAR ditukar kepada huruf ayat supaya mudah dibaca. */
+function nice(s) {
+  s = String(s || '').trim();
+  if (s === s.toUpperCase() && /[A-Z]{3}/.test(s)) {
+    s = s.toLowerCase().replace(/(^|[.!?]\s+)([a-z])/g, function (m, a, b) { return a + b.toUpperCase(); })
+      .replace(/\b(subuh|zohor|asar|maghrib|isyak|malaysia|jata|ko-kurikulum)\b/g, function (w) { return w.charAt(0).toUpperCase() + w.slice(1); })
+      .replace(/\b(jpn|kpm|ppd|pk|hem)\b/g, function (w) { return w.toUpperCase(); });
+  }
+  return s;
+}
+function offUse() { return LS.get('offUse', {}); }
+function bumpOffUse(kod) { var u = offUse(); u[kod] = (u[kod] || 0) + 1; LS.set('offUse', u); }
+function quickList() {
+  var u = offUse();
+  var used = S.offenses.filter(function (o) { return u[o.kod]; })
+    .sort(function (a, b) { return u[b.kod] - u[a.kod]; }).slice(0, 6);
+  var pin = S.offenses.filter(function (o) { return o.pantas && used.indexOf(o) < 0; });
+  return { used: used, pin: pin };
+}
+function offRowHtml(o, first) {
+  return '<button class="off' + (first ? ' first' : '') + '" data-kod="' + esc(o.kod) + '"><span class="kd sev-' + sevOf(o) + '">' + esc(o.kod) + '</span>' +
+    '<span class="tx">' + esc(nice(o.kesalahan)) + '</span><span class="pt">' + o.mata + ' mata</span></button>';
+}
+function renderOffTabs(searching) {
+  var counts = { r: 0, s: 0, b: 0, x: 0 };
+  S.offenses.forEach(function (o) { counts[sevOf(o)]++; });
+  var ql = quickList(), nq = ql.used.length + ql.pin.length;
+  var tabs = [];
+  if (nq) tabs.push(['pantas', '⭐ Pantas', nq]);
+  ['r', 's', 'b', 'x'].forEach(function (k) { if (counts[k]) tabs.push([k, SEVNAME[k], counts[k]]); });
+  tabs.push(['all', 'Semua', S.offenses.length]);
+  if (!tabs.some(function (t) { return t[0] === S.offTab; })) S.offTab = tabs[0][0];
+  $('offTabs').classList.toggle('dim', !!searching);
+  $('offTabs').innerHTML = tabs.map(function (t) {
+    return '<button data-tab="' + t[0] + '"' + (t[0] === S.offTab && !searching ? ' class="on"' : '') + '>' + t[1] + '<span class="c">' + t[2] + '</span></button>';
+  }).join('');
+  $('offTabs').querySelectorAll('button').forEach(function (b) {
+    b.onclick = function () { S.offTab = b.dataset.tab; $('offQ').value = ''; renderOffList(); };
   });
-  $('offList').innerHTML = list.length ? list.map(function (o) {
-    return '<button class="chip' + (S.off && S.off.kod === o.kod ? ' on' : '') + '" data-kod="' + esc(o.kod) + '"><b>' + esc(o.kod) + '</b>' + esc(o.kesalahan) + '</button>';
-  }).join('') : '<div class="muted">Tiada kesalahan sepadan. Tambah dalam tab KESALAHAN di Google Sheet.</div>';
-  $('offList').querySelectorAll('.chip').forEach(function (b) {
+}
+function searchOffenses(qs) {
+  var q = tokens(qs), qk = qs.toLowerCase().replace(/\s+/g, ''), u = offUse();
+  return S.offenses.map(function (o) {
+    var sc = 0, kod = o.kod.toLowerCase();
+    if (kod === qk) sc = 100; else if (qk.length >= 2 && kod.indexOf(qk) === 0) sc = 50;
+    var t = tokens(o.kesalahan + ' ' + o.kategori);
+    var all = q.length && q.every(function (x) {
+      return t.some(function (w) { return w.indexOf(x) === 0 || (x.length >= 3 && w.indexOf(x) > 0); });
+    });
+    if (all) sc += 10 + (o.pantas ? 2 : 0) + Math.min(u[o.kod] || 0, 20) * 0.1;
+    return { o: o, sc: sc };
+  }).filter(function (x) { return x.sc > 0; })
+    .sort(function (a, b) { return b.sc - a.sc; }).map(function (x) { return x.o; });
+}
+function renderOffList() {
+  var qs = $('offQ').value.trim();
+  renderOffTabs(!!qs);
+  var html = '';
+  if (qs) {
+    var res = searchOffenses(qs);
+    html = res.map(function (o, i) { return offRowHtml(o, i === 0); }).join('');
+    if (!html) html = '<div class="empty">Tiada kesalahan sepadan dengan "' + esc(qs) + '".</div>';
+  } else if (S.offTab === 'pantas') {
+    var ql = quickList();
+    if (ql.used.length) html += '<div class="offgrp">Kerap anda guna</div>' + ql.used.map(function (o) { return offRowHtml(o); }).join('');
+    if (ql.pin.length) html += '<div class="offgrp">Pilihan pantas sekolah</div>' + ql.pin.map(function (o) { return offRowHtml(o); }).join('');
+  } else {
+    ['r', 's', 'b', 'x'].forEach(function (k) {
+      if (S.offTab !== 'all' && S.offTab !== k) return;
+      var l = S.offenses.filter(function (o) { return sevOf(o) === k; });
+      if (l.length) html += '<div class="offgrp">' + SEVNAME[k] + ' · ' + l.length + '</div>' + l.map(function (o) { return offRowHtml(o); }).join('');
+    });
+  }
+  if (!S.offenses.length) html = '<div class="empty">Tiada kesalahan aktif. Tambah dalam tab KESALAHAN di Google Sheet.</div>';
+  $('offList').innerHTML = html;
+  $('offList').scrollTop = 0;
+  $('offList').querySelectorAll('.off').forEach(function (b) {
     b.onclick = function () {
       setOffense(S.offenses.filter(function (o) { return o.kod === b.dataset.kod; })[0]);
       $('offQ').value = '';
@@ -503,7 +592,8 @@ function setOffense(o) {
   $('offPicker').classList.toggle('hidden', !!o);
   $('offChosen').classList.toggle('hidden', !o);
   if (o) {
-    $('offChosen').innerHTML = '<div class="selected-off"><span>' + esc(o.kesalahan) + '</span><span class="pts">−' + o.mata + ' mata</span>' +
+    $('offChosen').innerHTML = '<div class="selected-off"><span class="kd sev-' + sevOf(o) + '">' + esc(o.kod) + '</span>' +
+      '<span class="tx">' + esc(nice(o.kesalahan)) + '<small>' + esc(SEVNAME[sevOf(o)]) + ' · ' + o.mata + ' mata demerit</small></span>' +
       '<button class="btn link" id="btnChangeOff">Tukar</button></div>';
     $('btnChangeOff').onclick = function () { setOffense(null); renderOffList(); $('offQ').focus(); };
   }
@@ -554,7 +644,7 @@ function select(id, forceOn) {
 function updateSaveBar() {
   var n = S.sel.size;
   var names = Array.from(S.sel.keys()).slice(-4).reverse().map(function (id) { var o = S.byId[id]; return o ? o.nama.split(' ').slice(0, 2).join(' ') : id; });
-  $('selCount').innerHTML = n + ' murid dipilih <small>' + (n ? esc(names.join(', ')) + (n > 4 ? '…' : '') + ' · ketik untuk lihat' : (S.off ? esc(S.off.kesalahan) : 'Pilih kesalahan dahulu')) + '</small>';
+  $('selCount').innerHTML = n + ' murid dipilih <small>' + (n ? esc(names.join(', ')) + (n > 4 ? '…' : '') + ' · ketik untuk lihat' : (S.off ? esc(nice(S.off.kesalahan)) : 'Pilih kesalahan dahulu')) + '</small>';
   $('btnSave').disabled = !n || !S.off;
   $('btnSave').textContent = n ? 'Simpan (' + n + ')' : 'Simpan';
 }
@@ -589,7 +679,8 @@ function confirmSave() {
   var tarikh = $('inTarikh').value;
   if (!tarikh) { toast('Isi tarikh', true); return; }
   modal('<h3>Sahkan rekod</h3>' +
-    '<p style="margin:0 0 6px"><b>' + esc(S.off.kesalahan) + '</b> (−' + S.off.mata + ' mata)</p>' +
+    '<p style="margin:0 0 6px"><span class="kd sev-' + sevOf(S.off) + '">' + esc(S.off.kod) + '</span> <b>' + esc(nice(S.off.kesalahan)) + '</b> (−' + S.off.mata + ' mata)</p>' +
+    (sevOf(S.off) === 'b' ? '<div class="alert warn" style="margin:6px 0">Kesalahan <b>Berat</b>. Pastikan maklumat betul dan isi catatan jika perlu.</div>' : '') +
     '<p class="muted" style="margin:0">' + dmy(tarikh) + ' ' + esc($('inMasa').value) + (($('inLokasi').value) ? ' · ' + esc($('inLokasi').value) : '') + '</p>' +
     '<p style="font-size:22px;font-weight:700;margin:12px 0">' + n + ' murid</p>' +
     '<div class="actions"><button class="btn" onclick="closeModal()">Batal</button><button class="btn pri" id="btnDoSave">Sahkan & simpan</button></div>');
@@ -604,6 +695,7 @@ function doSave() {
     lokasi: $('inLokasi').value, catatan: $('inCatatan').value.trim(), ids: ids
   }).then(function (r) {
     loading(false);
+    if (r.disimpan) bumpOffUse(S.off.kod);
     ids.forEach(function (id) { S.done[id] = 1; });
     S.sel.clear(); saveDraft(); renderList(); updateSaveBar();
     $('inCatatan').value = '';
@@ -676,7 +768,7 @@ function loadRecent() {
   api('getRecent', S.ctx, { milikSaya: $('onlyMine').checked }).then(function (r) {
     if (!r.batches.length) { $('recentList').innerHTML = '<div class="empty">Belum ada rekod.</div>'; return; }
     $('recentList').innerHTML = r.batches.map(function (b) {
-      return '<div class="batch"><div class="t">' + esc(b.kesalahan) + ' — ' + b.murid.length + ' murid</div>' +
+      return '<div class="batch"><div class="t">' + esc(nice(b.kesalahan)) + ' — ' + b.murid.length + ' murid</div>' +
         '<div class="m">' + dmy(b.tarikh) + ' ' + esc(b.masa) + (b.lokasi ? ' · ' + esc(b.lokasi) : '') + ' · oleh ' + esc(b.pelapor) + (b.peranan ? ' (' + esc(b.peranan) + ')' : '') + '</div>' +
         (b.catatan ? '<div class="m">Catatan: ' + esc(b.catatan) + '</div>' : '') +
         '<details><summary>Senarai murid</summary><ol>' + b.murid.map(function (m) { return '<li>' + esc(m[0]) + ' <span class="muted">' + esc(m[1]) + '</span></li>'; }).join('') + '</ol></details>' +

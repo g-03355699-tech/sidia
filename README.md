@@ -62,6 +62,13 @@ Pelayar log masuk dengan lebih daripada satu akaun Google. Buang `/a/<domain>` d
 - Pilihan yang belum disimpan kekal walaupun telefon tertutup atau internet terputus.
 - Rekod yang tersilap boleh dibatalkan serta-merta, atau dipadam di tab **Terkini** dalam tempoh 24 jam.
 
+## Senarai kesalahan
+SiDIA disertakan dengan **142 kesalahan standard** (Ringan / Sederhana / Berat), termasuk 5 kesalahan tidak hadir solat berjemaah (W01–W05).
+- Di web app, kesalahan dipilih melalui tab **⭐ Pantas / Ringan / Sederhana / Berat**, atau dicari ikut nama atau kod (cth `rokok`, `R16`). Kesalahan yang kerap digunakan oleh setiap pengguna dipaparkan paling atas.
+- Tandakan lajur **Pantas** dalam tab KESALAHAN (atau ⭐ dalam wizard) untuk kesalahan yang selalu direkod.
+- Sekolah yang mempunyai senarai sendiri boleh **tampal terus dari Excel** dalam wizard (langkah 3). Lajur Kod/Code, Kesalahan/Description, Kategori/Category (1/2/3) dan Mata/Demerit dikenal pasti secara automatik.
+- Menu **SiDIA › Guna senarai kesalahan standard SiDIA** menggantikan tab KESALAHAN dengan senarai standard. Rekod lama tidak terjejas.
+
 ## Laporan & markah rumah
 Buka tab **Laporan** (perlukan kod admin) dan pilih tempoh. Paparan menunjukkan:
 - Jumlah kes dan **mata demerit mengikut rumah**

@@ -315,6 +315,14 @@ function readFiles(files) {
           : XLSX.read(new Uint8Array(rd.result), { type: 'array' });
         wb.SheetNames.forEach(function (sn) {
           var aoa = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: false, defval: '' });
+          // Nombor panjang (No. KP / MyKid) dipaparkan Excel sebagai 1.30927E+11 — ambil nilai sebenar
+          var raw = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: '' });
+          aoa.forEach(function (row, i) {
+            row.forEach(function (c, j) {
+              var v = raw[i] && raw[i][j];
+              if (typeof v === 'number' && Number.isInteger(v) && Math.abs(v) >= 1e6) row[j] = String(v);
+            });
+          });
           var multi = wb.SheetNames.length > 1;
           var fileBase = f.name.replace(/\.[^.]+$/, '');
           var b = makeBlock(f.name + (multi ? ' › ' + sn : ''), multi && !/^(sheet|helaian)\s*\d*$/i.test(sn) ? sn : fileBase, aoa);
@@ -386,6 +394,7 @@ function renderBlocks() {
 function cell(r, j) { return j >= 0 ? String(r[j] == null ? '' : r[j]).trim() : ''; }
 function buildRows() {
   var rows = [];
+  W.lostIds = 0;
   W.blocks.forEach(function (b) {
     if (b.map.nama < 0) return;
     b.data.forEach(function (r) {
@@ -393,6 +402,7 @@ function buildRows() {
       if (nama.length < 3 || !/[a-z]{2,}/i.test(nama) || /^(nama|jumlah|bil\.?|no\.?)\b/i.test(nama)) return;
       var kelas = b.map.kelas >= 0 ? cell(r, b.map.kelas) : b.fallbackKelas;
       var id = cell(r, b.map.id).replace(/[\s-]/g, '');
+      if (/^\d+(\.\d+)?e\+?\d+$/i.test(id)) { W.lostIds = (W.lostIds || 0) + 1; id = ''; } // digit sudah hilang dalam fail
       if (/^\d{11}$/.test(id)) id = '0' + id; // MyKid yang hilang sifar di depan (Excel simpan sebagai nombor)
       rows.push([id, nama, kelas, cell(r, b.map.rumah)]);
     });
@@ -412,6 +422,7 @@ function renderPreview() {
   var warn = [];
   if (noKelas) warn.push(noKelas + ' murid tiada kelas.');
   if (noRumah) warn.push(noRumah + ' murid tiada rumah. Laporan mata rumah memerlukan lajur Rumah.');
+  if (W.lostIds) warn.push(W.lostIds + ' No. KP / ID dalam fail berbentuk saintifik (cth 1.30927E+11) dan digitnya sudah hilang dalam fail itu sendiri. ID akan dijana daripada nama. Untuk guna No. KP: dalam Excel, format lajur itu sebagai Number (0 tempat perpuluhan) atau Text, kemudian simpan semula fail.');
   if (noId === rows.length) warn.push('Tiada lajur ID / No. MyKid. ID akan dijana daripada nama (masih boleh digunakan).');
   if (dup) warn.push(dup + ' nama berulang dalam kelas yang sama.');
   var rk = Object.keys(rumah).sort();

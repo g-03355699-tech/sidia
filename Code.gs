@@ -852,7 +852,9 @@ function readStudents_() {
   var tab = s.TAB_MURID || SH.MURID;
   var sh = ss.getSheetByName(tab);
   if (!sh) throw new Error('Tab murid "' + tab + '" tidak dijumpai. Semak TETAPAN > TAB_MURID.');
-  var values = sh.getDataRange().getDisplayValues();
+  var range = sh.getDataRange();
+  var values = range.getDisplayValues();
+  var rawValues = range.getValues(); // untuk No. KP yang disimpan sebagai nombor (dipapar 1.30927E+11)
   var hr = -1, map = null;
   for (var i = 0; i < Math.min(10, values.length); i++) {
     map = mapHeaders_(values[i]);
@@ -869,7 +871,12 @@ function readStudents_() {
     var row = values[r];
     var nama = String(row[map.nama] || '').trim();
     if (!nama) continue;
-    var id = map.id >= 0 ? String(row[map.id] || '').trim() : '';
+    var id = '';
+    if (map.id >= 0) {
+      var rv = rawValues[r][map.id];
+      id = typeof rv === 'number' && rv % 1 === 0 && Math.abs(rv) >= 1e6 ? String(rv) : String(row[map.id] || '').trim();
+      if (/^\d{11}$/.test(id)) id = '0' + id;
+    }
     if (!id) id = 'R' + (r + 1);
     if (seen[id]) { warnings.push('ID berulang: ' + id); id = id + '_' + (r + 1); }
     seen[id] = 1;

@@ -178,6 +178,7 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
           <div style="flex:1">
             <a class="btn" id="btnWa" href="#" style="background:#25d366;border-color:#25d366;color:#fff">Kongsi di WhatsApp</a>
             <div class="alert info" style="margin-top:12px" id="codeInfo"></div>
+            <div class="hint" style="margin-bottom:8px"><b>Keluar "Sorry, unable to open the file"?</b> Pelayar sedang log masuk dengan akaun Google lain. Buka pautan dalam Incognito, atau tukar <b>Who has access</b> kepada <b>Anyone</b> (dilindungi kod akses).</div>
             <div class="hint">Jika anda mengubah kod Apps Script kemudian, pilih <b>Deploy › Manage deployments › ✎ Edit › Version: New version</b> supaya pautan kekal sama.</div>
           </div>
         </div>
@@ -450,6 +451,7 @@ function renderDeploy() {
     ? '<code>Anyone within ' + esc(dom) + '</code> jika semua pengguna ada akaun ' + esc(dom) + ', <b>atau</b> <code>Anyone</code> jika pengawas tiada akaun sekolah' + (hasPin ? '' : ' <span style="color:var(--danger)">(isi Kod akses di langkah 1 dahulu!)</span>')
     : '<code>Anyone</code>' + (hasPin ? ' (dilindungi oleh kod akses anda)' : ' <span style="color:var(--danger)">— sila isi Kod akses di langkah 1 dahulu!</span>');
   if (!url) return;
+  url = url.replace(/\/a\/[^/]+\/macros\//, '/macros/'); // pautan tanpa /a/domain/ mengelakkan ralat akaun berganda
   $('appUrl').value = url;
   $('btnOpen').href = url;
   var sek = W.state.tetapan.NAMA_SEKOLAH || 'sekolah kita';

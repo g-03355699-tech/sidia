@@ -25,6 +25,9 @@ Sistem rekod disiplin murid sekolah berasaskan Google Sheet + Google Apps Script
 
 Kali pertama, Google akan meminta kebenaran. Jika keluar amaran *"Google hasn't verified this app"*, klik **Advanced › Go to SiDIA**. Skrip itu berjalan dalam akaun anda sendiri.
 
+### Ralat "Sorry, unable to open the file at present"
+Pelayar log masuk dengan lebih daripada satu akaun Google. Buang `/a/<domain>` daripada pautan web app (`https://script.google.com/macros/s/…/exec`), buka dalam Incognito, atau tukar **Who has access** kepada **Anyone** dan gunakan kod akses.
+
 ## Fail
 | Fail | Fungsi |
 |---|---|

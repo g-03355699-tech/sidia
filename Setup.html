@@ -10,7 +10,7 @@
 html,body{margin:0;height:100%;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
 button,input,select,textarea{font:inherit;color:inherit}
 .wrap{display:flex;height:100%}
-aside{width:200px;flex:0 0 auto;background:var(--bg);border-right:1px solid var(--line);padding:16px 10px}
+aside{position:relative;width:200px;flex:0 0 auto;background:var(--bg);border-right:1px solid var(--line);padding:16px 10px}
 aside .logo{font-weight:800;font-size:20px;color:var(--pri);padding:0 8px 14px}
 .stepbtn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:10px 8px;border-radius:8px;cursor:pointer;text-align:left;color:var(--muted)}
 .stepbtn .n{width:24px;height:24px;border-radius:50%;border:2px solid #b8c1ca;display:grid;place-items:center;font-size:12px;font-weight:700;flex:0 0 auto}
@@ -87,6 +87,7 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
     <button class="stepbtn" data-s="2"><span class="n">2</span>Senarai murid</button>
     <button class="stepbtn" data-s="3"><span class="n">3</span>Kesalahan & mata</button>
     <button class="stepbtn" data-s="4"><span class="n">4</span>Aktifkan & kongsi</button>
+    <div id="verBox" style="position:absolute;bottom:14px;left:10px;width:180px;font-size:12px;color:var(--muted)"></div>
   </aside>
 
   <main>
@@ -608,6 +609,33 @@ $('btnCopy').onclick = function () {
   $('btnCopy').textContent = 'Disalin ✓';
 };
 
+/* ---------- versi & kemas kini ---------- */
+function cmpVer(a, b) {
+  var pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number);
+  for (var i = 0; i < 3; i++) { var d = (pa[i] || 0) - (pb[i] || 0); if (d) return d; }
+  return 0;
+}
+function renderVersion() {
+  var v = W.state.versi, t = W.state.versiTerkini;
+  if (t && cmpVer(t, v) > 0) {
+    $('verBox').innerHTML = '<div class="alert info" style="margin:0;padding:8px">Versi baharu <b>' + esc(t) + '</b> tersedia.<br><button class="btn sm pri" id="btnUpd" style="margin-top:6px;width:100%;justify-content:center">⬆️ Kemas kini</button></div>' +
+      '<div style="margin-top:4px">Versi anda: ' + esc(v) + '</div>';
+    $('btnUpd').onclick = function () {
+      if (!confirm('Kemas kini SiDIA ke versi ' + t + '?\n\nPautan web app kekal sama. Data murid & rekod tidak diubah.')) return;
+      loading(true, 'Mengemas kini SiDIA…');
+      api('wizKemasKini').then(function (r) {
+        loading(false);
+        $('verBox').innerHTML = '<div class="alert ok" style="margin:0;padding:8px">✅ Dikemas kini ke ' + esc(r.versi) + '.<br>Tutup tetingkap ini dan <b>muat semula</b> Google Sheet.</div>';
+      }).catch(function (e) {
+        loading(false);
+        $('verBox').innerHTML = '<div class="alert err" style="margin:0;padding:8px;white-space:pre-line">' + esc(e.message) + '</div>';
+      });
+    };
+  } else {
+    $('verBox').textContent = 'SiDIA versi ' + (v || '?') + (t ? ' · terkini' : '');
+  }
+}
+
 /* ---------- mula ---------- */
 loading(true, 'Memuatkan…');
 api('wizGetState').then(function (st) {
@@ -622,6 +650,7 @@ api('wizGetState').then(function (st) {
   if (st.murid.count) W.done[2] = 1;
   if (st.webAppUrl) W.done[4] = 1;
   renderOffenses();
+  renderVersion();
   go(!t.NAMA_SEKOLAH ? 1 : !st.murid.count ? 2 : st.webAppUrl ? 4 : 1);
 }).catch(function (e) { loading(false); document.querySelector('main').innerHTML = '<div class="alert err">' + esc(e.message) + '</div>'; });
 </script>

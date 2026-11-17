@@ -34,15 +34,49 @@ Pelayar log masuk dengan lebih daripada satu akaun Google. Buang `/a/<domain>` d
 | `Code.gs` | Kod pelayan (baca murid, simpan rekod, laporan, wizard) |
 | `Index.html` | Web app untuk merekod (telefon & komputer) |
 | `Setup.html` | Wizard persediaan dalam Google Sheet |
-| `appsscript.json` | Tetapan projek (zon waktu Malaysia) |
+| `appsscript.json` | Tetapan projek (zon waktu, kebenaran) |
+| `version.json` | Maklumat keluaran terkini untuk kemas kini satu klik |
+| `CHANGELOG.md` | Senarai perubahan setiap versi |
 | `docs/` | Halaman pengenalan (GitHub Pages) |
 
 ## Pemasangan manual (tanpa templat)
 1. Cipta Google Sheet baharu › **Extensions › Apps Script**.
-2. Tampal `Code.gs`. Tambah fail HTML `Index` dan `Setup`, kemudian tampal isinya. (Pilihan) tampal `appsscript.json`.
-3. Simpan, muat semula Google Sheet, kemudian klik **SiDIA › 🚀 Mula di sini**.
+2. Tampal `Code.gs`. Tambah fail HTML `Index` dan `Setup`, kemudian tampal isinya.
+3. **Project Settings ⚙ › tandakan "Show appsscript.json manifest file in editor"**, kemudian tampal isi `appsscript.json`. Fail ini wajib untuk kemas kini satu klik.
+4. Simpan, muat semula Google Sheet, kemudian klik **SiDIA › 🚀 Mula di sini**.
 
-> Selepas mengubah kod, gunakan **Deploy › Manage deployments › ✎ Edit › Version: New version** supaya pautan kekal sama.
+## Kemas kini ke versi baharu (untuk sekolah)
+SiDIA boleh mengemas kini dirinya sendiri. Pautan web app kekal sama, dan data murid serta rekod tidak diubah.
+
+**Sekali sahaja:** buka https://script.google.com/home/usersettings dan hidupkan **Google Apps Script API** (ON).
+
+**Setiap kali ada versi baharu:**
+1. Dalam Google Sheet SiDIA, klik **SiDIA › ⬆️ Semak kemas kini SiDIA…** Wizard (**🚀 Mula di sini**) juga memaparkan notis apabila versi baharu tersedia.
+2. Baca senarai perubahan, kemudian klik **Yes**.
+3. Muat semula Google Sheet. Jika Google meminta kebenaran baharu, klik **Continue › Allow**.
+
+Proses ini:
+- memuat turun kod keluaran terkini dari GitHub
+- menggantikan fail `Code`, `Index`, `Setup` dan `appsscript` (fail lain milik sekolah dikekalkan)
+- mencipta versi baharu dan mengemas kini deployment web app sedia ada, dengan tetapan akses (*Who has access*) dikekalkan
+
+**Jika suis Apps Script API disekat oleh pentadbir domain:** kemas kini secara manual. Tampal semula `Code.gs`, `Index.html`, `Setup.html` dan `appsscript.json` daripada [keluaran terkini](https://github.com/g-03355699-tech/sidia/releases), kemudian **Deploy › Manage deployments › ✎ Edit › Version: New version › Deploy**.
+
+> **Kali pertama sahaja:** sekolah yang memasang SiDIA sebelum versi 1.1.0 perlu menampal keempat-empat fail secara manual sekali (termasuk `appsscript.json`). Selepas itu, kemas kini satu klik boleh digunakan.
+
+## Untuk penyelenggara: menerbitkan versi baharu
+1. Buat perubahan kod dan uji.
+2. Naikkan nombor versi di **dua** tempat:
+   - `Code.gs` → `var SIDIA_VERSION = 'X.Y.Z';`
+   - `version.json` → `version`, `ref` (`vX.Y.Z`), `tarikh` dan `nota` (senarai perubahan ringkas yang dipaparkan kepada sekolah)
+3. Tambah catatan dalam `CHANGELOG.md`.
+4. Commit, cipta tag dan push kedua-duanya:
+   ```bash
+   git tag vX.Y.Z && git push origin main vX.Y.Z
+   ```
+5. Kemas kini Google Sheet templat menggunakan menu **⬆️ Semak kemas kini** supaya salinan baharu mendapat versi terkini.
+
+Sekolah hanya menerima kod daripada **tag** yang dinyatakan dalam `version.json`. Perubahan di cawangan `main` yang belum diterbitkan tidak sampai kepada sekolah. Kemas kini juga dibatalkan jika versi dalam `Code.gs` pada tag itu tidak sepadan dengan `version.json`.
 
 ## Untuk penyelenggara: menyediakan templat "Buat salinan"
 1. Pasang SiDIA secara manual dalam Google Sheet baharu bernama **SiDIA (Templat)**. Buka wizard sekali supaya semua tab dicipta, kemudian tutup tanpa mengisi apa-apa. Padam tab kosong *Sheet1* jika ada.

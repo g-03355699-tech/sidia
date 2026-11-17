@@ -11,6 +11,11 @@
  *   LAPORAN    – dijana daripada menu / web app
  */
 
+/** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
+var SIDIA_VERSION = '1.1.0';
+/** Sumber kemas kini (repo awam GitHub). */
+var SIDIA_REPO = 'g-03355699-tech/sidia';
+
 var SH = {
   TETAPAN: 'TETAPAN',
   MURID: 'MURID',
@@ -204,6 +209,8 @@ function onOpen() {
     .addItem('Semak senarai murid', 'semakMuridMenu')
     .addItem('Jana laporan mata rumah…', 'janaLaporanMenu')
     .addItem('Guna senarai kesalahan standard SiDIA…', 'gunaKesalahanStandard')
+    .addSeparator()
+    .addItem('⬆️ Semak kemas kini SiDIA…', 'semakKemasKiniMenu')
     .addItem('Baiki / cipta semula tab sistem', 'setupSistem')
     .addToUi();
   try {
@@ -310,6 +317,8 @@ function wizGetState() {
     offenses: offenses,
     webAppUrl: detectWebAppUrl_(),
     scriptUrl: 'https://script.google.com/d/' + ScriptApp.getScriptId() + '/edit',
+    versi: SIDIA_VERSION,
+    versiTerkini: (function () { try { return latestRelease_().version; } catch (e) { return ''; } })(),
     email: currentEmail_()
   };
 }
@@ -505,6 +514,7 @@ function doGet() {
 
 /** Maklumat awal (tanpa data murid) untuk paparan log masuk. */
 function getConfig() {
+  migrateIfNeeded_();
   var s = getSettings_();
   var users = readUsers_();
   var email = currentEmail_();
@@ -933,4 +943,188 @@ function dateStr_(v) {
   m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);
   if (m) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
   return s;
+}
+
+
+/* =========================================================
+ *  KEMAS KINI SATU KLIK
+ *  Memuat turun kod keluaran terkini dari GitHub dan memasangnya ke dalam
+ *  projek Apps Script ini melalui Apps Script API, kemudian mengemas kini
+ *  deployment web app sedia ada (pautan kekal sama). Data dalam Google Sheet
+ *  tidak disentuh.
+ *  Syarat (sekali sahaja): https://script.google.com/home/usersettings
+ *  › Google Apps Script API › ON
+ * ========================================================= */
+
+var SIDIA_FILES = [
+  { name: 'Code', type: 'SERVER_JS', path: 'Code.gs' },
+  { name: 'Index', type: 'HTML', path: 'Index.html' },
+  { name: 'Setup', type: 'HTML', path: 'Setup.html' },
+  { name: 'appsscript', type: 'JSON', path: 'appsscript.json' }
+];
+
+function semakKemasKiniMenu() {
+  var ui = SpreadsheetApp.getUi();
+  var rel;
+  try { rel = latestRelease_(); } catch (e) {
+    ui.alert('Tidak dapat menyemak kemas kini', e.message, ui.ButtonSet.OK); return;
+  }
+  if (compareVersion_(rel.version, SIDIA_VERSION) <= 0) {
+    ui.alert('SiDIA terkini', 'Anda sudah menggunakan versi terkini (' + SIDIA_VERSION + ').', ui.ButtonSet.OK); return;
+  }
+  var nota = (rel.nota || []).map(function (n) { return '• ' + n; }).join('\n');
+  var r = ui.alert('Versi baharu SiDIA ' + rel.version,
+    'Versi anda: ' + SIDIA_VERSION + '\nVersi baharu: ' + rel.version + (rel.tarikh ? ' (' + rel.tarikh + ')' : '') +
+    (nota ? '\n\nApa yang baharu:\n' + nota : '') +
+    '\n\nKod akan dikemas kini dan web app dikemas kini secara automatik. Pautan web app kekal sama. Data murid & rekod tidak diubah.\n\nKemas kini sekarang?',
+    ui.ButtonSet.YES_NO);
+  if (r !== ui.Button.YES) return;
+  try {
+    var res = pasangKemasKini_(rel);
+    ui.alert('✅ SiDIA dikemas kini ke versi ' + rel.version,
+      (res.deployment ? 'Web app telah dikemas kini (pautan sama).\n\n' :
+        'Kod telah dikemas kini, tetapi tiada deployment web app dijumpai. Lakukan Deploy › New deployment › Web app.\n\n') +
+      'Muat semula (refresh) halaman Google Sheet ini. Jika Google meminta kebenaran baharu, klik Continue › Allow.',
+      ui.ButtonSet.OK);
+  } catch (e) {
+    ui.alert('Kemas kini gagal', e.message, ui.ButtonSet.OK);
+  }
+}
+
+/** Dipanggil dari wizard. */
+function wizKemasKini() {
+  var rel = latestRelease_();
+  if (compareVersion_(rel.version, SIDIA_VERSION) <= 0) return { versi: SIDIA_VERSION, sudahTerkini: true };
+  var res = pasangKemasKini_(rel);
+  return { versi: rel.version, deployment: res.deployment };
+}
+
+function latestRelease_() {
+  var url = 'https://raw.githubusercontent.com/' + SIDIA_REPO + '/main/version.json?t=' + Date.now();
+  var resp = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  if (resp.getResponseCode() !== 200) throw new Error('Tidak dapat membaca maklumat versi dari GitHub (HTTP ' + resp.getResponseCode() + ').');
+  var rel = JSON.parse(resp.getContentText());
+  if (!rel.version || !rel.ref) throw new Error('Fail version.json tidak lengkap.');
+  return rel;
+}
+
+function compareVersion_(a, b) {
+  var pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number);
+  for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+    var d = (pa[i] || 0) - (pb[i] || 0);
+    if (d) return d > 0 ? 1 : -1;
+  }
+  return 0;
+}
+
+function pasangKemasKini_(rel) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var scriptId = ScriptApp.getScriptId();
+    var api = 'https://script.googleapis.com/v1/projects/' + scriptId;
+
+    // 1. kandungan semasa projek (untuk kekalkan fail tambahan sekolah)
+    var current = scriptApi_('get', api + '/content').files || [];
+
+    // 2. muat turun fail keluaran baharu (ikut tag, bukan cawangan main)
+    var fresh = SIDIA_FILES.map(function (f) {
+      var url = 'https://raw.githubusercontent.com/' + SIDIA_REPO + '/' + encodeURIComponent(rel.ref) + '/' + f.path;
+      var r = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+      if (r.getResponseCode() !== 200) throw new Error('Gagal memuat turun ' + f.path + ' (HTTP ' + r.getResponseCode() + ').');
+      return { name: f.name, type: f.type, source: r.getContentText() };
+    });
+    var newCode = fresh[0].source;
+    if (newCode.indexOf("var SIDIA_VERSION = '" + rel.version + "'") < 0) {
+      throw new Error('Versi dalam Code.gs (' + rel.ref + ') tidak sepadan dengan ' + rel.version + '. Kemas kini dibatalkan.');
+    }
+
+    // 3. deployment web app sedia ada
+    var deps = (scriptApi_('get', api + '/deployments').deployments || []).filter(function (d) {
+      return (d.entryPoints || []).some(function (e) { return e.entryPointType === 'WEB_APP'; }) && d.deploymentConfig && d.deploymentConfig.versionNumber;
+    });
+    var saved = getSettings_().WEB_APP_URL || '';
+    var dep = null;
+    deps.forEach(function (d) {
+      var wa = d.entryPoints.filter(function (e) { return e.entryPointType === 'WEB_APP'; })[0].webApp || {};
+      if (saved && wa.url && sameWebApp_(wa.url, saved)) dep = d;
+    });
+    if (!dep && deps.length) dep = deps.sort(function (a, b) { return String(b.updateTime).localeCompare(String(a.updateTime)); })[0];
+
+    // 4. manifest: kekalkan tetapan akses web app sekolah ini
+    var manifest = JSON.parse(fresh[3].source);
+    var oldManifest = current.filter(function (f) { return f.name === 'appsscript'; })[0];
+    var oldWebapp = null;
+    try { oldWebapp = JSON.parse(oldManifest.source).webapp || null; } catch (e) {}
+    if (dep) {
+      var cfg = (dep.entryPoints.filter(function (e) { return e.entryPointType === 'WEB_APP'; })[0].webApp || {}).entryPointConfig;
+      if (cfg && cfg.access) oldWebapp = { access: cfg.access, executeAs: cfg.executeAs || 'USER_DEPLOYING' };
+    }
+    if (oldWebapp) manifest.webapp = oldWebapp; else delete manifest.webapp;
+    fresh[3].source = JSON.stringify(manifest, null, 2);
+
+    // 5. gabung: ganti fail SiDIA, kekalkan fail lain milik sekolah
+    var ours = {}; SIDIA_FILES.forEach(function (f) { ours[f.name] = 1; });
+    var keep = current.filter(function (f) {
+      if (ours[f.name]) return false;
+      // fail kod SiDIA lama dengan nama lain (cth "Kod") — buang supaya fungsi tidak bertindih
+      if (f.type === 'SERVER_JS' && /function readStudents_\(|var SIDIA_VERSION/.test(f.source || '')) return false;
+      return true;
+    }).map(function (f) { return { name: f.name, type: f.type, source: f.source }; });
+    scriptApi_('put', api + '/content', { files: fresh.concat(keep) });
+
+    // 6. versi baharu + kemas kini deployment (pautan kekal)
+    var ver = scriptApi_('post', api + '/versions', { description: 'SiDIA ' + rel.version });
+    var updated = null;
+    if (dep) {
+      updated = scriptApi_('put', api + '/deployments/' + dep.deploymentId, {
+        deploymentConfig: {
+          scriptId: scriptId, versionNumber: ver.versionNumber, manifestFileName: 'appsscript',
+          description: 'SiDIA ' + rel.version
+        }
+      });
+    }
+    return { versionNumber: ver.versionNumber, deployment: updated ? updated.deploymentId : null, kept: keep.map(function (f) { return f.name; }) };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function sameWebApp_(a, b) {
+  var id = function (u) { var m = String(u).match(/\/s\/([^/]+)\//); return m ? m[1] : u; };
+  return id(a) === id(b);
+}
+
+function scriptApi_(method, url, body) {
+  var opt = {
+    method: method, muteHttpExceptions: true, contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }
+  };
+  if (body) opt.payload = JSON.stringify(body);
+  var r = UrlFetchApp.fetch(url, opt);
+  var code = r.getResponseCode(), txt = r.getContentText();
+  if (code >= 200 && code < 300) return txt ? JSON.parse(txt) : {};
+  if (code === 403 && /Apps Script API|has not been used|is disabled|not enabled/i.test(txt)) {
+    throw new Error('Google Apps Script API belum dihidupkan untuk akaun anda.\n\n' +
+      'Buka https://script.google.com/home/usersettings › hidupkan "Google Apps Script API" (ON), ' +
+      'tunggu 1–2 minit, kemudian cuba lagi.\n\nJika suis itu tidak dibenarkan oleh pentadbir domain, ' +
+      'gunakan kaedah kemas kini manual dalam README.');
+  }
+  var msg = txt;
+  try { msg = JSON.parse(txt).error.message; } catch (e) {}
+  throw new Error('Apps Script API (' + code + '): ' + msg);
+}
+
+/** Jalankan persediaan tab yang baharu selepas kemas kini (sekali bagi setiap versi). */
+function migrateIfNeeded_() {
+  try {
+    if (getSettings_().VERSI_DIPASANG === SIDIA_VERSION) return;
+    var lock = LockService.getScriptLock();
+    if (!lock.tryLock(5000)) return;
+    try {
+      if (getSettings_().VERSI_DIPASANG === SIDIA_VERSION) return;
+      ensureSetup_();
+      setSetting_('VERSI_DIPASANG', SIDIA_VERSION);
+    } finally { lock.releaseLock(); }
+  } catch (e) { console.warn('migrasi: ' + e.message); }
 }

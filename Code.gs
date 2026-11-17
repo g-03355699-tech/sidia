@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.3.0';
+var SIDIA_VERSION = '1.4.0';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 /** Ikon web app (dihoskan di GitHub Pages). */
@@ -515,7 +515,7 @@ function doGet() {
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle(s.NAMA_APP || 'SiDIA')
     .setFaviconUrl(SIDIA_ICON)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1, viewport-fit=cover')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 

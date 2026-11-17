@@ -1,5 +1,14 @@
 # Senarai Perubahan SiDIA
 
+## 1.4.0 (17 Nov 2026)
+Reka bentuk semula UI/UX web app berdasarkan garis panduan UI UX Pro Max (produk pendidikan/LMS):
+- **Sistem reka bentuk**: token warna semantik (teal pendidikan + amber), fon Inter, skala jejari/bayang/pergerakan yang konsisten
+- **Mod gelap automatik** mengikut tetapan telefon, sesuai untuk semakan waktu Subuh/malam
+- **Ikon SVG** menggantikan emoji (navigasi, menu Admin, butang)
+- **Aksesibiliti**: kontras ≥4.5:1, cincin fokus, label ARIA, senarai murid boleh digunakan dengan papan kekunci (Space/Enter), notis diumumkan kepada pembaca skrin, Escape menutup tetingkap, zum tidak lagi dimatikan, `prefers-reduced-motion`
+- **Sentuhan**: semua sasaran ≥44px, maklum balas tekan, petunjuk tab aktif (pil), ruang selamat iPhone (safe area)
+- *Empty state* yang lebih membantu, sheet bawah dengan pemegang, butang × tunggal dalam kotak carian
+
 ## 1.3.0 (17 Nov 2026)
 - **Laporan PDF rasmi** (Admin › Laporan › 📄 Muat turun PDF), dijana dalam pelayar:
   - header SiDIA (logo, nama sekolah, tempoh) dan footer (penyedia, tarikh, SULIT, Halaman X / Y) pada setiap halaman

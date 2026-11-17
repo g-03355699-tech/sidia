@@ -27,7 +27,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   await p.fill('#q2', 'muhammad'); await p.press('#q2', 'Enter');
   await p.fill('#q2', 'nur'); await p.tap('#list2 .item >> nth=0'); await p.waitForTimeout(100);
   ok(await p.evaluate(() => S.sel.size) === 2 && await p.evaluate(() => document.activeElement.id) === 'q2', 'ketik nama: dipilih, papan kekunci kekal');
-  ok(/✓ 2/.test(await p.textContent('#q2N')), 'kiraan dipilih dalam kotak carian');
+  ok((await p.textContent('#q2N')).trim() === '2' && await p.isVisible('#q2N'), 'kiraan dipilih dalam kotak carian');
   await p.screenshot({ path: path.join(out, 'app-carian.png') });
   await p.tap('#srchDone');
   ok(await p.isVisible('#saveBar') && !(await p.isVisible('#srch')), 'Selesai: kembali, bar Simpan kelihatan');

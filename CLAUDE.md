@@ -31,6 +31,15 @@ Pengguna dan penyelenggara berbahasa Melayu. **Semua teks UI, mesej ralat, dokum
 - Kategori kesalahan: `Ringan` / `Sederhana` / `Berat` (1/2/3 juga diterima). Kod mesti unik.
 - `ensureSetup_()` mesti selamat dijalankan berulang kali. `migrateIfNeeded_()` menjalankannya sekali bagi setiap versi baharu (tetapan `VERSI_DIPASANG`).
 
+## Reka bentuk UI (Index.html)
+Berdasarkan garis panduan **UI UX Pro Max** (github.com/nextlevelbuilder/ui-ux-pro-max-skill), produk "LMS / pendidikan":
+- **Token semantik sahaja** dalam komponen (`--pri`, `--pri-ink`, `--surface`, `--surface-2`, `--line`, `--muted`, `--danger`…). Jangan tulis hex terus dalam komponen. Setiap token ada padanan mod gelap dalam `@media (prefers-color-scheme:dark)`.
+- `--pri` (#0f766e) untuk latar dengan teks putih; `--pri-ink` untuk teks/pautan berwarna jenama (lebih cerah dalam mod gelap).
+- **Ikon SVG** daripada sprite `<symbol id="i-…">` di atas `<header>`; dalam JS guna `ic('nama', 'sm|lg')`. **Jangan guna emoji sebagai ikon.**
+- Sasaran sentuhan ≥44px, input ≥48px dengan fon 16px (elak zum automatik iOS), `:focus-visible` mesti kelihatan, jangan matikan zum (`maximum-scale`).
+- Item senarai murid ialah `role="checkbox"` dengan `aria-checked`; notis (`toast`) juga diumumkan melalui `#live` (`aria-live`).
+- Animasi hanya `opacity`/`transform` dengan token `--dur-*`; hormati `prefers-reduced-motion`. **Skrin carian (`#srch`) hanya animasi opacity**: kedudukan input mesti tetap semasa fokus (iOS).
+
 ## Konvensyen kod
 - Gaya ES5 (`var`, `function`) dalam `Code.gs` dan skrip klien, untuk konsisten dan selamat di pelayar lama.
 - Fungsi peribadi pelayan berakhir dengan `_` (tidak boleh dipanggil dari klien). Fungsi yang dipanggil melalui `google.script.run` tidak mempunyai `_`.

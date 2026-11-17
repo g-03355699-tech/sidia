@@ -64,7 +64,13 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-off
 .selected-off .btn.link{flex:0 0 auto}
 /* murid */
 .searchwrap{position:relative}
-.searchwrap input{font-size:18px;padding-right:44px}
+.searchwrap input{font-size:18px;padding-right:96px}
+.searchwrap .qn{position:absolute;right:46px;top:50%;transform:translateY(-50%);background:var(--pri);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:3px 8px;pointer-events:none}
+/* Mod taip (telefon): kotak carian di atas, sorok bahagian yang tidak perlu semasa papan kekunci dibuka */
+body.kb main{padding-bottom:80vh}
+body.kb #hint,body.kb #btnPaste,body.kb .savebar,body.kb nav.tabs,body.kb header .school{display:none!important}
+body.kb .list{margin-top:8px}
+body.kb .toast{top:64px;bottom:auto}
 .searchwrap .clr{position:absolute;right:4px;top:4px;bottom:4px;width:40px;border:0;background:none;font-size:20px;color:var(--muted);cursor:pointer}
 .tools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .tools select{flex:1 1 140px}
@@ -180,8 +186,9 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
     <div class="card">
       <h2><span class="step">2</span> Pilih murid</h2>
       <div class="searchwrap">
-        <input type="search" id="q" autocomplete="off" autocapitalize="off" spellcheck="false"
-               placeholder="Taip nama / kelas, tekan Enter untuk pilih">
+        <input type="search" id="q" name="sidia-cari-murid" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next"
+               placeholder="Taip nama atau kelas…">
+        <span class="qn hidden" id="qN"></span>
         <button class="clr" id="qClr" aria-label="Kosongkan">×</button>
       </div>
       <div class="tools">
@@ -468,6 +475,10 @@ function initRekod() {
     } else if (e.key === 'Escape') { $('q').value = ''; renderList(); }
   });
   $('qClr').onclick = function () { $('q').value = ''; renderList(); $('q').focus(); };
+  ['q', 'offQ'].forEach(function (id) {
+    $(id).addEventListener('focus', function () { kbOn($(id)); });
+    $(id).addEventListener('blur', kbOff);
+  });
   $('fKelas').onchange = renderList;
   $('fRumah').onchange = renderList;
   $('list').addEventListener('click', function (e) {
@@ -560,6 +571,43 @@ function searchOffenses(qs) {
   }).filter(function (x) { return x.sc > 0; })
     .sort(function (a, b) { return b.sc - a.sc; }).map(function (x) { return x.o; });
 }
+/* ---- mod taip: pastikan kotak carian & senarai tidak dilindungi papan kekunci ---- */
+var kbTimer;
+function isPhone() { return window.matchMedia('(max-width: 700px)').matches || ('ontouchstart' in window && window.innerWidth < 900); }
+function kbOn(el) {
+  if (!isPhone()) return;
+  clearTimeout(kbTimer);
+  document.body.classList.add('kb');
+  var pos = function () {
+    var h = document.querySelector('header').offsetHeight;
+    var y = el.getBoundingClientRect().top + window.pageYOffset - h - 10;
+    window.scrollTo(0, Math.max(0, y));
+  };
+  setTimeout(pos, 50); setTimeout(pos, 400); // selepas animasi papan kekunci iOS/Android
+}
+function kbOff() {
+  // lengah sedikit supaya ketikan pada senarai tidak terlepas akibat susun atur berubah
+  kbTimer = setTimeout(function () {
+    var a = document.activeElement;
+    if (a && (a.id === 'q' || a.id === 'offQ')) return;
+    document.body.classList.remove('kb');
+  }, 450);
+}
+if (window.visualViewport) {
+  // jika papan kekunci ditutup tanpa blur (Android: butang kembali), keluar dari mod taip
+  var vvMax = window.visualViewport.height, kbSeen = false;
+  window.visualViewport.addEventListener('resize', function () {
+    var h = window.visualViewport.height;
+    if (h > vvMax) vvMax = h;
+    if (!document.body.classList.contains('kb')) { kbSeen = false; return; }
+    if (h < vvMax * 0.75) { kbSeen = true; return; }          // papan kekunci sedang dibuka
+    if (kbSeen && h > vvMax * 0.9) {                          // papan kekunci telah ditutup
+      kbSeen = false;
+      var a = document.activeElement; if (a && a.blur) a.blur();
+    }
+  });
+}
+
 function renderOffList() {
   var qs = $('offQ').value.trim();
   renderOffTabs(!!qs);
@@ -648,6 +696,7 @@ function select(id, forceOn) {
 function updateSaveBar() {
   var n = S.sel.size;
   var names = Array.from(S.sel.keys()).slice(-4).reverse().map(function (id) { var o = S.byId[id]; return o ? o.nama.split(' ').slice(0, 2).join(' ') : id; });
+  $('qN').textContent = '✓ ' + n; $('qN').classList.toggle('hidden', !n);
   $('selCount').innerHTML = n + ' murid dipilih <small>' + (n ? esc(names.join(', ')) + (n > 4 ? '…' : '') + ' · ketik untuk lihat' : (S.off ? esc(nice(S.off.kesalahan)) : 'Pilih kesalahan dahulu')) + '</small>';
   $('btnSave').disabled = !n || !S.off;
   $('btnSave').textContent = n ? 'Simpan (' + n + ')' : 'Simpan';

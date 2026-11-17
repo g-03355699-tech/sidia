@@ -1,11 +1,11 @@
 {
-  "version": "1.4.0",
-  "ref": "0798b501532b77c2fc97da757ed6180165de6a43",
+  "version": "1.5.0",
+  "ref": "2ac2f1c9a49ab91b00de217cc9d21cce969155fc",
   "tarikh": "2026-11-17",
   "nota": [
-    "Reka bentuk baharu web app: lebih kemas, ikon baharu, butang lebih besar untuk telefon",
-    "Mod gelap automatik mengikut tetapan telefon (sesuai untuk semakan Subuh/malam)",
-    "Lebih mudah diakses: kontras, saiz teks dan zum dibenarkan",
-    "Laporan PDF rasmi (dari 1.3.0)"
+    "Guru, warden, guru disiplin dan admin kini boleh menyunting senarai kesalahan di web app (Admin › Senarai kesalahan)",
+    "Senarai kesalahan lalai kini sama dengan Infomurid (137 kesalahan); W01–W05 dinyahaktifkan secara automatik, rekod lama kekal",
+    "Kesalahan yang sudah ada rekod tidak boleh dipadam; nyahaktifkan sahaja supaya laporan lama kekal",
+    "Extension Chrome baharu untuk import rekod SiDIA ke Infomurid (muat turun di halaman SiDIA)"
   ]
 }

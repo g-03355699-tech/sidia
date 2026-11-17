@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SiDIA — Sistem Rekod Disiplin Murid</title>
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="img/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="alternate icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#0f766e">
 <meta name="description" content="SiDIA: rekod kesalahan disiplin ramai murid serentak (cth tidak hadir solat berjemaah) oleh warden, guru dan pengawas, dan kira mata rumah secara automatik. Percuma, guna Google Sheet sekolah anda.">
 <meta property="og:title" content="SiDIA — Sistem Rekod Disiplin Murid">
 <meta property="og:description" content="Rekod disiplin ramai murid dalam beberapa saat. Percuma untuk semua sekolah.">
@@ -36,7 +43,7 @@ img{max-width:100%;height:auto;display:block}
 nav.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 nav.top .wrap{display:flex;align-items:center;gap:22px;height:62px}
 .logo{font-weight:800;font-size:22px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;letter-spacing:-.02em}
-.logo i{width:30px;height:30px;border-radius:9px;background:var(--pri);display:grid;place-items:center;color:#fff;font-style:normal;font-size:16px}
+.logo img{width:32px;height:32px;display:block}
 nav.top .links{display:flex;gap:20px;margin-left:auto;font-size:15px}
 nav.top .links a{color:var(--muted);text-decoration:none;font-weight:500}
 nav.top .links a:hover{color:var(--ink)}
@@ -129,7 +136,7 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
 
 <nav class="top">
   <div class="wrap">
-    <a class="logo" href="#"><i>✓</i>SiDIA</a>
+    <a class="logo" href="#"><img src="img/favicon.svg" alt="" width="32" height="32">SiDIA</a>
     <div class="links">
       <a href="#masalah">Kenapa SiDIA</a>
       <a href="#ciri">Ciri</a>
@@ -321,7 +328,7 @@ footer .wrap{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
 
 <footer>
   <div class="wrap">
-    <span>SiDIA · Sistem Rekod Disiplin Murid · Versi 1.2.1 · <a href="https://github.com/g-03355699-tech/sidia/blob/main/CHANGELOG.md">Senarai perubahan</a> · Sumber terbuka (MIT)</span>
+    <span>SiDIA · Sistem Rekod Disiplin Murid · Versi 1.2.2 · <a href="https://github.com/g-03355699-tech/sidia/blob/main/CHANGELOG.md">Senarai perubahan</a> · Sumber terbuka (MIT)</span>
     <a href="https://github.com/g-03355699-tech/sidia">github.com/g-03355699-tech/sidia</a>
   </div>
 </footer>

@@ -11,7 +11,9 @@ html,body{margin:0;height:100%;font:14px/1.45 system-ui,-apple-system,"Segoe UI"
 button,input,select,textarea{font:inherit;color:inherit}
 .wrap{display:flex;height:100%}
 aside{position:relative;width:200px;flex:0 0 auto;background:var(--bg);border-right:1px solid var(--line);padding:16px 10px}
-aside .logo{font-weight:800;font-size:20px;color:var(--pri);padding:0 8px 14px}
+aside .logo{font-weight:800;font-size:20px;color:var(--pri);padding:0 8px 14px;display:flex;align-items:center;gap:8px}
+aside .logo span{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#16a093,#0b5a54);display:grid;place-items:center}
+aside .logo svg{width:26px;height:26px}
 .stepbtn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:10px 8px;border-radius:8px;cursor:pointer;text-align:left;color:var(--muted)}
 .stepbtn .n{width:24px;height:24px;border-radius:50%;border:2px solid #b8c1ca;display:grid;place-items:center;font-size:12px;font-weight:700;flex:0 0 auto}
 .stepbtn.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.06)}
@@ -83,7 +85,7 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
 <body>
 <div class="wrap">
   <aside>
-    <div class="logo">SiDIA</div>
+    <div class="logo"><span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 9.5 51 16.5V31c0 11.4-8 19.6-19 23.5C21 50.6 13 42.4 13 31V16.5Z" fill="#fff" fill-opacity=".14" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linejoin="round"/><path d="M22.5 32.5 29.5 39.5 42.5 25" fill="none" stroke="#fff" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>SiDIA</div>
     <button class="stepbtn" data-s="1"><span class="n">1</span>Maklumat sekolah</button>
     <button class="stepbtn" data-s="2"><span class="n">2</span>Senarai murid</button>
     <button class="stepbtn" data-s="3"><span class="n">3</span>Kesalahan & mata</button>

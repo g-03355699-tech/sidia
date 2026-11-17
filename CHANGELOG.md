@@ -1,5 +1,9 @@
 # Senarai Perubahan SiDIA
 
+## 1.2.2 (17 Nov 2026)
+- Ikon SiDIA baharu (perisai dengan tanda ✓): favicon web app, logo di tajuk web app & wizard
+- Halaman pengenalan: favicon, ikon skrin utama (iPhone/Android) dan web manifest
+
 ## 1.2.1 (17 Nov 2026)
 - Kemas kini satu klik: mesej ralat kini menerangkan punca sebenar (suis Apps Script API OFF, API projek dinyahaktifkan, disekat pentadbir domain, atau kebenaran tidak lengkap) dan memaparkan mesej asal Google
 

@@ -20,6 +20,7 @@ Pengguna dan penyelenggara berbahasa Melayu. **Semua teks UI, mesej ralat, dokum
 | `version.json` | Maklumat keluaran terkini yang dibaca oleh updater (`version`, `ref`, `tarikh`, `nota`) |
 | `CHANGELOG.md` | Senarai perubahan |
 | `docs/` | Halaman pengenalan GitHub Pages (`docs/index.html`, `docs/img/`). `TEMPLATE_ID` = ID Google Sheet templat untuk butang "Buat salinan" |
+| `docs/img/favicon.svg` | Sumber ikon SiDIA (`icon-full.svg` = versi tanpa sudut bulat untuk ikon skrin utama). PNG/ICO dijana daripadanya. Web app memaparkan ikon melalui `SIDIA_ICON` (`logo-96.png` di GitHub Pages) dalam `doGet` |
 | `tests/` | Ujian tempatan: simulasi Apps Script + Playwright |
 | `panduan/` | Penjana panduan PDF: `node panduan/jana.js` → `docs/panduan/Panduan-SiDIA-{Guru,Warden,Pengawas,Admin}.pdf`. Tangkapan skrin diambil daripada web app simulasi (`tangkap.js`) |
 

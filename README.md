@@ -60,7 +60,7 @@ Proses ini:
 - menggantikan fail `Code`, `Index`, `Setup` dan `appsscript` (fail lain milik sekolah dikekalkan)
 - mencipta versi baharu dan mengemas kini deployment web app sedia ada, dengan tetapan akses (*Who has access*) dikekalkan
 
-**Jika suis Apps Script API disekat oleh pentadbir domain:** kemas kini secara manual. Tampal semula `Code.gs`, `Index.html`, `Setup.html` dan `appsscript.json` daripada [keluaran terkini](https://github.com/g-03355699-tech/sidia/releases), kemudian **Deploy › Manage deployments › ✎ Edit › Version: New version › Deploy**.
+**Jika suis Apps Script API disekat oleh pentadbir domain:** kemas kini secara manual. Tampal semula `Code.gs`, `Index.html`, `Setup.html` dan `appsscript.json` daripada repo ini (cawangan `main`), kemudian **Deploy › Manage deployments › ✎ Edit › Version: New version › Deploy**.
 
 > **Kali pertama sahaja:** sekolah yang memasang SiDIA sebelum versi 1.1.0 perlu menampal keempat-empat fail secara manual sekali (termasuk `appsscript.json`). Selepas itu, kemas kini satu klik boleh digunakan.
 
@@ -70,13 +70,10 @@ Proses ini:
    - `Code.gs` → `var SIDIA_VERSION = 'X.Y.Z';`
    - `version.json` → `version`, `ref` (`vX.Y.Z`), `tarikh` dan `nota` (senarai perubahan ringkas yang dipaparkan kepada sekolah)
 3. Tambah catatan dalam `CHANGELOG.md`.
-4. Commit, cipta tag dan push kedua-duanya:
-   ```bash
-   git tag vX.Y.Z && git push origin main vX.Y.Z
-   ```
+4. Commit dan push kod keluaran ke `main`. Kemudian isikan **SHA commit** itu (atau nama tag, cth `vX.Y.Z`) dalam `ref` di `version.json`, commit dan push sekali lagi. `ref` menentukan versi kod yang dimuat turun oleh sekolah.
 5. Kemas kini Google Sheet templat menggunakan menu **⬆️ Semak kemas kini** supaya salinan baharu mendapat versi terkini.
 
-Sekolah hanya menerima kod daripada **tag** yang dinyatakan dalam `version.json`. Perubahan di cawangan `main` yang belum diterbitkan tidak sampai kepada sekolah. Kemas kini juga dibatalkan jika versi dalam `Code.gs` pada tag itu tidak sepadan dengan `version.json`.
+Sekolah hanya menerima kod daripada **`ref`** (commit/tag) yang dinyatakan dalam `version.json`. Perubahan di cawangan `main` yang belum diterbitkan tidak sampai kepada sekolah. Kemas kini juga dibatalkan jika versi dalam `Code.gs` pada tag itu tidak sepadan dengan `version.json`.
 
 ## Untuk penyelenggara: menyediakan templat "Buat salinan"
 1. Pasang SiDIA secara manual dalam Google Sheet baharu bernama **SiDIA (Templat)**. Buka wizard sekali supaya semua tab dicipta, kemudian tutup tanpa mengisi apa-apa. Padam tab kosong *Sheet1* jika ada.

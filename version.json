@@ -1,11 +1,11 @@
 {
-  "version": "1.2.2",
-  "ref": "2a52d28187d21e3526eae38a1e2ae9a4cf636be7",
+  "version": "1.2.3",
+  "ref": "ce4a520eec2be066db6ef2d6e6f17bcc6efd2076",
   "tarikh": "2026-11-17",
   "nota": [
-    "Ikon SiDIA baharu di tab pelayar dan tajuk web app",
-    "PIN berbeza untuk Guru & Warden, Pengawas dan Admin; tab Admin (Laporan, Tukar PIN, Tetapan, Kongsi, Sistem)",
-    "Panduan PDF untuk guru, warden, pengawas dan admin",
+    "Baiki iPhone: kotak carian murid tidak lagi menjadikan skrin kosong",
+    "Telefon: skrin carian penuh dengan butang Selesai",
+    "Ikon SiDIA baharu; PIN ikut peranan & tab Admin (dari 1.2.x)",
     "Selepas kemas kini: buka Admin › PIN akses dan tetapkan PIN untuk setiap peranan"
   ]
 }

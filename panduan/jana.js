@@ -194,7 +194,11 @@ const PANDUAN = [
       step('9', 'Sistem & kemas kini',
         `<p>Memaparkan versi SiDIA. Apabila versi baharu tersedia, ketik <b>⬆️ Kemas kini</b>. Pautan web app kekal sama dan data tidak diubah.</p>
          <p>Syarat (sekali sahaja, oleh pemilik Google Sheet): hidupkan <b>Google Apps Script API</b> di <code>script.google.com/home/usersettings</code>.</p>
-         <p>Senarai murid dan senarai kesalahan diurus melalui Google Sheet › <b>SiDIA › 🚀 Mula di sini</b>.</p>`, 'sistem') +
+         <p>Senarai murid diurus melalui Google Sheet › <b>SiDIA › 🚀 Mula di sini</b>.</p>`, 'sistem') +
+      step('10', 'Senarai kesalahan',
+        `<p><b>🛡️ Admin › Senarai kesalahan</b>: tambah kesalahan, ubah nama, kategori dan mata demerit, tanda ⭐ pilihan pantas, atau nyahtanda <b>Aktif</b>. Perubahan terus digunakan oleh semua pengguna.</p>
+         <p>Guru, warden dan guru disiplin juga boleh membuka menu ini <b>tanpa PIN Admin</b>. Pengawas tidak boleh.</p>
+         ${tip('Kesalahan yang sudah ada rekod tidak boleh dipadam atau ditukar kodnya. Nyahaktifkan sahaja supaya laporan lama kekal. Kod yang tiada dalam Infomurid tidak akan diimport ke Infomurid.')}`, ['senarai-kesalahan', 'senarai-kesalahan-ubah']) +
       SOALAN(`<p><b>Rumah dipaparkan dua kali dalam laporan (cth "WJ" dan "WAJA")?</b> Nama rumah dalam senarai murid tidak seragam. Betulkan dalam tab MURID dengan Find & replace.</p>
               <p><b>Pengguna tidak dapat membuka pautan?</b> Kongsi pautan dari menu Kongsi (tanpa <code>/a/domain/</code>). Pastikan <i>Who has access</i> ditetapkan kepada <b>Anyone</b> jika ada pengguna tanpa akaun sekolah.</p>`)
   }

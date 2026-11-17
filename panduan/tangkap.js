@@ -62,6 +62,10 @@ module.exports = async function tangkap() {
   await p.click('[data-sub=subKongsi]'); await p.waitForTimeout(400); await top(); await shot('kongsi');
   await p.click('#subKongsi [data-back]');
   await p.click('[data-sub=subSistem]'); await top(); await shot('sistem');
+  await p.click('#subSistem [data-back]');
+  await p.click('#adminHome [data-sub=subKesalahan]'); await p.waitForSelector('#kesList .off'); await top(); await shot('senarai-kesalahan');
+  await p.fill('#kesQ', 'R28'); await p.click('#kesList [data-kk=R28]'); await p.waitForTimeout(200); await shot('senarai-kesalahan-ubah');
+  await p.click('#kBatal');
   // pengawas
   await p.click('#hdrWho'); await p.waitForSelector('#vLogin:not(.hidden)');
   await p.fill('#inNama', 'Haziq (Pengawas)'); await p.selectOption('#inPeranan', 'Pengawas'); await p.fill('#inPin', '5678');

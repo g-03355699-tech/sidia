@@ -956,6 +956,131 @@ function readOffenses_() {
     });
 }
 
+/* ============ SUNTING SENARAI KESALAHAN (web app) ============ */
+
+/** Guru, warden, guru disiplin dan admin boleh mengubah senarai kesalahan; pengawas tidak. */
+function requireEditor_(ctx) {
+  var user = auth_(ctx);
+  if (user.group === 'murid' && !user.isAdmin) throw new Error('AKSES_DITOLAK: Pengawas tidak boleh mengubah senarai kesalahan.');
+  return user;
+}
+
+function kesalahanSheet_() {
+  var ss = SpreadsheetApp.getActive();
+  var sh = ss.getSheetByName(SH.KESALAHAN);
+  if (!sh) sh = ensureSheet_(ss, SH.KESALAHAN, ['Kod', 'Kesalahan', 'Kategori', 'Mata', 'Aktif', 'Pantas']);
+  return sh;
+}
+
+/** Bilangan rekod bagi setiap kod dalam tab REKOD. */
+function kodUsage_() {
+  var sh = rekodSheet_(), last = sh.getLastRow(), out = {};
+  if (last < 2) return out;
+  sh.getRange(2, R.KOD + 1, last - 1, 1).getDisplayValues().forEach(function (r) {
+    var k = String(r[0]).trim().toUpperCase();
+    if (k) out[k] = (out[k] || 0) + 1;
+  });
+  return out;
+}
+
+function offenseRows_(sh) {
+  var last = sh.getLastRow();
+  if (last < 2) return [];
+  return sh.getRange(2, 1, last - 1, 6).getDisplayValues().map(function (r, i) {
+    return { row: i + 2, kod: String(r[0]).trim(), kesalahan: String(r[1]).trim(), kategori: String(r[2]).trim(),
+      mata: parseFloat(r[3]) || 0, aktif: !isNo_(r[4]), pantas: isYes_(r[5]) };
+  }).filter(function (o) { return o.kod || o.kesalahan; });
+}
+
+/** Semua kesalahan (termasuk tidak aktif) untuk skrin sunting. */
+function getOffensesEdit(ctx) {
+  requireEditor_(ctx);
+  var use = kodUsage_();
+  return offenseRows_(kesalahanSheet_()).map(function (o) {
+    delete o.row;
+    o.guna = use[o.kod.toUpperCase()] || 0;
+    return o;
+  });
+}
+
+function normKategori_(k) {
+  k = String(k || '').trim().toLowerCase();
+  if (k === 'ringan' || k === '1') return 'Ringan';
+  if (k === 'sederhana' || k === '2') return 'Sederhana';
+  if (k === 'berat' || k === '3') return 'Berat';
+  throw new Error('Kategori mesti Ringan, Sederhana atau Berat.');
+}
+
+/**
+ * Tambah atau kemas kini satu kesalahan.
+ * o = {kod, kesalahan, kategori, mata, aktif, pantas}; kodAsal = kod sebelum diubah ('' untuk kesalahan baharu).
+ */
+function saveOffense(ctx, o, kodAsal) {
+  requireEditor_(ctx);
+  o = o || {};
+  var kod = String(o.kod || '').trim().toUpperCase();
+  var teks = String(o.kesalahan || '').replace(/\s+/g, ' ').trim();
+  kodAsal = String(kodAsal || '').trim().toUpperCase();
+  if (!/^[A-Z0-9][A-Z0-9\-]{0,9}$/.test(kod)) throw new Error('Kod mesti 1–10 aksara (huruf, nombor atau -), cth R31.');
+  if (teks.length < 3) throw new Error('Sila isi nama kesalahan.');
+  if (teks.length > 300) throw new Error('Nama kesalahan terlalu panjang (maksimum 300 aksara).');
+  var kategori = normKategori_(o.kategori);
+  var mata = Number(o.mata);
+  if (!isFinite(mata) || mata < 0 || mata > 100) throw new Error('Mata demerit mesti nombor antara 0 hingga 100.');
+  mata = Math.round(mata * 10) / 10;
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var sh = kesalahanSheet_();
+    var rows = offenseRows_(sh);
+    var asal = null, dup = null;
+    rows.forEach(function (r) {
+      var k = r.kod.toUpperCase();
+      if (kodAsal && k === kodAsal) asal = r;
+      if (k === kod && k !== kodAsal) dup = r;
+    });
+    if (dup) throw new Error('Kod ' + kod + ' sudah digunakan untuk "' + dup.kesalahan + '".');
+    if (kodAsal && !asal) throw new Error('Kesalahan ' + kodAsal + ' tidak dijumpai. Muat semula senarai.');
+    if (asal && kod !== kodAsal) {
+      var n = kodUsage_()[kodAsal] || 0;
+      if (n) throw new Error('Kod ' + kodAsal + ' sudah digunakan dalam ' + n + ' rekod, jadi kod tidak boleh ditukar. Nyahaktifkan kesalahan ini dan tambah kesalahan baharu.');
+    }
+    var row = [kod, teks, kategori, mata, o.aktif === false ? 'Tidak' : 'Ya', o.pantas ? 'Ya' : ''];
+    var r = asal ? asal.row : Math.max(sh.getLastRow(), 1) + 1;
+    sh.getRange(r, 1, 1, 1).setNumberFormat('@');
+    sh.getRange(r, 1, 1, 6).setValues([row]);
+    SpreadsheetApp.flush();
+  } finally {
+    lock.releaseLock();
+  }
+  return { offenses: readOffensesSafe_(), kod: kod };
+}
+
+/** Padam kesalahan yang belum pernah digunakan. Yang sudah digunakan hanya boleh dinyahaktifkan. */
+function deleteOffense(ctx, kod) {
+  requireEditor_(ctx);
+  kod = String(kod || '').trim().toUpperCase();
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var n = kodUsage_()[kod] || 0;
+    if (n) throw new Error('Kod ' + kod + ' sudah digunakan dalam ' + n + ' rekod. Nyahaktifkan sahaja supaya laporan lama kekal.');
+    var sh = kesalahanSheet_();
+    var t = offenseRows_(sh).filter(function (r) { return r.kod.toUpperCase() === kod; })[0];
+    if (!t) throw new Error('Kesalahan ' + kod + ' tidak dijumpai.');
+    sh.deleteRows(t.row, 1);
+    SpreadsheetApp.flush();
+  } finally {
+    lock.releaseLock();
+  }
+  return { offenses: readOffensesSafe_() };
+}
+
+function readOffensesSafe_() {
+  try { return readOffenses_(); } catch (e) { return []; }
+}
+
 /**
  * Baca senarai murid. Lajur dikesan secara automatik daripada tajuk:
  * Nama (wajib), Kelas, Rumah, ID / No. MyKid / No. KP / Angka Giliran.

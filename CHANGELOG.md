@@ -3,6 +3,9 @@
 ## 1.5.0 (17 Nov 2026)
 - Senarai kesalahan lalai kini **137 kesalahan**, sama dengan senarai salah laku Infomurid: W01–W05 (tidak hadir solat berjemaah) dibuang
 - Sekolah sedia ada: W01–W05 dinyahaktifkan secara automatik dalam tab KESALAHAN (Aktif = Tidak) selepas kemas kini. Rekod lama tidak diubah dan masih dikira dalam laporan
+- **Sunting senarai kesalahan di web app** (🛡️ Admin › Senarai kesalahan): guru, warden, guru disiplin dan admin boleh menambah kesalahan, mengubah nama, kategori dan mata demerit, menanda ⭐ pilihan pantas, serta menyahaktifkan atau memadam kesalahan. Pengawas tidak boleh
+  - kesalahan yang sudah ada rekod: kod dikunci dan tidak boleh dipadam (nyahaktifkan sahaja) supaya laporan lama kekal
+  - perubahan terus muncul dalam skrin Rekod
 - Extension SiDIA → Infomurid 1.0.2: rekod dengan kod yang tiada dalam Infomurid dilangkau secara automatik
 
 ## Extension SiDIA → Infomurid 1.0.1 (17 Nov 2026)

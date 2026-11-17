@@ -43,7 +43,36 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(/0 rekod disimpan/.test(await p.textContent('#modalBody')), 'rekod berganda dihalang');
   await p.click('text=Rekod seterusnya');
   // ---------- menu Admin ----------
-  await p.click('nav.tabs button[data-v=vAdmin]'); await p.fill('#inAdminPin', '1111'); await p.click('#btnAdmin'); await p.waitForTimeout(300);
+  // ---------- senarai kesalahan (guru tanpa PIN Admin) ----------
+  await p.click('nav.tabs button[data-v=vAdmin]'); await p.waitForTimeout(150);
+  ok(await p.isVisible('#guruTools') && await p.isVisible('#adminGate'), 'guru: butang Senarai kesalahan tanpa PIN Admin');
+  await p.click('#guruTools [data-sub=subKesalahan]'); await p.waitForSelector('#kesList .off');
+  ok(await p.locator('#kesList .off').count() === 137, 'senarai kesalahan aktif (137) dipaparkan');
+  await p.screenshot({ path: path.join(out, 'app-kesalahan-senarai.png') });
+  await p.click('#btnKesBaru'); await p.fill('#kKod', 'z01'); await p.fill('#kTeks', 'TIDAK MEMBAWA KAD MATRIK');
+  await p.selectOption('#kKat', 'Sederhana'); await p.check('#kPantas');
+  await p.screenshot({ path: path.join(out, 'app-kesalahan-ubah.png') });
+  await p.click('#kSimpan'); await p.waitForTimeout(400);
+  const z = await p.evaluate(() => S.offenses.filter(o => o.kod === 'Z01')[0]);
+  ok(z && z.kategori === 'Sederhana' && z.mata === 5 && z.pantas, 'tambah kesalahan Z01 (kod huruf besar, mata ikut kategori, pantas)');
+  ok(/Z01/.test(await p.textContent('#offList')) || await p.evaluate(() => quickList().pin.some(o => o.kod === 'Z01')), 'Z01 terus muncul dalam skrin Rekod');
+  await p.click('#btnKesBaru'); await p.fill('#kKod', 'R28'); await p.fill('#kTeks', 'PENDUA'); await p.click('#kSimpan'); await p.waitForTimeout(300);
+  ok(/sudah digunakan/.test(await p.textContent('#toast').catch(() => '')) || await p.isVisible('#kSimpan'), 'kod pendua ditolak');
+  await p.click('#kBatal');
+  await p.fill('#kesQ', 'R28'); await p.click('#kesList [data-kk=R28]');
+  ok(await p.getAttribute('#kKod', 'readonly') !== null && !(await p.isVisible('#kPadam')), 'R28 sudah digunakan: kod dikunci, tiada butang Padam');
+  await p.fill('#kMata', '4'); await p.click('#kSimpan'); await p.waitForTimeout(300);
+  ok(await p.evaluate(() => S.offenses.filter(o => o.kod === 'R28')[0].mata) === 4 && await p.evaluate(() => S.off && S.off.mata) === 4, 'ubah mata R28 (kesalahan dipilih turut dikemas kini)');
+  await p.fill('#kesQ', 'Z01'); await p.click('#kesList [data-kk=Z01]'); await p.uncheck('#kAktif'); await p.click('#kSimpan'); await p.waitForTimeout(300);
+  ok(!(await p.evaluate(() => S.offenses.some(o => o.kod === 'Z01'))), 'nyahaktif Z01: hilang daripada skrin Rekod');
+  await p.fill('#kesQ', ''); await p.click('#kesTabs [data-kt=x]');
+  ok(/Z01/.test(await p.textContent('#kesList')), 'Z01 dalam tab Tidak aktif');
+  p.once('dialog', d => d.accept()); await p.click('#kesList [data-kk=Z01]'); await p.click('#kPadam'); await p.waitForTimeout(300);
+  ok(await p.evaluate(() => !_ss.sheets.KESALAHAN.d.some(r => r[0] === 'Z01')), 'padam kesalahan yang belum digunakan');
+  ok(await p.evaluate(() => { try { saveOffense({ peranan: 'Pengawas', nama: 'X', pin: '5678' }, { kod: 'Q1', kesalahan: 'UJIAN', kategori: 'Ringan', mata: 1 }, ''); return false; } catch (e) { return /Pengawas tidak boleh/.test(e.message); } }), 'pelayan: pengawas tidak boleh mengubah senarai kesalahan');
+  await p.click('#subKesalahan [data-back]');
+  // ---------- menu Admin ----------
+  await p.fill('#inAdminPin', '1111'); await p.click('#btnAdmin'); await p.waitForTimeout(300);
   ok(await p.isVisible('#adminGate'), 'PIN Admin salah ditolak');
   await p.fill('#inAdminPin', '9999'); await p.click('#btnAdmin'); await p.waitForTimeout(400);
   ok(await p.isVisible('#adminHome'), 'menu Admin dibuka dengan PIN Admin');

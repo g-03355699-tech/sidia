@@ -128,7 +128,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri-ink)
 .off:active{background:var(--pri-soft)}
 .off.first{box-shadow:inset 3px 0 0 var(--pri)}
 .kd{flex:0 0 auto;font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 7px;min-width:44px;text-align:center;margin-top:1px;font-variant-numeric:tabular-nums}
-.off .tx{flex:1;font-size:15px;line-height:1.4}
+.off .tx{flex:1;min-width:0;overflow-wrap:anywhere;font-size:15px;line-height:1.4}
 .off .pt{flex:0 0 auto;font-size:12.5px;color:var(--muted);white-space:nowrap;margin-top:2px;font-variant-numeric:tabular-nums}
 .sev-r{background:var(--sev-r-bg);color:var(--sev-r)}.sev-s{background:var(--sev-s-bg);color:var(--sev-s)}.sev-b{background:var(--sev-b-bg);color:var(--sev-b)}.sev-x{background:var(--sev-x-bg);color:var(--sev-x)}
 .selected-off{display:flex;align-items:center;gap:12px;background:var(--pri-soft);border:1px solid var(--pri-soft-2);border-radius:var(--r);padding:12px 14px;font-weight:600}
@@ -256,6 +256,15 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .wabtn:active{transform:scale(.98)}
 .wabtn b{display:block;font-size:15px}
 .wabtn small{opacity:.92;font-size:12.5px}
+.kes-tools{display:grid;grid-template-columns:1fr auto;gap:8px;margin:10px 0}
+.kes-tools .btn{white-space:nowrap}
+#kesList{max-height:none}
+#kesList .off.off-x .tx,#kesList .off.off-x .kd{opacity:.55}
+.off .tx small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.ck{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer;font-size:15px}
+.ck input{width:22px;height:22px;accent-color:var(--pri);flex:none}
+.frm2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+#kKod{text-transform:uppercase}
 .kbd{font-size:11.5px;border:1px solid var(--line-strong);border-radius:4px;padding:0 5px;color:var(--muted);font-family:inherit}
 @media (min-width:1024px){main{padding-top:24px}}
 </style>
@@ -287,6 +296,8 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
   <symbol id="i-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
   <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1Z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
 </svg>
 <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
@@ -381,6 +392,11 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
       <input type="password" id="inAdminPin" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="••••">
       <div class="actions"><button class="btn pri" id="btnAdmin">Buka</button></div>
     </div>
+    <div id="guruTools" class="hidden">
+      <div class="admgrid">
+        <button class="admbtn wide" data-sub="subKesalahan"><span class="i"><svg class="ico lg" aria-hidden="true"><use href="#i-list"/></svg></span><span><b>Senarai kesalahan</b><br><small>Tambah, ubah mata demerit, tanda pilihan pantas atau nyahaktifkan kesalahan. Tidak perlu PIN Admin.</small></span></button>
+      </div>
+    </div>
 
     <div id="adminHome" class="hidden">
       <div class="admgrid">
@@ -388,6 +404,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
         <button class="admbtn" data-sub="subPin"><span class="i"><svg class="ico lg" aria-hidden="true"><use href="#i-key"/></svg></span><b>PIN akses</b><small>Tukar PIN Guru/Warden, Murid & Admin</small></button>
         <button class="admbtn" data-sub="subTetapan"><span class="i"><svg class="ico lg" aria-hidden="true"><use href="#i-sliders"/></svg></span><b>Tetapan sekolah</b><small>Nama sekolah, lokasi, had padam rekod</small></button>
         <button class="admbtn" data-sub="subKongsi"><span class="i"><svg class="ico lg" aria-hidden="true"><use href="#i-share"/></svg></span><b>Kongsi pautan</b><small>Kod QR & mesej WhatsApp untuk guru dan pengawas</small></button>
+        <button class="admbtn wide" data-sub="subKesalahan"><span class="i"><svg class="ico lg" aria-hidden="true"><use href="#i-list"/></svg></span><span><b>Senarai kesalahan</b><br><small>Tambah, ubah mata, pilihan pantas, aktif/tidak aktif</small></span></button>
         <button class="admbtn wide" data-sub="subSistem"><span class="i"><svg class="ico lg" aria-hidden="true"><use href="#i-info"/></svg></span><span><b>Sistem</b> <span id="updBadge"></span><br><small>Versi, kemas kini SiDIA, buka Google Sheet</small></span></button>
       </div>
       <div class="statgrid" id="admStats"></div>
@@ -432,7 +449,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
         <label class="f" for="tNama">Nama sekolah</label><input type="text" id="tNama">
         <label class="f" for="tLokasi">Lokasi (satu setiap baris)</label><textarea id="tLokasi" rows="6"></textarea>
         <label class="f" for="tHad">Guru & pengawas boleh padam rekod sendiri dalam tempoh (jam)</label><input type="text" id="tHad" inputmode="numeric">
-        <p class="muted">Senarai murid dan senarai kesalahan diurus dalam Google Sheet: menu <b>SiDIA › Mula di sini</b>.</p>
+        <p class="muted">Senarai murid diurus dalam Google Sheet: menu <b>SiDIA › Mula di sini</b>. Senarai kesalahan boleh diubah di menu <b>Senarai kesalahan</b>.</p>
         <div class="actions"><button class="btn pri" id="btnSaveTetapan">Simpan tetapan</button></div>
       </div>
     </div>
@@ -442,6 +459,20 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
       <div class="card">
         <h2><svg class="ico" aria-hidden="true"><use href="#i-share"/></svg>Kongsi pautan SiDIA</h2>
         <div id="kongsiBody"></div>
+      </div>
+    </div>
+
+    <div id="subKesalahan" class="adsub hidden">
+      <div class="backbar"><button class="btn link" data-back><svg class="ico" aria-hidden="true"><use href="#i-chev-left"/></svg>Kembali</button></div>
+      <div class="card">
+        <h2><svg class="ico" aria-hidden="true"><use href="#i-list"/></svg>Senarai kesalahan</h2>
+        <p class="muted" style="margin:0">Perubahan terus disimpan ke tab KESALAHAN dan digunakan oleh semua pengguna. Kesalahan yang sudah ada rekod tidak boleh dipadam; nyahaktifkan sahaja supaya laporan lama kekal.</p>
+        <div class="kes-tools">
+          <input type="search" id="kesQ" placeholder="Cari kod atau kesalahan" aria-label="Cari kesalahan" autocomplete="off">
+          <button class="btn pri" id="btnKesBaru"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Tambah</button>
+        </div>
+        <div class="offtabs" id="kesTabs" role="tablist" aria-label="Tapis kesalahan"></div>
+        <div class="offlist" id="kesList"><div class="empty">Memuatkan…</div></div>
       </div>
     </div>
 
@@ -1099,8 +1130,7 @@ function loadRecent() {
 var adminInit = false, lastReport = null, A = null;
 function initAdmin() {
   var isAdmin = S.user && S.user.isAdmin;
-  $('adminGate').classList.toggle('hidden', isAdmin);
-  if (!isAdmin) { $('adminHome').classList.add('hidden'); showSub('none'); }
+  if (!isAdmin) showSub(null);
   else if (!A) loadAdmin(); else showSub(null);
   if (adminInit) return;
   adminInit = true;
@@ -1109,7 +1139,7 @@ function initAdmin() {
   $('btnReport').onclick = runReport;
   $('btnAdmin').onclick = function () {
     S.ctx.adminPin = $('inAdminPin').value.trim();
-    loadAdmin(function () { S.user.isAdmin = true; LS.set('ctx', S.ctx); $('adminGate').classList.add('hidden'); $('inAdminPin').value = ''; },
+    loadAdmin(function () { S.user.isAdmin = true; LS.set('ctx', S.ctx); $('inAdminPin').value = ''; },
       function () { delete S.ctx.adminPin; });
   };
   $('inAdminPin').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnAdmin').click(); });
@@ -1120,6 +1150,8 @@ function initAdmin() {
   });
   $('btnSavePin').onclick = savePins;
   $('btnSaveTetapan').onclick = saveTetapan;
+  $('btnKesBaru').onclick = function () { editKes(null); };
+  $('kesQ').addEventListener('input', renderKes);
 }
 function loadAdmin(onOk, onFail) {
   loading(true, 'Memuatkan…');
@@ -1135,13 +1167,109 @@ function renderAdminHome() {
   $('updBadge').innerHTML = A.versiTerkini && cmpVer(A.versiTerkini, A.versi) > 0 ? '<span class="badge">Baharu</span>' : '';
 }
 function showSub(id) {
-  $('adminHome').classList.toggle('hidden', !!id || !(S.user && S.user.isAdmin));
+  var isAdmin = !!(S.user && S.user.isAdmin);
+  var canEdit = isAdmin || !!(S.user && S.user.group !== 'murid');
+  if (id === 'subKesalahan' && !canEdit) id = null;
+  $('adminHome').classList.toggle('hidden', !!id || !isAdmin || !A);
+  $('adminGate').classList.toggle('hidden', !!id || isAdmin);
+  $('guruTools').classList.toggle('hidden', !!id || isAdmin || !canEdit);
   document.querySelectorAll('.adsub').forEach(function (e) { e.classList.toggle('hidden', e.id !== id); });
   if (id === 'subPin') renderPin();
   if (id === 'subTetapan') renderTetapan();
   if (id === 'subKongsi') renderKongsi();
   if (id === 'subSistem') renderSistem();
+  if (id === 'subKesalahan') loadKes();
   window.scrollTo(0, 0);
+}
+/* ---------- Senarai kesalahan (guru, warden, guru disiplin, admin) ---------- */
+var KES = { list: [], tab: 'aktif' };
+function loadKes() {
+  $('kesList').innerHTML = '<div class="empty">Memuatkan…</div>';
+  api('getOffensesEdit', S.ctx).then(function (l) { KES.list = l; renderKes(); })
+    .catch(function (e) { $('kesList').innerHTML = '<div class="empty">' + esc(errMsg(e)) + '</div>'; toast(errMsg(e), true); });
+}
+function kesTabs() {
+  var akt = KES.list.filter(function (o) { return o.aktif; });
+  return [['aktif', 'Aktif', akt.length], ['pantas', 'Pantas', akt.filter(function (o) { return o.pantas; }).length],
+    ['r', 'Ringan', akt.filter(function (o) { return sevOf(o) === 'r'; }).length], ['s', 'Sederhana', akt.filter(function (o) { return sevOf(o) === 's'; }).length],
+    ['b', 'Berat', akt.filter(function (o) { return sevOf(o) === 'b'; }).length], ['x', 'Tidak aktif', KES.list.length - akt.length]];
+}
+function renderKes() {
+  var qs = $('kesQ').value.trim().toLowerCase();
+  $('kesTabs').classList.toggle('dim', !!qs);
+  $('kesTabs').innerHTML = kesTabs().map(function (t) {
+    return '<button role="tab" aria-selected="' + (t[0] === KES.tab) + '" data-kt="' + t[0] + '"' + (t[0] === KES.tab && !qs ? ' class="on"' : '') + '>' + t[1] + '<span class="c">' + t[2] + '</span></button>';
+  }).join('');
+  $('kesTabs').querySelectorAll('[data-kt]').forEach(function (b) { b.onclick = function () { KES.tab = b.dataset.kt; $('kesQ').value = ''; renderKes(); }; });
+  var l = KES.list.filter(function (o) {
+    if (qs) return (o.kod + ' ' + o.kesalahan).toLowerCase().indexOf(qs) >= 0;
+    if (KES.tab === 'x') return !o.aktif;
+    if (!o.aktif) return false;
+    if (KES.tab === 'pantas') return o.pantas;
+    if (KES.tab === 'aktif') return true;
+    return sevOf(o) === KES.tab;
+  });
+  $('kesList').innerHTML = l.length ? l.map(function (o) {
+    var meta = [o.kategori || 'Tiada kategori', o.mata + ' mata'];
+    if (o.pantas) meta.push('Pantas');
+    if (!o.aktif) meta.push('Tidak aktif');
+    if (o.guna) meta.push(o.guna + ' rekod');
+    return '<button class="off' + (o.aktif ? '' : ' off-x') + '" data-kk="' + esc(o.kod) + '"><span class="kd sev-' + sevOf(o) + '">' + esc(o.kod) + '</span>' +
+      '<span class="tx">' + esc(nice(o.kesalahan)) + '<small>' + esc(meta.join(' · ')) + '</small></span>' +
+      (o.pantas ? '<span class="pt">' + ic('star', 'sm') + '</span>' : '') + '</button>';
+  }).join('') : '<div class="empty">' + (qs ? 'Tiada kesalahan sepadan dengan "' + esc(qs) + '".' : 'Tiada kesalahan dalam kategori ini.') + '</div>';
+  $('kesList').querySelectorAll('[data-kk]').forEach(function (b) {
+    b.onclick = function () { editKes(KES.list.filter(function (o) { return o.kod === b.dataset.kk; })[0]); };
+  });
+}
+function editKes(o) {
+  var baru = !o;
+  o = o || { kod: '', kesalahan: '', kategori: 'Ringan', mata: 3, aktif: true, pantas: false, guna: 0 };
+  var kunciKod = !baru && o.guna > 0;
+  modal('<h3>' + (baru ? 'Tambah kesalahan' : 'Ubah kesalahan ' + esc(o.kod)) + '</h3>' +
+    '<div class="frm2"><div><label class="f" for="kKod">Kod</label><input type="text" id="kKod" maxlength="10" autocapitalize="characters" autocomplete="off" value="' + esc(o.kod) + '"' + (kunciKod ? ' readonly aria-describedby="kKodNote"' : '') + ' placeholder="cth R31"></div>' +
+    '<div><label class="f" for="kMata">Mata demerit</label><input type="text" id="kMata" inputmode="decimal" value="' + esc(o.mata) + '"></div></div>' +
+    (kunciKod ? '<p class="muted" id="kKodNote" style="margin:4px 0 0;font-size:13px">Kod tidak boleh ditukar kerana sudah digunakan dalam ' + o.guna + ' rekod.</p>' : '') +
+    '<label class="f" for="kTeks">Kesalahan</label><textarea id="kTeks" rows="3" maxlength="300">' + esc(o.kesalahan) + '</textarea>' +
+    '<label class="f" for="kKat">Kategori</label><select id="kKat">' + ['Ringan', 'Sederhana', 'Berat'].map(function (k) {
+      return '<option' + (String(o.kategori).toLowerCase() === k.toLowerCase() ? ' selected' : '') + '>' + k + '</option>'; }).join('') + '</select>' +
+    '<label class="ck" style="margin-top:8px"><input type="checkbox" id="kAktif"' + (o.aktif ? ' checked' : '') + '> Aktif (boleh dipilih semasa merekod)</label>' +
+    '<label class="ck"><input type="checkbox" id="kPantas"' + (o.pantas ? ' checked' : '') + '> ' + ic('star', 'sm') + ' Pilihan pantas (dipaparkan di atas)</label>' +
+    '<div class="actions">' + (!baru && !o.guna ? '<button class="btn danger" id="kPadam">Padam</button>' : '') +
+    '<button class="btn" id="kBatal">Batal</button><button class="btn pri" id="kSimpan">Simpan</button></div>');
+  $('kBatal').onclick = closeModal;
+  $('kKat').onchange = function () {
+    // cadangan mata ikut kategori jika pengguna belum mengubahnya
+    if (baru && ['3', '5', '10', ''].indexOf($('kMata').value.trim()) >= 0) $('kMata').value = { Ringan: 3, Sederhana: 5, Berat: 10 }[$('kKat').value];
+  };
+  $('kSimpan').onclick = function () {
+    var d = { kod: $('kKod').value.trim().toUpperCase(), kesalahan: $('kTeks').value.trim(), kategori: $('kKat').value,
+      mata: $('kMata').value.trim().replace(',', '.'), aktif: $('kAktif').checked, pantas: $('kPantas').checked };
+    if (!d.kod) { toast('Sila isi kod.', true); $('kKod').focus(); return; }
+    if (!d.kesalahan) { toast('Sila isi nama kesalahan.', true); $('kTeks').focus(); return; }
+    if (d.mata === '' || isNaN(Number(d.mata))) { toast('Mata demerit mesti nombor.', true); $('kMata').focus(); return; }
+    $('kSimpan').disabled = true;
+    api('saveOffense', S.ctx, d, baru ? '' : o.kod).then(function (r) {
+      closeModal(); afterKesChange(r.offenses);
+      toast((baru ? 'Kesalahan ' + r.kod + ' ditambah' : 'Kesalahan ' + r.kod + ' dikemas kini'));
+      loadKes();
+    }).catch(function (e) { $('kSimpan').disabled = false; toast(errMsg(e), true); });
+  };
+  if ($('kPadam')) $('kPadam').onclick = function () {
+    if (!confirm('Padam kesalahan ' + o.kod + '?\n\n' + nice(o.kesalahan))) return;
+    api('deleteOffense', S.ctx, o.kod).then(function (r) {
+      closeModal(); afterKesChange(r.offenses); toast('Kesalahan ' + o.kod + ' dipadam'); loadKes();
+    }).catch(function (e) { toast(errMsg(e), true); });
+  };
+}
+/** Kemas kini senarai kesalahan dalam skrin Rekod tanpa memuat semula aplikasi. */
+function afterKesChange(list) {
+  S.offenses = list || [];
+  if (S.off) {
+    var cur = S.offenses.filter(function (x) { return x.kod === S.off.kod; })[0];
+    if (cur) S.off = cur; else setOffense(null);
+  }
+  if (rekodReady) renderOffList();
 }
 function cmpVer(a, b) {
   var pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number);

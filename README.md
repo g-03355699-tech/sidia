@@ -101,6 +101,7 @@ Sekolah hanya menerima kod daripada **`ref`** (commit/tag) yang dinyatakan dalam
 ## Senarai kesalahan
 SiDIA disertakan dengan **137 kesalahan standard** (Ringan / Sederhana / Berat), sama dengan senarai salah laku Infomurid. Untuk kehadiran surau gunakan *R28 Lewat ke surau/masjid*, atau tambah kod sekolah sendiri dalam tab KESALAHAN (kod yang tiada dalam Infomurid tidak akan diimport ke Infomurid).
 - Di web app, kesalahan dipilih melalui tab **⭐ Pantas / Ringan / Sederhana / Berat**, atau dicari ikut nama atau kod (cth `rokok`, `R16`). Kesalahan yang kerap digunakan oleh setiap pengguna dipaparkan paling atas.
+- **Sunting di web app:** guru, warden, guru disiplin dan admin boleh membuka **🛡️ Admin › Senarai kesalahan** (tanpa PIN Admin) untuk menambah kesalahan, mengubah nama/kategori/mata demerit, menanda ⭐ pilihan pantas, atau menyahaktifkan kesalahan. Pengawas tidak boleh. Kesalahan yang sudah ada rekod tidak boleh dipadam atau ditukar kodnya (nyahaktifkan sahaja), supaya laporan lama kekal.
 - Tandakan lajur **Pantas** dalam tab KESALAHAN (atau ⭐ dalam wizard) untuk kesalahan yang selalu direkod.
 - Sekolah yang mempunyai senarai sendiri boleh **tampal terus dari Excel** dalam wizard (langkah 3). Lajur Kod/Code, Kesalahan/Description, Kategori/Category (1/2/3) dan Mata/Demerit dikenal pasti secara automatik.
 - Menu **SiDIA › Guna senarai kesalahan standard SiDIA** menggantikan tab KESALAHAN dengan senarai standard. Rekod lama tidak terjejas.
@@ -117,9 +118,9 @@ Jumlah mata ditolak bagi setiap rumah = jumlah lajur *Mata* dalam tab KESALAHAN.
 ## PIN & peranan
 | Peranan | PIN | Boleh |
 |---|---|---|
-| Guru, Warden, Guru Disiplin | **PIN Guru & Warden** (`KOD_GURU`) | Rekod, lihat semua rekod terkini, padam rekod sendiri |
+| Guru, Warden, Guru Disiplin | **PIN Guru & Warden** (`KOD_GURU`) | Rekod, lihat semua rekod terkini, padam rekod sendiri, **sunting senarai kesalahan** |
 | Pengawas / murid bertugas | **PIN Murid** (`KOD_MURID`) | Rekod, lihat & padam **rekod sendiri** sahaja. Tiada menu Admin |
-| Admin | **PIN Admin** (`KOD_ADMIN`) | Semua, termasuk menu **🛡️ Admin**: laporan, tukar PIN, tetapan sekolah, kongsi pautan, kemas kini |
+| Admin | **PIN Admin** (`KOD_ADMIN`) | Semua, termasuk menu **🛡️ Admin**: laporan, tukar PIN, tetapan sekolah, senarai kesalahan, kongsi pautan, kemas kini |
 
 - PIN ialah 4–8 digit, dan setiap peranan mesti mempunyai PIN berbeza. Guru boleh membuka menu Admin dengan memasukkan PIN Admin.
 - **Tukar PIN:** admin buka **🛡️ Admin › PIN akses** di telefon. Pengguna kumpulan itu perlu log masuk semula dengan PIN baharu.

@@ -68,9 +68,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-off
 .searchwrap .qn{position:absolute;right:46px;top:50%;transform:translateY(-50%);background:var(--pri);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:3px 8px;pointer-events:none}
 /* Mod taip (telefon): kotak carian di atas, sorok bahagian yang tidak perlu semasa papan kekunci dibuka */
 body.kb main{padding-bottom:80vh}
-body.kb #hint,body.kb #btnPaste,body.kb .savebar,body.kb nav.tabs,body.kb header .school{display:none!important}
+body.kb #hint,body.kb #btnPaste,body.kb header .school{display:none!important}
+/* bar simpan & menu bawah disorok HANYA ketika papan kekunci benar-benar kelihatan */
+body.kbopen .savebar,body.kbopen nav.tabs{display:none!important}
 body.kb .list{margin-top:8px}
-body.kb .toast{top:64px;bottom:auto}
+body.kbopen .toast{top:64px;bottom:auto}
 .searchwrap .clr{position:absolute;right:4px;top:4px;bottom:4px;width:40px;border:0;background:none;font-size:20px;color:var(--muted);cursor:pointer}
 .tools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .tools select{flex:1 1 140px}
@@ -571,41 +573,49 @@ function searchOffenses(qs) {
   }).filter(function (x) { return x.sc > 0; })
     .sort(function (a, b) { return b.sc - a.sc; }).map(function (x) { return x.o; });
 }
-/* ---- mod taip: pastikan kotak carian & senarai tidak dilindungi papan kekunci ---- */
-var kbTimer;
+/* ---- mod taip: pastikan kotak carian & senarai tidak dilindungi papan kekunci ----
+ * 'kb'     : kotak carian aktif → gulir ke atas, sorok petua
+ * 'kbopen' : papan kekunci BENAR-BENAR kelihatan (visualViewport mengecil) → sorok bar simpan & menu
+ * Bar simpan tidak bergantung pada blur, kerana di iOS papan kekunci boleh ditutup tanpa blur. */
+var kbTimer, vvMax = window.visualViewport ? window.visualViewport.height : 0;
 function isPhone() { return window.matchMedia('(max-width: 700px)').matches || ('ontouchstart' in window && window.innerWidth < 900); }
 function kbOn(el) {
   if (!isPhone()) return;
   clearTimeout(kbTimer);
   document.body.classList.add('kb');
   var pos = function () {
+    if (!document.body.classList.contains('kb')) return;
     var h = document.querySelector('header').offsetHeight;
     var y = el.getBoundingClientRect().top + window.pageYOffset - h - 10;
     window.scrollTo(0, Math.max(0, y));
   };
-  setTimeout(pos, 50); setTimeout(pos, 400); // selepas animasi papan kekunci iOS/Android
+  setTimeout(pos, 50); setTimeout(pos, 400); // selepas animasi papan kekunci
 }
 function kbOff() {
   // lengah sedikit supaya ketikan pada senarai tidak terlepas akibat susun atur berubah
   kbTimer = setTimeout(function () {
     var a = document.activeElement;
-    if (a && (a.id === 'q' || a.id === 'offQ')) return;
+    if (a && (a.id === 'q' || a.id === 'offQ') && document.body.classList.contains('kbopen')) return;
     document.body.classList.remove('kb');
   }, 450);
 }
+function kbCheck() {
+  if (!window.visualViewport) return;
+  var h = window.visualViewport.height;
+  if (h > vvMax) vvMax = h;
+  var open = h < vvMax * 0.8;
+  var was = document.body.classList.contains('kbopen');
+  document.body.classList.toggle('kbopen', open && document.body.classList.contains('kb'));
+  if (was && !open) {
+    // papan kekunci ditutup: pulihkan paparan penuh walaupun kotak carian masih "aktif"
+    document.body.classList.remove('kb');
+    var a = document.activeElement;
+    if (a && (a.id === 'q' || a.id === 'offQ') && a.blur) a.blur();
+  }
+}
 if (window.visualViewport) {
-  // jika papan kekunci ditutup tanpa blur (Android: butang kembali), keluar dari mod taip
-  var vvMax = window.visualViewport.height, kbSeen = false;
-  window.visualViewport.addEventListener('resize', function () {
-    var h = window.visualViewport.height;
-    if (h > vvMax) vvMax = h;
-    if (!document.body.classList.contains('kb')) { kbSeen = false; return; }
-    if (h < vvMax * 0.75) { kbSeen = true; return; }          // papan kekunci sedang dibuka
-    if (kbSeen && h > vvMax * 0.9) {                          // papan kekunci telah ditutup
-      kbSeen = false;
-      var a = document.activeElement; if (a && a.blur) a.blur();
-    }
-  });
+  window.visualViewport.addEventListener('resize', kbCheck);
+  window.addEventListener('orientationchange', function () { vvMax = 0; setTimeout(kbCheck, 500); });
 }
 
 function renderOffList() {

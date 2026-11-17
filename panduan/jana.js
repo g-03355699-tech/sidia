@@ -56,7 +56,8 @@ const BUTIRAN = n => step(n, 'Semak tarikh, masa dan lokasi',
 const PILIH_MURID = (n) =>
   seksyen('Pilih murid: tiga cara', 'Pilih cara yang paling sesuai dengan situasi. Ketiga-tiga cara boleh digabungkan sebelum menekan Simpan.') +
   step(n + 'a', 'Taip nama & tekan Enter',
-    `<p>Taip sebahagian nama dan/atau kelas, contohnya <code>hafiz 4</code>. Murid teratas (bergaris hijau di kiri) terus dipilih apabila anda menekan <b>Enter</b> pada papan kekunci.</p>
+    `<p>Ketik kotak <b>Taip nama atau kelas</b>. Di telefon, <b>skrin carian</b> dibuka dengan kotak carian di bahagian atas, jadi senarai tidak dilindungi papan kekunci.</p>
+     <p>Taip sebahagian nama dan/atau kelas, contohnya <code>hafiz 4</code>. Murid teratas (bergaris hijau di kiri) terus dipilih apabila anda menekan <b>Enter</b> pada papan kekunci. Ketik <b>Selesai</b> untuk kembali dan simpan.</p>
      <p>Kotak carian dikosongkan secara automatik, jadi anda boleh terus menaip nama seterusnya. Bilangan murid yang dipilih dipaparkan dalam kotak carian (cth <b>✓ 3</b>).</p>
      ${tip('Ejaan <i>Mohd / Muhd / Muhammad</i> dan <i>Nor / Noor / Nur</i> dianggap sama. Anda juga boleh ketik terus nama dalam senarai.')}`, 'cari') +
   step(n + 'b', 'Ikut kelas: pilih semua, buang yang hadir',
@@ -157,8 +158,8 @@ const PANDUAN = [
         `<p>Dalam tab <b>⭐ Pantas</b>, ketik <b>R16 Datang lewat ke sekolah</b>. Anda juga boleh menaip <code>lewat</code> dalam kotak carian kesalahan.</p>
          <p>Pilih lokasi <b>Pintu Pagar</b>.</p>`, 'pengawas-kesalahan') +
       step('4', 'Taip nama setiap murid & tekan Enter',
-        `<ol><li>Tanya nama dan kelas murid.</li><li>Taip sebahagian nama dan kelas, contohnya <code>danish 4</code>, kemudian tekan <b>Enter</b>.</li>
-         <li>Ulang untuk murid seterusnya. Bilangan murid dipaparkan dalam kotak carian.</li></ol>
+        `<ol><li>Ketik kotak <b>Taip nama atau kelas</b>. Skrin carian akan dibuka.</li><li>Tanya nama dan kelas murid.</li><li>Taip sebahagian nama dan kelas, contohnya <code>danish 4</code>, kemudian tekan <b>Enter</b>.</li>
+         <li>Ulang untuk murid seterusnya. Bilangan murid dipaparkan dalam kotak carian.</li><li>Ketik <b>Selesai</b>, kemudian <b>Simpan</b>.</li></ol>
          ${tip('Jika murid yang dipilih salah, ketik namanya dalam senarai untuk membuang tanda.')}`, 'pengawas-rekod') +
       SIMPAN('5') +
       seksyen('Selepas merekod') + TERKINI('6', true) +

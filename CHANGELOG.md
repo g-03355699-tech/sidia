@@ -1,5 +1,9 @@
 # Senarai Perubahan SiDIA
 
+## 1.2.3 (17 Nov 2026)
+- Baiki (iPhone): menekan kotak carian murid tidak lagi menolak paparan ke atas sehingga skrin kosong
+- Telefon: **skrin carian penuh**. Kotak carian sentiasa di bahagian atas skrin, senarai murid terus di bawahnya, dengan kiraan murid dipilih dan butang **Selesai**
+
 ## 1.2.2 (17 Nov 2026)
 - Ikon SiDIA baharu (perisai dengan tanda ✓): favicon web app, logo di tajuk web app & wizard
 - Halaman pengenalan: favicon, ikon skrin utama (iPhone/Android) dan web manifest

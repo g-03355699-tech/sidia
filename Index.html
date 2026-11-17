@@ -68,13 +68,17 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-off
 .searchwrap{position:relative}
 .searchwrap input{font-size:18px;padding-right:96px}
 .searchwrap .qn{position:absolute;right:46px;top:50%;transform:translateY(-50%);background:var(--pri);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:3px 8px;pointer-events:none}
-/* Mod taip (telefon): kotak carian di atas, sorok bahagian yang tidak perlu semasa papan kekunci dibuka */
-body.kb main{padding-bottom:80vh}
-body.kb #hint,body.kb #btnPaste,body.kb header .school{display:none!important}
-/* bar simpan & menu bawah disorok HANYA ketika papan kekunci benar-benar kelihatan */
-body.kbopen .savebar,body.kbopen nav.tabs{display:none!important}
-body.kb .list{margin-top:8px}
-body.kbopen .toast{top:64px;bottom:auto}
+/* Skrin carian penuh (telefon): kotak carian sentiasa di atas, jadi iOS tidak menolak halaman */
+.srch{position:fixed;inset:0;z-index:45;background:var(--bg);display:flex;flex-direction:column}
+.srchbar{flex:0 0 auto;display:flex;gap:8px;align-items:center;padding:10px 12px;background:var(--pri)}
+.srchbar .searchwrap{flex:1;min-width:0}
+.srchbar input{border-color:transparent}
+.srchbar .done{flex:0 0 auto;border:0;background:#fff;color:var(--pri-d);font-weight:700;border-radius:10px;padding:0 14px;min-height:44px;cursor:pointer}
+.srchsub{flex:0 0 auto;padding:6px 14px;font-size:12px;color:var(--muted);background:#fff;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srch .list{flex:1;margin:0;border:0;border-radius:0;overflow:auto;-webkit-overflow-scrolling:touch;padding-bottom:50vh;background:#fff}
+body.srch{overflow:hidden}
+body.srch .toast{top:72px;bottom:auto}
+#q[readonly]{cursor:text;background:#fff}
 .searchwrap .clr{position:absolute;right:4px;top:4px;bottom:4px;width:40px;border:0;background:none;font-size:20px;color:var(--muted);cursor:pointer}
 .tools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .tools select{flex:1 1 140px}
@@ -341,6 +345,19 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
   <button data-v="vAdmin" id="tabAdmin"><span class="ic">🛡️</span>Admin</button>
 </nav>
 
+<div class="srch hidden" id="srch">
+  <div class="srchbar">
+    <div class="searchwrap">
+      <input type="search" id="q2" name="sidia-cari-murid-2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" placeholder="Taip nama atau kelas…">
+      <span class="qn hidden" id="q2N"></span>
+      <button class="clr" id="q2Clr" aria-label="Kosongkan">×</button>
+    </div>
+    <button class="done" id="srchDone">Selesai</button>
+  </div>
+  <div class="srchsub" id="srchSub"></div>
+  <div class="list" id="list2"></div>
+</div>
+
 <div class="modal hidden" id="modal"><div class="sheet" id="modalBody"></div></div>
 <div class="loading hidden" id="loading"><div><div class="spin"></div><span id="loadingTxt">Memuatkan…</span></div></div>
 
@@ -559,37 +576,42 @@ function initRekod() {
   $('offQ').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') { e.preventDefault(); var f = $('offList').querySelector('.off'); if (f) f.click(); }
   });
-  $('q').addEventListener('input', function () { renderList(); });
-  $('q').addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      var first = $('list').querySelector('.item.first');
-      if (first) { select(first.dataset.id, true); $('q').value = ''; renderList(); toast('✓ ' + S.byId[first.dataset.id].nama); }
-    } else if (e.key === 'Escape') { $('q').value = ''; renderList(); }
+  // Telefon: kotak carian dalam halaman hanya membuka skrin carian penuh (tiada papan kekunci di tengah halaman)
+  if (isPhone()) { $('q').readOnly = true; $('q').setAttribute('inputmode', 'none'); $('q').addEventListener('click', openSrch); }
+  ['q', 'q2'].forEach(function (id) {
+    $(id).addEventListener('input', function () { renderList(); });
+    $(id).addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        var first = listEl().querySelector('.item.first');
+        if (first) { select(first.dataset.id, true); this.value = ''; renderList(); toast('✓ ' + S.byId[first.dataset.id].nama); }
+      } else if (e.key === 'Escape') { if (S.srch && !this.value) closeSrch(); else { this.value = ''; renderList(); } }
+    });
   });
-  $('qClr').onclick = function () { $('q').value = ''; renderList(); $('q').focus(); };
-  ['q', 'offQ'].forEach(function (id) {
-    $(id).addEventListener('focus', function () { kbOn($(id)); });
-    $(id).addEventListener('blur', kbOff);
-  });
+  $('qClr').onclick = function () { $('q').value = ''; renderList(); if (isPhone()) openSrch(); else $('q').focus(); };
+  $('q2Clr').onclick = function () { $('q2').value = ''; renderList(); $('q2').focus(); };
+  $('srchDone').onclick = closeSrch;
   $('fKelas').onchange = renderList;
   $('fRumah').onchange = renderList;
-  $('list').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-act]');
-    if (b) {
-      var act = b.dataset.act;
-      var ids = currentIds();
-      if (act === 'all') ids.forEach(function (id) { S.sel.set(id, 1); });
-      if (act === 'none') ids.forEach(function (id) { S.sel.delete(id); });
-      renderList(); updateSaveBar(); saveDraft();
-      return;
-    }
-    var it = e.target.closest('.item');
-    if (!it) return;
-    select(it.dataset.id);
-    // jika mencari tanpa kelas, kosongkan carian supaya cepat taip nama seterusnya
-    if ($('q').value && !$('fKelas').value) { $('q').value = ''; renderList(); $('q').focus(); }
-    else { it.classList.toggle('on', S.sel.has(it.dataset.id)); }
+  ['list', 'list2'].forEach(function (id) {
+    $(id).addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]');
+      if (b) {
+        var act = b.dataset.act;
+        var ids = currentIds();
+        if (act === 'all') ids.forEach(function (id) { S.sel.set(id, 1); });
+        if (act === 'none') ids.forEach(function (id) { S.sel.delete(id); });
+        renderList(); updateSaveBar(); saveDraft();
+        return;
+      }
+      var it = e.target.closest('.item');
+      if (!it) return;
+      select(it.dataset.id);
+      var qi = qInput();
+      // jika mencari tanpa kelas, kosongkan carian supaya cepat taip nama seterusnya
+      if (qi.value && !$('fKelas').value) { qi.value = ''; renderList(); if (S.srch || !isPhone()) qi.focus(); }
+      else { it.classList.toggle('on', S.sel.has(it.dataset.id)); it.querySelector('.tick').textContent = S.sel.has(it.dataset.id) ? '✓' : ''; }
+    });
   });
   $('btnClearSel').onclick = function () {
     if (S.sel.size > 3 && !confirm('Kosongkan ' + S.sel.size + ' murid yang dipilih?')) return;
@@ -664,50 +686,29 @@ function searchOffenses(qs) {
   }).filter(function (x) { return x.sc > 0; })
     .sort(function (a, b) { return b.sc - a.sc; }).map(function (x) { return x.o; });
 }
-/* ---- mod taip: pastikan kotak carian & senarai tidak dilindungi papan kekunci ----
- * 'kb'     : kotak carian aktif → gulir ke atas, sorok petua
- * 'kbopen' : papan kekunci BENAR-BENAR kelihatan (visualViewport mengecil) → sorok bar simpan & menu
- * Bar simpan tidak bergantung pada blur, kerana di iOS papan kekunci boleh ditutup tanpa blur. */
-var kbTimer, vvMax = window.visualViewport ? window.visualViewport.height : 0;
+/* ---- skrin carian penuh (telefon) ----
+ * Web app Apps Script berjalan dalam iframe. Di iOS, memfokuskan kotak di tengah halaman membuatkan
+ * Safari menolak seluruh halaman ke atas, dan gulir manual menjadikannya lebih teruk (paparan kosong).
+ * Penyelesaian: kotak carian kedua (#q2) yang sentiasa berada di bahagian atas skrin. */
 function isPhone() { return window.matchMedia('(max-width: 700px)').matches || ('ontouchstart' in window && window.innerWidth < 900); }
-function kbOn(el) {
-  if (!isPhone()) return;
-  clearTimeout(kbTimer);
-  document.body.classList.add('kb');
-  var pos = function () {
-    if (!document.body.classList.contains('kb')) return;
-    var h = document.querySelector('header').offsetHeight;
-    var y = el.getBoundingClientRect().top + window.pageYOffset - h - 10;
-    window.scrollTo(0, Math.max(0, y));
-  };
-  setTimeout(pos, 50); setTimeout(pos, 400); // selepas animasi papan kekunci
+function qInput() { return S.srch ? $('q2') : $('q'); }
+function listEl() { return S.srch ? $('list2') : $('list'); }
+function openSrch() {
+  if (S.srch) return;
+  S.srch = true;
+  $('q2').value = $('q').value; $('q').value = '';
+  $('srch').classList.remove('hidden'); document.body.classList.add('srch');
+  $('q2').focus();               // dalam pengendali ketikan → iOS membuka papan kekunci
+  renderList(); updateSaveBar();
 }
-function kbOff() {
-  // lengah sedikit supaya ketikan pada senarai tidak terlepas akibat susun atur berubah
-  kbTimer = setTimeout(function () {
-    var a = document.activeElement;
-    if (a && (a.id === 'q' || a.id === 'offQ') && document.body.classList.contains('kbopen')) return;
-    document.body.classList.remove('kb');
-  }, 450);
+function closeSrch() {
+  if (!S.srch) return;
+  $('q2').blur();
+  S.srch = false; $('q2').value = '';
+  $('srch').classList.add('hidden'); document.body.classList.remove('srch');
+  renderList(); updateSaveBar();
 }
-function kbCheck() {
-  if (!window.visualViewport) return;
-  var h = window.visualViewport.height;
-  if (h > vvMax) vvMax = h;
-  var open = h < vvMax * 0.8;
-  var was = document.body.classList.contains('kbopen');
-  document.body.classList.toggle('kbopen', open && document.body.classList.contains('kb'));
-  if (was && !open) {
-    // papan kekunci ditutup: pulihkan paparan penuh walaupun kotak carian masih "aktif"
-    document.body.classList.remove('kb');
-    var a = document.activeElement;
-    if (a && (a.id === 'q' || a.id === 'offQ') && a.blur) a.blur();
-  }
-}
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', kbCheck);
-  window.addEventListener('orientationchange', function () { vvMax = 0; setTimeout(kbCheck, 500); });
-}
+function focusSearch() { if (isPhone()) openSrch(); else $('q').focus(); }
 
 function renderOffList() {
   var qs = $('offQ').value.trim();
@@ -736,7 +737,7 @@ function renderOffList() {
       setOffense(S.offenses.filter(function (o) { return o.kod === b.dataset.kod; })[0]);
       $('offQ').value = '';
       saveDraft();
-      $('q').focus();
+      if (!isPhone()) $('q').focus();
     };
   });
 }
@@ -755,11 +756,20 @@ function setOffense(o) {
 }
 
 function currentIds() {
-  return search($('q').value, $('fKelas').value, $('fRumah').value, 0).map(function (x) { return x.o.id; });
+  return search(qInput().value, $('fKelas').value, $('fRumah').value, 0).map(function (x) { return x.o.id; });
 }
 function renderList() {
-  var q = $('q').value.trim(), kelas = $('fKelas').value, rumah = $('fRumah').value;
-  var el = $('list');
+  var q = qInput().value.trim(), kelas = $('fKelas').value, rumah = $('fRumah').value;
+  var el = listEl();
+  if (S.srch) {
+    $('srchSub').textContent = (S.off ? nice(S.off.kesalahan) : 'Pilih kesalahan dahulu') + (kelas ? ' · Kelas ' + kelas : '') + (rumah ? ' · Rumah ' + rumah : '');
+    if (!q && !kelas && !rumah) {
+      var sel2 = Array.from(S.sel.keys()).map(function (id) { return S.byId[id]; }).filter(Boolean).reverse();
+      el.innerHTML = '<div class="empty">Taip sebahagian nama dan/atau kelas, cth <b>hafiz 4</b>, kemudian tekan <b>Enter</b> atau ketik nama. Ketik <b>Selesai</b> untuk kembali dan simpan.</div>' +
+        (sel2.length ? '<div class="listhead">Dipilih (' + sel2.length + ')</div>' + sel2.map(function (o) { return itemHtml(o, ''); }).join('') : '');
+      return;
+    }
+  }
   if (!q && !kelas && !rumah) {
     // tunjuk murid yang dipilih sahaja (jika ada)
     if (!S.sel.size) { el.innerHTML = '<div class="empty">Taip nama murid atau pilih kelas.</div>'; return; }
@@ -798,6 +808,7 @@ function updateSaveBar() {
   var n = S.sel.size;
   var names = Array.from(S.sel.keys()).slice(-4).reverse().map(function (id) { var o = S.byId[id]; return o ? o.nama.split(' ').slice(0, 2).join(' ') : id; });
   $('qN').textContent = '✓ ' + n; $('qN').classList.toggle('hidden', !n);
+  $('q2N').textContent = '✓ ' + n; $('q2N').classList.toggle('hidden', !n);
   $('selCount').innerHTML = n + ' murid dipilih <small>' + (n ? esc(names.join(', ')) + (n > 4 ? '…' : '') + ' · ketik untuk lihat' : (S.off ? esc(nice(S.off.kesalahan)) : 'Pilih kesalahan dahulu')) + '</small>';
   $('btnSave').disabled = !n || !S.off;
   $('btnSave').textContent = n ? 'Simpan (' + n + ')' : 'Simpan';
@@ -858,7 +869,7 @@ function doSave() {
     if (r.tidakDijumpai.length) msg += '<div class="alert err">' + r.tidakDijumpai.length + ' ID murid tidak dijumpai dalam senarai.</div>';
     modal('<h3>Selesai</h3>' + msg + '<div class="actions">' +
       (r.batch ? '<button class="btn danger" id="btnUndo">Batal rekod ini</button>' : '') +
-      '<button class="btn pri" onclick="closeModal();document.getElementById(\'q\').focus()">Rekod seterusnya</button></div>');
+      '<button class="btn pri" onclick="closeModal();if(!isPhone())document.getElementById(\'q\').focus()">Rekod seterusnya</button></div>');
     if (r.batch) $('btnUndo').onclick = function () { undoBatch(r.batch, ids); };
   }).catch(function (e) {
     loading(false);

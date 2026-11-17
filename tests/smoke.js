@@ -19,7 +19,17 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(await p.evaluate(() => S.students.length) === 800, '800 murid dimuatkan');
   await p.fill('#offQ', 'lewat surau'); await p.press('#offQ', 'Enter');
   ok(/R28/.test(await p.textContent('#offChosen')), 'carian kesalahan + Enter memilih R28');
-  await p.fill('#q', 'muhammad'); await p.press('#q', 'Enter');
+  await p.tap('#q'); await p.waitForSelector('#srch:not(.hidden)');
+  ok(await p.evaluate(() => document.activeElement.id) === 'q2', 'telefon: ketik carian membuka skrin carian penuh');
+  ok(Math.round((await p.locator('#q2').boundingBox()).y) < 20, 'kotak carian berada di atas skrin');
+  await p.fill('#q2', 'muhammad'); await p.press('#q2', 'Enter');
+  await p.fill('#q2', 'nur'); await p.tap('#list2 .item >> nth=0'); await p.waitForTimeout(100);
+  ok(await p.evaluate(() => S.sel.size) === 2 && await p.evaluate(() => document.activeElement.id) === 'q2', 'ketik nama: dipilih, papan kekunci kekal');
+  ok(/✓ 2/.test(await p.textContent('#q2N')), 'kiraan dipilih dalam kotak carian');
+  await p.screenshot({ path: path.join(out, 'app-carian.png') });
+  await p.tap('#srchDone');
+  ok(await p.isVisible('#saveBar') && !(await p.isVisible('#srch')), 'Selesai: kembali, bar Simpan kelihatan');
+  await p.evaluate(() => { S.sel.delete([...S.sel.keys()][1]); updateSaveBar(); });
   ok(/^MOHD|^MUHAMMAD|^MUHD/.test(await p.evaluate(() => S.byId[[...S.sel.keys()][0]].nama)), 'alias Muhammad = Mohd');
   await p.evaluate(() => document.activeElement.blur());
   await p.selectOption('#fKelas', '3 CEMERLANG'); await p.click('[data-act=all]');

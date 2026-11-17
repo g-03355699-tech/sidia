@@ -13,7 +13,7 @@ module.exports = async function tangkap() {
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
   p.on('dialog', d => d.accept());
   const shot = async (n, opt) => { await p.waitForTimeout(150); await p.screenshot({ path: path.join(img, n + '.png'), ...(opt || {}) }); };
-  const top = () => p.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); document.body.classList.remove('kb', 'kbopen'); window.scrollTo(0, 0); });
+  const top = () => p.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); window.scrollTo(0, 0); });
 
   await p.goto('file://' + path.join(tout, 'app.html'));
   await p.waitForSelector('#vLogin:not(.hidden)');
@@ -27,14 +27,12 @@ module.exports = async function tangkap() {
   await p.selectOption('#inLokasi', 'Surau');
   await top(); await shot('kesalahan-pilih');
   // taip + Enter
-  await p.fill('#q', 'hafiz 4');
-  await p.evaluate(() => { const h = document.querySelector('header').offsetHeight; window.scrollTo(0, document.getElementById('q').getBoundingClientRect().top + scrollY - h - 10); });
-  await shot('cari');
-  await p.fill('#q', '');
+  await p.tap('#q'); await p.fill('#q2', 'hafiz 4'); await shot('cari');
+  await p.fill('#q2', ''); await p.tap('#srchDone');
   // ikut kelas
   await p.selectOption('#fKelas', '4 BESTARI'); await p.click('[data-act=all]');
   const it = p.locator('.item'); for (const i of [1, 4]) await it.nth(i).click();
-  await p.evaluate(() => { const h = document.querySelector('header').offsetHeight; window.scrollTo(0, document.getElementById('fKelas').getBoundingClientRect().top + scrollY - h - 70); document.activeElement.blur(); document.body.classList.remove('kb','kbopen'); });
+  await p.evaluate(() => { const h = document.querySelector('header').offsetHeight; window.scrollTo(0, document.getElementById('fKelas').getBoundingClientRect().top + scrollY - h - 70); document.activeElement.blur(); });
   await shot('kelas');
   // sahkan
   await p.click('#btnSave'); await shot('sahkan');
@@ -73,9 +71,13 @@ module.exports = async function tangkap() {
   await p.fill('#offQ', 'lewat'); await top(); await shot('pengawas-kesalahan');
   await p.evaluate(() => { setOffense(S.offenses.find(o => o.kod === 'R16')); });
   await p.selectOption('#inLokasi', 'Pintu Pagar');
-  for (const q of ['danish', 'aqilah 2', 'irfan 5']) { await p.fill('#q', q); await p.press('#q', 'Enter'); }
-  await top(); await p.evaluate(() => { const h = document.querySelector('header').offsetHeight; window.scrollTo(0, document.getElementById('q').getBoundingClientRect().top + scrollY - h - 10); });
+  await top(); await p.tap('#q');
+  for (const q of ['danish', 'aqilah 2']) { await p.fill('#q2', q); await p.press('#q2', 'Enter'); }
+  await p.fill('#q2', 'irfan 5');
+  await p.evaluate(() => document.querySelector('.toast') && document.querySelector('.toast').remove());
   await shot('pengawas-rekod');
+  await p.fill('#q2', ''); await p.press('#q2', 'Enter'); await p.tap('#srchDone');
+  await p.evaluate(() => { const f = document.querySelector('#list .item'); }); 
   await p.click('#btnSave'); await p.click('#btnDoSave'); await p.waitForTimeout(500); await p.click('text=Rekod seterusnya');
   await p.click('nav.tabs button[data-v=vTerkini]'); await p.waitForTimeout(500); await top(); await shot('pengawas-terkini');
 

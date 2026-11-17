@@ -43,7 +43,7 @@ Pengguna dan penyelenggara berbahasa Melayu. **Semua teks UI, mesej ralat, dokum
 ## Perkara yang pernah menyebabkan pepijat (jangan ulang)
 - **No. KP sebagai nombor**: Excel/Sheets memaparkan `1.30927E+11`. Baca nilai mentah (`raw: true` di SheetJS, `getValues()` di pelayan). Pulihkan sifar depan bagi 11 digit. Tulis lajur ID dengan format teks (`setNumberFormat('@')`).
 - **iPhone Safari**: `input[type=date|time]` melimpah keluar kotak. Perlukan `-webkit-appearance:none; min-width:0`.
-- **Papan kekunci telefon**: mod taip (`body.kb`) menggulir kotak carian ke atas. Bar Simpan disorok hanya apabila `visualViewport` benar-benar mengecil (`body.kbopen`), **bukan** berdasarkan fokus, kerana iOS boleh menutup papan kekunci tanpa `blur`.
+- **Papan kekunci telefon / iframe Apps Script**: web app berjalan dalam iframe Google. Di iOS, memfokuskan input di tengah halaman membuatkan Safari menolak seluruh halaman ke atas; **jangan** gulir secara manual selepas fokus (pernah menyebabkan skrin kosong) dan jangan bergantung pada `visualViewport` dalam iframe. Penyelesaian semasa: di telefon, `#q` adalah `readonly` dan membuka **skrin carian penuh** (`#srch`, input `#q2` di bahagian atas). Gunakan `qInput()`/`listEl()` untuk input & senarai aktif.
 - **`ScriptApp.getService().getUrl()` tidak boleh dipercayai** jika ada beberapa deployment. Pautan yang disimpan/ditampal pengguna (`WEB_APP_URL`) diutamakan.
 - **Pautan `/a/<domain>/macros/…`** gagal ("Sorry, unable to open the file") jika pelayar log masuk dengan beberapa akaun. Kongsikan pautan `/macros/s/…/exec`.
 - Tajuk fail Excel seperti "SENARAI NAMA MURID…" bukan baris tajuk lajur. Pengesanan baris tajuk memerlukan ≥2 sel dan memilih baris yang paling banyak lajur dikenali.

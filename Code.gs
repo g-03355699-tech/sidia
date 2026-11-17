@@ -17,7 +17,8 @@ var SH = {
   KESALAHAN: 'KESALAHAN',
   PENGGUNA: 'PENGGUNA',
   REKOD: 'REKOD',
-  LAPORAN: 'LAPORAN'
+  LAPORAN: 'LAPORAN',
+  MULA: 'MULA'
 };
 
 var REKOD_HEADERS = [
@@ -42,7 +43,8 @@ var DEFAULT_TETAPAN = [
   ['LOKASI', 'Surau,Asrama,Kelas,Dewan Makan,Kantin,Padang,Pintu Pagar,Dewan', 'Senarai lokasi (pisahkan dengan koma)'],
   ['HAD_PADAM_JAM', '24', 'Pengguna biasa boleh padam rekod sendiri dalam tempoh ini (jam)'],
   ['ID_SPREADSHEET_MURID', '', 'Pilihan. Jika senarai murid berada dalam fail Google Sheet lain, tampal ID fail itu di sini'],
-  ['TAB_MURID', 'MURID', 'Nama tab yang mengandungi senarai murid']
+  ['TAB_MURID', 'MURID', 'Nama tab yang mengandungi senarai murid'],
+  ['WEB_APP_URL', '', 'Pautan web app (diisi automatik oleh wizard)']
 ];
 
 var DEFAULT_KESALAHAN = [
@@ -74,14 +76,26 @@ var DEFAULT_KESALAHAN = [
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('SiDIA')
-    .addItem('1. Sediakan sistem (kali pertama)', 'setupSistem')
-    .addItem('2. Semak senarai murid', 'semakMuridMenu')
+    .addItem('🚀 Mula di sini (wizard persediaan)', 'bukaWizard')
     .addSeparator()
+    .addItem('Semak senarai murid', 'semakMuridMenu')
     .addItem('Jana laporan mata rumah…', 'janaLaporanMenu')
+    .addItem('Baiki / cipta semula tab sistem', 'setupSistem')
     .addToUi();
+  try {
+    var url = getSettings_().WEB_APP_URL;
+    SpreadsheetApp.getActive().toast(url ? 'Pautan web app: ' + url : 'Klik menu SiDIA › 🚀 Mula di sini untuk bermula.', 'SiDIA', 8);
+  } catch (e) {}
 }
 
+/** Menu lama: cipta tab yang hilang (tanpa memadam data). */
 function setupSistem() {
+  ensureSetup_();
+  SpreadsheetApp.getUi().alert('Tab sistem SiDIA telah disemak dan dicipta (jika perlu).\n\nGunakan menu SiDIA › 🚀 Mula di sini untuk wizard persediaan.');
+}
+
+/** Cipta semua tab yang diperlukan. Selamat dijalankan berulang kali. */
+function ensureSetup_() {
   var ss = SpreadsheetApp.getActive();
 
   var t = ensureSheet_(ss, SH.TETAPAN, ['Tetapan', 'Nilai', 'Keterangan']);
@@ -102,12 +116,7 @@ function setupSistem() {
 
   var tabMurid = getSettings_().TAB_MURID || SH.MURID;
   if (!getSettings_().ID_SPREADSHEET_MURID && !ss.getSheetByName(tabMurid)) {
-    var m = ensureSheet_(ss, tabMurid, ['ID', 'Nama', 'Kelas', 'Rumah', 'Jantina']);
-    m.getRange(2, 1, 3, 5).setValues([
-      ['M0001', 'CONTOH: AHMAD BIN ALI', '4 AMANAH', 'MERAH', 'L'],
-      ['M0002', 'CONTOH: NUR AISYAH BINTI OMAR', '4 AMANAH', 'BIRU', 'P'],
-      ['M0003', 'CONTOH: MUHAMMAD HAFIZ BIN YUSOF', '5 BESTARI', 'HIJAU', 'L']
-    ]);
+    ensureSheet_(ss, tabMurid, ['ID', 'Nama', 'Kelas', 'Rumah']);
   }
 
   var p = ensureSheet_(ss, SH.PENGGUNA, ['Emel', 'Nama', 'Peranan']);
@@ -116,15 +125,177 @@ function setupSistem() {
       'Jika diisi, HANYA emel dalam senarai ini boleh guna web app.');
   }
 
-  var r = ensureSheet_(ss, SH.REKOD, REKOD_HEADERS);
-  r.setFrozenRows(1);
+  ensureSheet_(ss, SH.REKOD, REKOD_HEADERS).setFrozenRows(1);
+  ensureMulaSheet_(ss);
+}
 
-  SpreadsheetApp.getUi().alert('SiDIA sedia digunakan.\n\n' +
-    'Langkah seterusnya:\n' +
-    '1) Isi tab TETAPAN (nama sekolah, kod akses).\n' +
-    '2) Tampal senarai murid ke tab ' + tabMurid + ' (lajur: ID, Nama, Kelas, Rumah).\n' +
-    '3) Semak tab KESALAHAN.\n' +
-    '4) Extensions > Apps Script > Deploy > New deployment > Web app.');
+/** Tab MULA: arahan ringkas yang dilihat sebaik sahaja salinan dibuka. */
+function ensureMulaSheet_(ss) {
+  var sh = ss.getSheetByName(SH.MULA);
+  if (sh) return sh;
+  sh = ss.insertSheet(SH.MULA, 0);
+  var rows = [
+    ['SiDIA — Sistem Rekod Disiplin Murid'],
+    [''],
+    ['SELAMAT DATANG! Ikut 3 langkah ini:'],
+    ['1.  Klik menu  SiDIA  ›  🚀 Mula di sini   (di bar menu atas, sebelah "Help" / "Bantuan")'],
+    ['      Kali pertama, Google akan minta kebenaran: klik Continue › pilih akaun anda › Allow.'],
+    ['      Jika keluar amaran "Google hasn\'t verified this app": klik Advanced › Go to SiDIA.'],
+    ['2.  Dalam wizard: isi maklumat sekolah dan muat naik fail senarai murid (Excel / CSV).'],
+    ['3.  Aktifkan web app dan kongsi pautan / kod QR kepada guru, warden & pengawas.'],
+    [''],
+    ['Semua data disimpan dalam Google Drive anda sendiri. Jangan padam atau tukar nama tab sistem.'],
+    ['Panduan penuh: https://g-03355699-tech.github.io/sidia/']
+  ];
+  sh.getRange(1, 1, rows.length, 1).setValues(rows);
+  sh.getRange('A1').setFontSize(20).setFontWeight('bold').setFontColor('#0f766e');
+  sh.getRange('A3').setFontSize(13).setFontWeight('bold');
+  sh.getRange('A4').setFontWeight('bold').setFontSize(12);
+  sh.setColumnWidth(1, 900);
+  sh.setHiddenGridlines && sh.setHiddenGridlines(true);
+  return sh;
+}
+
+/* =========================================================
+ *  WIZARD PERSEDIAAN (dialog dalam Google Sheet)
+ * ========================================================= */
+
+function bukaWizard() {
+  ensureSetup_();
+  var html = HtmlService.createHtmlOutputFromFile('Setup').setWidth(920).setHeight(660);
+  SpreadsheetApp.getUi().showModalDialog(html, 'SiDIA — Persediaan Sekolah');
+}
+
+function wizGetState() {
+  ensureSetup_();
+  var s = getSettings_();
+  var murid = { count: 0, kelas: 0, rumah: [], error: '' };
+  try {
+    var st = readStudents_().students.filter(function (x) { return !/^CONTOH/i.test(x[1]); });
+    var k = {}, r = {};
+    st.forEach(function (x) { k[x[2]] = 1; if (x[3]) r[x[3]] = 1; });
+    murid = { count: st.length, kelas: Object.keys(k).length, rumah: Object.keys(r).sort(), error: '' };
+  } catch (e) { murid.error = e.message; }
+  var kes = SpreadsheetApp.getActive().getSheetByName(SH.KESALAHAN);
+  var offenses = kes.getLastRow() > 1 ? kes.getRange(2, 1, kes.getLastRow() - 1, 5).getDisplayValues()
+    .filter(function (r) { return r[0] || r[1]; }) : [];
+  return {
+    tetapan: {
+      NAMA_SEKOLAH: s.NAMA_SEKOLAH === 'SMK Contoh' ? '' : s.NAMA_SEKOLAH,
+      KOD_AKSES: s.KOD_AKSES, KOD_ADMIN: s.KOD_ADMIN, LOKASI: s.LOKASI, PERANAN: s.PERANAN
+    },
+    murid: murid,
+    offenses: offenses,
+    webAppUrl: detectWebAppUrl_(),
+    scriptUrl: 'https://script.google.com/d/' + ScriptApp.getScriptId() + '/edit',
+    email: currentEmail_()
+  };
+}
+
+function wizSaveSchool(o) {
+  o = o || {};
+  var nama = String(o.NAMA_SEKOLAH || '').trim();
+  if (!nama) throw new Error('Sila isi nama sekolah.');
+  ['NAMA_SEKOLAH', 'KOD_AKSES', 'KOD_ADMIN', 'LOKASI'].forEach(function (k) {
+    if (o[k] != null) setSetting_(k, String(o[k]).trim());
+  });
+  try { SpreadsheetApp.getActive().rename('SiDIA — ' + nama); } catch (e) {}
+  return true;
+}
+
+/**
+ * Simpan senarai murid daripada wizard.
+ * rows = [[id, nama, kelas, rumah], ...]; mode = 'ganti' | 'tambah'
+ */
+function wizSaveStudents(rows, mode) {
+  rows = (rows || []).filter(function (r) { return r && String(r[1] || '').trim(); });
+  if (!rows.length) throw new Error('Tiada murid untuk disimpan.');
+  if (rows.length > 5000) throw new Error('Terlalu banyak baris (maksimum 5000).');
+  var ss = SpreadsheetApp.getActive();
+  setSetting_('TAB_MURID', SH.MURID);
+  setSetting_('ID_SPREADSHEET_MURID', '');
+  var sh = ss.getSheetByName(SH.MURID) || ss.insertSheet(SH.MURID);
+  var existing = [];
+  if (mode === 'tambah' && sh.getLastRow() > 1) {
+    existing = sh.getRange(2, 1, sh.getLastRow() - 1, 4).getDisplayValues()
+      .filter(function (r) { return r[1] && !/^CONTOH/i.test(r[1]); });
+  }
+  var seen = {}, out = [];
+  existing.concat(rows).forEach(function (r) {
+    var id = String(r[0] || '').trim(), nama = String(r[1]).trim().replace(/\s+/g, ' ');
+    var kelas = String(r[2] || '').trim().replace(/\s+/g, ' ').toUpperCase();
+    var rumah = String(r[3] || '').trim().toUpperCase();
+    if (!id) id = autoId_(nama);
+    var base = id, n = 2;
+    while (seen[id]) id = base + '-' + (n++);
+    seen[id] = 1;
+    out.push([id, nama.toUpperCase(), kelas, rumah]);
+  });
+  sh.clear();
+  sh.getRange(1, 1, 1, 4).setValues([['ID', 'Nama', 'Kelas', 'Rumah']]).setFontWeight('bold').setBackground('#e6f4f2');
+  sh.setFrozenRows(1);
+  sh.getRange(2, 1, out.length, 1).setNumberFormat('@'); // kekalkan sifar di depan No. MyKid
+  sh.getRange(2, 1, out.length, 4).setValues(out);
+  sh.setColumnWidth(2, 340);
+  return { disimpan: out.length };
+}
+
+/** ID stabil daripada nama (jika fail tiada lajur ID / MyKid). */
+function autoId_(nama) {
+  var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, String(nama).toUpperCase().replace(/[^A-Z0-9]/g, ''));
+  var hex = bytes.slice(0, 5).map(function (b) { return ('0' + (b & 255).toString(16)).slice(-2); }).join('');
+  return 'N' + hex.toUpperCase();
+}
+
+/** rows = [[kod, kesalahan, kategori, mata, aktif], ...] */
+function wizSaveOffenses(rows) {
+  rows = (rows || []).filter(function (r) { return String(r[1] || '').trim(); });
+  if (!rows.length) throw new Error('Sekurang-kurangnya satu kesalahan diperlukan.');
+  var seen = {}, out = [];
+  rows.forEach(function (r, i) {
+    var kod = String(r[0] || '').trim().toUpperCase() || ('X' + ('0' + (i + 1)).slice(-2));
+    if (seen[kod]) throw new Error('Kod kesalahan berulang: ' + kod);
+    seen[kod] = 1;
+    out.push([kod, String(r[1]).trim(), String(r[2] || '').trim(), parseFloat(r[3]) || 0, r[4] === false || /^(tidak|no)$/i.test(r[4]) ? 'Tidak' : 'Ya']);
+  });
+  var sh = SpreadsheetApp.getActive().getSheetByName(SH.KESALAHAN);
+  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 5).clearContent();
+  sh.getRange(2, 1, out.length, 5).setValues(out);
+  return { disimpan: out.length };
+}
+
+function wizCheckDeploy(manualUrl) {
+  if (manualUrl) {
+    manualUrl = String(manualUrl).trim();
+    if (!/^https:\/\/script\.google\.com\/.+\/exec(\?.*)?$/.test(manualUrl)) {
+      throw new Error('Pautan tidak sah. Pautan web app bermula dengan https://script.google.com/ dan berakhir dengan /exec');
+    }
+    setSetting_('WEB_APP_URL', manualUrl);
+    return manualUrl;
+  }
+  return detectWebAppUrl_();
+}
+
+function detectWebAppUrl_() {
+  var url = '';
+  try { url = ScriptApp.getService().getUrl() || ''; } catch (e) {}
+  if (/\/exec$/.test(url)) {
+    if (getSettings_().WEB_APP_URL !== url) setSetting_('WEB_APP_URL', url);
+    return url;
+  }
+  return getSettings_().WEB_APP_URL || '';
+}
+
+function setSetting_(key, val) {
+  var sh = SpreadsheetApp.getActive().getSheetByName(SH.TETAPAN);
+  var last = sh.getLastRow();
+  var keys = last > 1 ? sh.getRange(2, 1, last - 1, 1).getValues() : [];
+  for (var i = 0; i < keys.length; i++) {
+    if (String(keys[i][0]).trim().toUpperCase() === key) { sh.getRange(i + 2, 2).setValue(val); return; }
+  }
+  var desc = '';
+  DEFAULT_TETAPAN.forEach(function (r) { if (r[0] === key) desc = r[2]; });
+  sh.appendRow([key, val, desc]);
 }
 
 function ensureSheet_(ss, name, headers) {
@@ -551,6 +722,7 @@ function readStudents_() {
       map.rumah >= 0 ? String(row[map.rumah] || '').trim().toUpperCase() : ''
     ]);
   }
+  if (!out.length) warnings.unshift('Senarai murid kosong. Pentadbir perlu jalankan menu SiDIA › Mula di sini.');
   var hdr = values[hr];
   var detected = ['nama', 'kelas', 'rumah', 'id'].filter(function (k) { return map[k] >= 0; })
     .map(function (k) { return k + '="' + hdr[map[k]] + '"'; }).join(', ');

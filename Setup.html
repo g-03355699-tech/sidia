@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<base target="_blank">
+<meta charset="utf-8">
+<style>
+:root{--ink:#18212b;--muted:#5f6b78;--line:#dde2e7;--bg:#f6f8f9;--pri:#0f766e;--pri-d:#0b5a54;--pri-soft:#e3f3f1;
+  --danger:#b42318;--danger-soft:#fdecea;--warn:#9a4a07;--warn-soft:#fff4e5;--ok:#147a3d;--ok-soft:#e7f6ec}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{display:flex;height:100%}
+aside{width:200px;flex:0 0 auto;background:var(--bg);border-right:1px solid var(--line);padding:16px 10px}
+aside .logo{font-weight:800;font-size:20px;color:var(--pri);padding:0 8px 14px}
+.stepbtn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:10px 8px;border-radius:8px;cursor:pointer;text-align:left;color:var(--muted)}
+.stepbtn .n{width:24px;height:24px;border-radius:50%;border:2px solid #b8c1ca;display:grid;place-items:center;font-size:12px;font-weight:700;flex:0 0 auto}
+.stepbtn.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.stepbtn.on .n{border-color:var(--pri);color:var(--pri)}
+.stepbtn.done .n{background:var(--pri);border-color:var(--pri);color:#fff}
+main{flex:1;overflow:auto;padding:20px 24px 90px;position:relative}
+h2{margin:0 0 4px;font-size:20px}
+p.lead{margin:0 0 16px;color:var(--muted)}
+label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:12px 0 4px}
+input[type=text],input[type=password],input[type=number],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;min-height:38px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:-1px}
+.hint{font-size:12px;color:var(--muted);margin-top:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;min-height:38px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.sm{min-height:30px;padding:4px 10px;font-size:13px}
+.footer{position:fixed;left:200px;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 24px;display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.footer .msg{margin-right:auto;font-size:13px;color:var(--muted)}
+.alert{padding:10px 12px;border-radius:8px;margin:10px 0;font-size:13px}
+.alert.ok{background:var(--ok-soft);color:var(--ok)}
+.alert.warn{background:var(--warn-soft);color:var(--warn)}
+.alert.err{background:var(--danger-soft);color:var(--danger)}
+.alert.info{background:var(--pri-soft);color:var(--pri-d)}
+.drop{border:2px dashed #b8c1ca;border-radius:12px;padding:26px;text-align:center;cursor:pointer;background:var(--bg);transition:.15s}
+.drop.over{border-color:var(--pri);background:var(--pri-soft)}
+.drop b{color:var(--pri)}
+.tabs2{display:flex;gap:4px;margin:14px 0 8px;border-bottom:1px solid var(--line)}
+.tabs2 button{border:0;background:none;padding:8px 12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs2 button.on{color:var(--pri);border-bottom-color:var(--pri);font-weight:600}
+.block{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.block .t{font-weight:600;display:flex;gap:8px;align-items:center}
+.block .t small{font-weight:400;color:var(--muted)}
+.maps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.maps label{font-size:11px;color:var(--muted);font-weight:600}
+.maps select{min-height:32px;padding:4px 6px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.stat{background:var(--bg);border-radius:10px;padding:8px 14px}
+.stat b{display:block;font-size:20px;color:var(--pri)}
+.stat span{font-size:12px;color:var(--muted)}
+.offtbl input{min-height:30px;padding:4px 6px;border-radius:6px}
+.offtbl td{padding:3px 4px}
+.offtbl .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px}
+ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:10px 0}
+ol.steps li{counter-increment:s;position:relative;padding:8px 0 8px 38px;border-bottom:1px solid var(--line)}
+ol.steps li:before{content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;background:var(--pri-soft);color:var(--pri);font-weight:700;display:grid;place-items:center}
+code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:12px}
+.urlbox{display:flex;gap:8px;align-items:center;margin:10px 0}
+.urlbox input{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.share{display:flex;gap:20px;align-items:flex-start;margin-top:10px}
+#qr{padding:10px;background:#fff;border:1px solid var(--line);border-radius:10px;width:200px;height:200px}
+#qr img,#qr canvas{width:178px!important;height:178px!important}
+.loading{position:fixed;inset:0;background:rgba(255,255,255,.75);display:grid;place-items:center;z-index:9;font-weight:600;color:var(--pri)}
+.spin{width:30px;height:30px;border:4px solid var(--pri-soft);border-top-color:var(--pri);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside>
+    <div class="logo">SiDIA</div>
+    <button class="stepbtn" data-s="1"><span class="n">1</span>Maklumat sekolah</button>
+    <button class="stepbtn" data-s="2"><span class="n">2</span>Senarai murid</button>
+    <button class="stepbtn" data-s="3"><span class="n">3</span>Kesalahan & mata</button>
+    <button class="stepbtn" data-s="4"><span class="n">4</span>Aktifkan & kongsi</button>
+  </aside>
+
+  <main>
+    <!-- 1 -->
+    <section id="s1">
+      <h2>Maklumat sekolah</h2>
+      <p class="lead">Maklumat ini dipaparkan di web app. Anda boleh mengubahnya bila-bila masa dalam tab TETAPAN.</p>
+      <label class="f" for="namaSekolah">Nama sekolah *</label>
+      <input type="text" id="namaSekolah" placeholder="cth: SMKA Sheikh Abdul Malek">
+      <div class="grid2">
+        <div>
+          <label class="f" for="kodAkses">Kod akses (untuk semua pengguna)</label>
+          <input type="text" id="kodAkses" placeholder="cth: 4821" autocomplete="off">
+          <div class="hint">Diperlukan jika web app dibuka kepada <b>Anyone</b>, cth pengawas tiada akaun DELIMa. Kosongkan jika tidak perlu.</div>
+        </div>
+        <div>
+          <label class="f" for="kodAdmin">Kod admin (laporan & padam rekod)</label>
+          <input type="text" id="kodAdmin" placeholder="cth: 7390" autocomplete="off">
+          <div class="hint">Untuk Guru Disiplin / PK HEM. Jika kosong, semua pengguna boleh melihat laporan.</div>
+        </div>
+      </div>
+      <label class="f" for="lokasi">Lokasi (pisahkan dengan koma)</label>
+      <input type="text" id="lokasi">
+    </section>
+
+    <!-- 2 -->
+    <section id="s2" class="hidden">
+      <h2>Senarai murid</h2>
+      <p class="lead">Muat naik fail Excel atau CSV. Boleh satu fail untuk semua murid, satu tab untuk setiap kelas, atau beberapa fail (satu fail setiap kelas).</p>
+      <div id="muridNow"></div>
+      <div class="tabs2">
+        <button data-t="file" class="on">📁 Muat naik fail</button>
+        <button data-t="paste">📋 Tampal dari Excel</button>
+      </div>
+      <div id="tFile">
+        <div class="drop" id="drop">
+          <div style="font-size:28px">📄</div>
+          <div><b>Klik untuk pilih fail</b> atau seret fail ke sini</div>
+          <div class="hint">.xlsx, .xls, .csv, .ods · boleh pilih beberapa fail sekaligus</div>
+          <input type="file" id="file" multiple accept=".xlsx,.xls,.csv,.ods,.txt" class="hidden">
+        </div>
+        <div class="hint" style="margin-top:6px">Lajur yang dikenal pasti: <b>Nama</b> (wajib), <b>Kelas</b>, <b>Rumah / Rumah Sukan</b>, <b>No. MyKid / No. KP / ID</b>.
+          Jika tiada lajur kelas, nama tab atau nama fail digunakan sebagai kelas. <a href="#" id="dlTpl" target="_self">Muat turun templat CSV</a></div>
+      </div>
+      <div id="tPaste" class="hidden">
+        <textarea id="pasteBox" rows="7" placeholder="Salin jadual dari Excel / Google Sheet (termasuk baris tajuk) dan tampal di sini.&#10;Nama&#9;Kelas&#9;Rumah&#10;AHMAD BIN ALI&#9;4 AMANAH&#9;MERAH"></textarea>
+        <div style="margin-top:6px"><button class="btn sm" id="btnPasteParse">Baca data</button></div>
+      </div>
+      <div id="blocks"></div>
+      <div id="preview"></div>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3" class="hidden">
+      <h2>Kesalahan & mata demerit</h2>
+      <p class="lead">Senarai ini ialah cadangan. Ubah mata, padam, atau tambah kesalahan mengikut peraturan sekolah. Kesalahan yang tidak <b>Aktif</b> tidak dipaparkan di web app.</p>
+      <table class="offtbl">
+        <thead><tr><th style="width:70px">Kod</th><th>Kesalahan</th><th style="width:130px">Kategori</th><th style="width:70px">Mata</th><th style="width:50px">Aktif</th><th style="width:30px"></th></tr></thead>
+        <tbody id="offBody"></tbody>
+      </table>
+      <div style="margin-top:8px"><button class="btn sm" id="btnAddOff">＋ Tambah kesalahan</button></div>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4" class="hidden">
+      <div id="deployNo">
+        <h2>Aktifkan web app</h2>
+        <p class="lead">Atas sebab keselamatan, Google memerlukan pemilik fail mengaktifkan web app sendiri. Langkah ini dibuat <b>sekali sahaja</b> dan mengambil masa kira-kira 1 minit.</p>
+        <ol class="steps">
+          <li><a class="btn sm pri" id="lnkScript" href="#">Buka Apps Script ↗</a> (tab baharu akan dibuka)</li>
+          <li>Klik butang biru <b>Deploy</b> (kanan atas) › <b>New deployment</b>.</li>
+          <li>Klik ikon ⚙ di sebelah <i>Select type</i> › pilih <b>Web app</b>.</li>
+          <li><b>Execute as:</b> <code>Me</code><br><b>Who has access:</b> <span id="accessHint"></span></li>
+          <li>Klik <b>Deploy</b>. Jika diminta, klik <b>Authorize access</b> › pilih akaun › <b>Allow</b>.</li>
+          <li>Kembali ke tetingkap ini dan klik <b>Semak</b> di bawah.</li>
+        </ol>
+        <div class="urlbox">
+          <button class="btn pri" id="btnCheck">↻ Semak</button>
+          <span class="hint">atau tampal <i>Web app URL</i>:</span>
+          <input type="text" id="manualUrl" placeholder="https://script.google.com/macros/s/…/exec">
+          <button class="btn" id="btnManual">Simpan</button>
+        </div>
+        <div id="deployMsg"></div>
+      </div>
+      <div id="deployYes" class="hidden">
+        <h2>🎉 SiDIA sedia digunakan!</h2>
+        <p class="lead">Kongsikan pautan atau kod QR ini kepada guru, warden dan pengawas. Di telefon, buka pautan dan pilih <b>Add to Home Screen</b> supaya mudah dicapai.</p>
+        <div class="urlbox">
+          <input type="text" id="appUrl" readonly>
+          <button class="btn" id="btnCopy">Salin</button>
+          <a class="btn pri" id="btnOpen" href="#">Buka ↗</a>
+        </div>
+        <div class="share">
+          <div id="qr"></div>
+          <div style="flex:1">
+            <a class="btn" id="btnWa" href="#" style="background:#25d366;border-color:#25d366;color:#fff">Kongsi di WhatsApp</a>
+            <div class="alert info" style="margin-top:12px" id="codeInfo"></div>
+            <div class="hint">Jika anda mengubah kod Apps Script kemudian, pilih <b>Deploy › Manage deployments › ✎ Edit › Version: New version</b> supaya pautan kekal sama.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">
+    <span class="msg" id="footMsg"></span>
+    <button class="btn" id="btnBack">‹ Kembali</button>
+    <button class="btn pri" id="btnNext">Simpan & teruskan ›</button>
+  </div>
+</div>
+<div class="loading hidden" id="loading"><div><div class="spin"></div><span id="loadingTxt">Memuatkan…</span></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+function api(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return new Promise(function (res, rej) {
+    var r = google.script.run.withSuccessHandler(res).withFailureHandler(function (e) { rej(e && e.message ? e : new Error(String(e))); });
+    r[fn].apply(r, args);
+  });
+}
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function loading(on, t) { $('loading').classList.toggle('hidden', !on); if (t) $('loadingTxt').textContent = t; }
+function foot(msg, err) { $('footMsg').innerHTML = msg ? '<span style="color:' + (err ? 'var(--danger)' : 'var(--ok)') + '">' + esc(msg) + '</span>' : ''; }
+
+var W = { step: 1, state: null, blocks: [], rows: [], done: {} };
+
+/* ---------- navigasi ---------- */
+function go(n) {
+  W.step = n;
+  [1, 2, 3, 4].forEach(function (i) { $('s' + i).classList.toggle('hidden', i !== n); });
+  document.querySelectorAll('.stepbtn').forEach(function (b) {
+    var s = +b.dataset.s; b.classList.toggle('on', s === n); b.classList.toggle('done', !!W.done[s] && s !== n);
+  });
+  $('btnBack').classList.toggle('hidden', n === 1);
+  $('btnNext').textContent = n === 4 ? 'Tutup' : n === 2 && !W.rows.length && W.state.murid.count ? 'Teruskan ›' : 'Simpan & teruskan ›';
+  foot('');
+  if (n === 4) renderDeploy();
+  if (n === 2) renderMuridNow();
+}
+document.querySelectorAll('.stepbtn').forEach(function (b) { b.onclick = function () { go(+b.dataset.s); }; });
+$('btnBack').onclick = function () { go(W.step - 1); };
+$('btnNext').onclick = function () {
+  var n = W.step;
+  var p = n === 1 ? saveSchool() : n === 2 ? saveStudents() : n === 3 ? saveOffenses() : null;
+  if (n === 4) { google.script.host.close(); return; }
+  p.then(function (ok) { if (ok !== false) { W.done[n] = 1; go(n + 1); } })
+   .catch(function (e) { loading(false); foot(e.message || String(e), true); });
+};
+
+/* ---------- 1. sekolah ---------- */
+function saveSchool() {
+  var o = { NAMA_SEKOLAH: $('namaSekolah').value.trim(), KOD_AKSES: $('kodAkses').value.trim(), KOD_ADMIN: $('kodAdmin').value.trim(), LOKASI: $('lokasi').value.trim() };
+  if (!o.NAMA_SEKOLAH) { $('namaSekolah').focus(); return Promise.reject(new Error('Sila isi nama sekolah.')); }
+  loading(true, 'Menyimpan…');
+  return api('wizSaveSchool', o).then(function () { loading(false); Object.assign(W.state.tetapan, o); });
+}
+
+/* ---------- 2. murid ---------- */
+function renderMuridNow() {
+  var m = W.state.murid;
+  $('muridNow').innerHTML = m.count
+    ? '<div class="alert ok">Senarai semasa: <b>' + m.count + ' murid</b>, ' + m.kelas + ' kelas' + (m.rumah.length ? ', rumah: ' + esc(m.rumah.join(', ')) : '') + '. Muat naik fail baharu hanya jika mahu mengemas kini.</div>'
+    : '';
+}
+document.querySelectorAll('.tabs2 button').forEach(function (b) {
+  b.onclick = function () {
+    document.querySelectorAll('.tabs2 button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    $('tFile').classList.toggle('hidden', b.dataset.t !== 'file');
+    $('tPaste').classList.toggle('hidden', b.dataset.t !== 'paste');
+  };
+});
+$('drop').onclick = function () { $('file').click(); };
+$('file').onchange = function () { readFiles(this.files); this.value = ''; };
+['dragenter', 'dragover'].forEach(function (ev) { $('drop').addEventListener(ev, function (e) { e.preventDefault(); $('drop').classList.add('over'); }); });
+['dragleave', 'drop'].forEach(function (ev) { $('drop').addEventListener(ev, function (e) { e.preventDefault(); $('drop').classList.remove('over'); }); });
+$('drop').addEventListener('drop', function (e) { readFiles(e.dataTransfer.files); });
+$('btnPasteParse').onclick = function () {
+  var txt = $('pasteBox').value;
+  if (!txt.trim()) return;
+  var sep = txt.indexOf('\t') >= 0 ? '\t' : (txt.split('\n')[0].indexOf(';') >= 0 ? ';' : ',');
+  var aoa = txt.split(/\r?\n/).map(function (l) { return l.split(sep); });
+  W.blocks = [makeBlock('Data ditampal', '', aoa)];
+  renderBlocks();
+};
+$('dlTpl').onclick = function (e) {
+  e.preventDefault();
+  var csv = '﻿No. MyKid,Nama,Kelas,Rumah\r\n080101010101,AHMAD BIN ALI,4 AMANAH,MERAH\r\n080202020202,NUR AISYAH BINTI OMAR,4 AMANAH,BIRU\r\n';
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'templat_murid_sidia.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+};
+
+function readFiles(files) {
+  if (!files || !files.length) return;
+  if (typeof XLSX === 'undefined') { foot('Pustaka Excel gagal dimuatkan. Semak internet, atau guna tab "Tampal dari Excel".', true); return; }
+  loading(true, 'Membaca fail…');
+  var list = Array.prototype.slice.call(files), out = [], pending = list.length;
+  list.forEach(function (f) {
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var wb = /\.(csv|txt)$/i.test(f.name)
+          ? XLSX.read(new TextDecoder('utf-8').decode(new Uint8Array(rd.result)), { type: 'string', raw: true })
+          : XLSX.read(new Uint8Array(rd.result), { type: 'array' });
+        wb.SheetNames.forEach(function (sn) {
+          var aoa = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: false, defval: '' });
+          var multi = wb.SheetNames.length > 1;
+          var fileBase = f.name.replace(/\.[^.]+$/, '');
+          var b = makeBlock(f.name + (multi ? ' › ' + sn : ''), multi && !/^(sheet|helaian)\s*\d*$/i.test(sn) ? sn : fileBase, aoa);
+          if (b.nRows) out.push(b);
+        });
+      } catch (e) { foot('Gagal membaca ' + f.name + ': ' + e.message, true); }
+      if (--pending === 0) { loading(false); W.blocks = out; renderBlocks(); }
+    };
+    rd.readAsArrayBuffer(f);
+  });
+}
+
+var PAT = {
+  nama: { inc: [/^nama( penuh)?( murid| pelajar)?$/, /^nama/, /^name/, /nama murid/, /nama pelajar/], exc: /kelas|rumah|bapa|ibu|penjaga|guru|sekolah/ },
+  kelas: { inc: [/^kelas/, /^class/, /tingkatan/, /^ting/, /^tahun/], exc: /guru/ },
+  rumah: { inc: [/^rumah/, /rumah sukan/, /^house/, /sukan/] },
+  id: { inc: [/^id( murid| pelajar)?$/, /mykid/, /mykad/, /no\.? ?(kp|k\/p|ic|kad)/, /kad pengenalan/, /angka giliran/, /no\.? ?(pend|daftar|matrik|sijil)/, /^id/] }
+};
+function findCol(hdr, key) {
+  var p = PAT[key];
+  for (var j = 0; j < p.inc.length; j++)
+    for (var i = 0; i < hdr.length; i++) {
+      var h = String(hdr[i] || '').trim().toLowerCase();
+      if (!h || (p.exc && p.exc.test(h))) continue;
+      if (p.inc[j].test(h)) return i;
+    }
+  return -1;
+}
+function makeBlock(label, fallbackKelas, aoa) {
+  aoa = aoa.filter(function (r) { return r && r.some(function (c) { return String(c).trim(); }); });
+  // baris tajuk = baris (dalam 20 pertama) yang paling banyak lajur dikenali; abaikan baris judul panjang
+  var hr = -1, best = 0;
+  for (var i = 0; i < Math.min(20, aoa.length); i++) {
+    var cells = aoa[i].map(function (c) { return String(c).trim().length > 40 ? '' : c; });
+    if (cells.filter(function (c) { return String(c).trim(); }).length < 2 || findCol(cells, 'nama') < 0) continue;
+    var sc = ['nama', 'kelas', 'rumah', 'id'].filter(function (k) { return findCol(cells, k) >= 0; }).length;
+    if (sc > best) { best = sc; hr = i; }
+  }
+  var hdr = hr >= 0 ? aoa[hr] : (aoa[0] || []).map(function (_, j) { return 'Lajur ' + String.fromCharCode(65 + j); });
+  var map = { nama: findCol(hdr, 'nama'), kelas: findCol(hdr, 'kelas'), rumah: findCol(hdr, 'rumah'), id: findCol(hdr, 'id') };
+  if (map.nama < 0) map.nama = guessNameCol(aoa);
+  return { label: label, fallbackKelas: String(fallbackKelas || '').trim(), hdr: hdr, data: aoa.slice(hr + 1), map: map, nRows: aoa.length - hr - 1 };
+}
+function guessNameCol(aoa) {
+  // lajur dengan teks paling panjang (biasanya nama)
+  var best = -1, bestLen = 0, sample = aoa.slice(0, 30);
+  (aoa[0] || []).forEach(function (_, j) {
+    var len = sample.reduce(function (a, r) { var v = String(r[j] || ''); return a + (/[a-z]{3,}/i.test(v) && v.indexOf(' ') > 0 ? v.length : 0); }, 0);
+    if (len > bestLen) { bestLen = len; best = j; }
+  });
+  return best;
+}
+function renderBlocks() {
+  if (!W.blocks.length) { $('blocks').innerHTML = '<div class="alert err">Tiada data murid ditemui dalam fail.</div>'; $('preview').innerHTML = ''; W.rows = []; return; }
+  $('blocks').innerHTML = W.blocks.map(function (b, bi) {
+    function sel(key, extra) {
+      return '<div><label>' + { nama: 'Nama *', kelas: 'Kelas', rumah: 'Rumah', id: 'ID / No. MyKid' }[key] + '</label><select data-b="' + bi + '" data-k="' + key + '">' +
+        '<option value="-1">' + (extra || '— tiada —') + '</option>' +
+        b.hdr.map(function (h, j) { return '<option value="' + j + '"' + (b.map[key] === j ? ' selected' : '') + '>' + esc(h || ('Lajur ' + (j + 1))) + '</option>'; }).join('') + '</select></div>';
+    }
+    return '<div class="block"><div class="t">📄 ' + esc(b.label) + ' <small>' + b.nRows + ' baris</small></div><div class="maps">' +
+      sel('nama') + sel('kelas', b.fallbackKelas ? 'Guna nama: ' + esc(b.fallbackKelas) : '— tiada —') + sel('rumah') + sel('id', '— jana automatik —') + '</div></div>';
+  }).join('');
+  $('blocks').querySelectorAll('select').forEach(function (s) {
+    s.onchange = function () { W.blocks[+s.dataset.b].map[s.dataset.k] = +s.value; buildRows(); };
+  });
+  buildRows();
+}
+function cell(r, j) { return j >= 0 ? String(r[j] == null ? '' : r[j]).trim() : ''; }
+function buildRows() {
+  var rows = [];
+  W.blocks.forEach(function (b) {
+    if (b.map.nama < 0) return;
+    b.data.forEach(function (r) {
+      var nama = cell(r, b.map.nama).replace(/\s+/g, ' ');
+      if (nama.length < 3 || !/[a-z]{2,}/i.test(nama) || /^(nama|jumlah|bil\.?|no\.?)\b/i.test(nama)) return;
+      var kelas = b.map.kelas >= 0 ? cell(r, b.map.kelas) : b.fallbackKelas;
+      var id = cell(r, b.map.id).replace(/[\s-]/g, '');
+      if (/^\d{11}$/.test(id)) id = '0' + id; // MyKid yang hilang sifar di depan (Excel simpan sebagai nombor)
+      rows.push([id, nama, kelas, cell(r, b.map.rumah)]);
+    });
+  });
+  W.rows = rows;
+  renderPreview();
+}
+function renderPreview() {
+  var rows = W.rows;
+  if (!rows.length) { $('preview').innerHTML = '<div class="alert err">Tiada murid dikesan. Pastikan lajur <b>Nama</b> dipilih dengan betul.</div>'; return; }
+  var kelas = {}, rumah = {}, names = {}, dup = 0, noKelas = 0, noRumah = 0, noId = 0;
+  rows.forEach(function (r) {
+    kelas[r[2]] = 1; if (r[3]) rumah[r[3].toUpperCase()] = 1; else noRumah++;
+    if (!r[2]) noKelas++; if (!r[0]) noId++;
+    var k = r[1].toUpperCase() + '|' + r[2].toUpperCase(); if (names[k]) dup++; names[k] = 1;
+  });
+  var warn = [];
+  if (noKelas) warn.push(noKelas + ' murid tiada kelas.');
+  if (noRumah) warn.push(noRumah + ' murid tiada rumah. Laporan mata rumah memerlukan lajur Rumah.');
+  if (noId === rows.length) warn.push('Tiada lajur ID / No. MyKid. ID akan dijana daripada nama (masih boleh digunakan).');
+  if (dup) warn.push(dup + ' nama berulang dalam kelas yang sama.');
+  var rk = Object.keys(rumah).sort();
+  $('preview').innerHTML =
+    '<div class="stats"><div class="stat"><b>' + rows.length + '</b><span>murid</span></div><div class="stat"><b>' + Object.keys(kelas).length + '</b><span>kelas</span></div>' +
+    '<div class="stat"><b>' + rk.length + '</b><span>rumah' + (rk.length ? ': ' + esc(rk.join(', ')) : '') + '</span></div></div>' +
+    (warn.length ? '<div class="alert warn">' + warn.map(esc).join('<br>') + '</div>' : '') +
+    '<table><thead><tr><th>ID</th><th>Nama</th><th>Kelas</th><th>Rumah</th></tr></thead><tbody>' +
+    rows.slice(0, 8).map(function (r) { return '<tr><td>' + esc(r[0] || '(auto)') + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td></tr>'; }).join('') +
+    '</tbody></table>' + (rows.length > 8 ? '<div class="hint">… dan ' + (rows.length - 8) + ' lagi</div>' : '') +
+    (W.state.murid.count ? '<label class="f">Data sedia ada (' + W.state.murid.count + ' murid)</label><select id="mode"><option value="ganti">Ganti keseluruhan senarai murid</option><option value="tambah">Tambah kepada senarai sedia ada</option></select>' : '');
+  $('btnNext').textContent = 'Simpan ' + rows.length + ' murid & teruskan ›';
+}
+function saveStudents() {
+  if (!W.rows.length) {
+    if (W.state.murid.count) return Promise.resolve(true);
+    return Promise.reject(new Error('Sila muat naik senarai murid dahulu.'));
+  }
+  loading(true, 'Menyimpan ' + W.rows.length + ' murid…');
+  var mode = $('mode') ? $('mode').value : 'ganti';
+  return api('wizSaveStudents', W.rows, mode).then(function (r) {
+    loading(false);
+    return api('wizGetState').then(function (st) { W.state.murid = st.murid; W.rows = []; W.blocks = []; $('blocks').innerHTML = ''; $('preview').innerHTML = ''; });
+  });
+}
+
+/* ---------- 3. kesalahan ---------- */
+function renderOffenses() {
+  $('offBody').innerHTML = W.state.offenses.map(offRow).join('');
+}
+function offRow(r) {
+  r = r || ['', '', '', 1, 'Ya'];
+  var aktif = !/^(tidak|no|n|x|0)$/i.test(String(r[4]).trim());
+  return '<tr><td><input type="text" value="' + esc(r[0]) + '"></td><td><input type="text" value="' + esc(r[1]) + '"></td><td><input type="text" value="' + esc(r[2]) + '"></td>' +
+    '<td><input type="number" min="0" step="1" value="' + esc(r[3]) + '"></td><td style="text-align:center"><input type="checkbox"' + (aktif ? ' checked' : '') + '></td>' +
+    '<td><button class="x" title="Padam">×</button></td></tr>';
+}
+$('offBody').addEventListener('click', function (e) { if (e.target.classList.contains('x')) e.target.closest('tr').remove(); });
+$('btnAddOff').onclick = function () {
+  $('offBody').insertAdjacentHTML('beforeend', offRow());
+  $('offBody').lastElementChild.querySelectorAll('input')[1].focus();
+};
+function saveOffenses() {
+  var rows = Array.prototype.map.call($('offBody').querySelectorAll('tr'), function (tr) {
+    var i = tr.querySelectorAll('input');
+    return [i[0].value, i[1].value, i[2].value, i[3].value, i[4].checked ? 'Ya' : 'Tidak'];
+  }).filter(function (r) { return r[1].trim(); });
+  loading(true, 'Menyimpan…');
+  return api('wizSaveOffenses', rows).then(function () { loading(false); W.state.offenses = rows; });
+}
+
+/* ---------- 4. aktifkan ---------- */
+function renderDeploy() {
+  var url = W.state.webAppUrl;
+  $('deployNo').classList.toggle('hidden', !!url);
+  $('deployYes').classList.toggle('hidden', !url);
+  $('lnkScript').href = W.state.scriptUrl;
+  var dom = (W.state.email.split('@')[1] || '');
+  var hasPin = !!(W.state.tetapan.KOD_AKSES || '').trim();
+  $('accessHint').innerHTML = dom && !/gmail\.com$/.test(dom)
+    ? '<code>Anyone within ' + esc(dom) + '</code> jika semua pengguna ada akaun ' + esc(dom) + ', <b>atau</b> <code>Anyone</code> jika pengawas tiada akaun sekolah' + (hasPin ? '' : ' <span style="color:var(--danger)">(isi Kod akses di langkah 1 dahulu!)</span>')
+    : '<code>Anyone</code>' + (hasPin ? ' (dilindungi oleh kod akses anda)' : ' <span style="color:var(--danger)">— sila isi Kod akses di langkah 1 dahulu!</span>');
+  if (!url) return;
+  $('appUrl').value = url;
+  $('btnOpen').href = url;
+  var sek = W.state.tetapan.NAMA_SEKOLAH || 'sekolah kita';
+  var t = W.state.tetapan;
+  var msg = 'Assalamualaikum & salam sejahtera. Pautan SiDIA (rekod disiplin murid) ' + sek + ':\n' + url + (t.KOD_AKSES ? '\nKod akses: ' + t.KOD_AKSES : '') + '\nBuka di telefon > Add to Home Screen.';
+  $('btnWa').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  $('codeInfo').innerHTML = (t.KOD_AKSES ? 'Kod akses pengguna: <b>' + esc(t.KOD_AKSES) + '</b><br>' : 'Tiada kod akses ditetapkan.<br>') +
+    (t.KOD_ADMIN ? 'Kod admin (rahsia, untuk laporan): <b>' + esc(t.KOD_ADMIN) + '</b>' : 'Tiada kod admin. Semua pengguna boleh melihat laporan.');
+  $('qr').innerHTML = '';
+  if (typeof QRCode !== 'undefined') new QRCode($('qr'), { text: url, width: 178, height: 178, correctLevel: QRCode.CorrectLevel.M });
+  else $('qr').innerHTML = '<div class="hint">Kod QR tidak dapat dijana (tiada internet).</div>';
+}
+$('btnCheck').onclick = function () { checkDeploy(); };
+$('btnManual').onclick = function () { checkDeploy($('manualUrl').value); };
+function checkDeploy(manual) {
+  loading(true, 'Menyemak…');
+  api('wizCheckDeploy', manual || '').then(function (url) {
+    loading(false);
+    if (url) { W.state.webAppUrl = url; W.done[4] = 1; renderDeploy(); }
+    else $('deployMsg').innerHTML = '<div class="alert warn">Web app belum dikesan. Pastikan anda telah klik <b>Deploy</b> dan pilih jenis <b>Web app</b>. Jika sudah, salin <i>Web app URL</i> dan tampal di atas.</div>';
+  }).catch(function (e) { loading(false); $('deployMsg').innerHTML = '<div class="alert err">' + esc(e.message) + '</div>'; });
+}
+$('btnCopy').onclick = function () {
+  $('appUrl').select();
+  try { navigator.clipboard.writeText($('appUrl').value); } catch (e) { document.execCommand('copy'); }
+  $('btnCopy').textContent = 'Disalin ✓';
+};
+
+/* ---------- mula ---------- */
+loading(true, 'Memuatkan…');
+api('wizGetState').then(function (st) {
+  loading(false);
+  W.state = st;
+  var t = st.tetapan;
+  $('namaSekolah').value = t.NAMA_SEKOLAH || '';
+  $('kodAkses').value = t.KOD_AKSES || '';
+  $('kodAdmin').value = t.KOD_ADMIN || '';
+  $('lokasi').value = t.LOKASI || '';
+  if (t.NAMA_SEKOLAH) W.done[1] = 1;
+  if (st.murid.count) W.done[2] = 1;
+  if (st.webAppUrl) W.done[4] = 1;
+  renderOffenses();
+  go(!t.NAMA_SEKOLAH ? 1 : !st.murid.count ? 2 : st.webAppUrl ? 4 : 1);
+}).catch(function (e) { loading(false); document.querySelector('main').innerHTML = '<div class="alert err">' + esc(e.message) + '</div>'; });
+</script>
+</body>
+</html>

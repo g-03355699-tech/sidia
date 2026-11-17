@@ -10,37 +10,43 @@ Sistem rekod disiplin murid sekolah berasaskan Google Sheet + Google Apps Script
 - Mod kod akses atau senarai emel DELIMa
 - Boleh digunakan oleh mana-mana sekolah (salin templat)
 
+🌐 **Halaman pengenalan: https://g-03355699-tech.github.io/sidia/**
+
 ---
 
-## Panduan Pemasangan
+## Cara mula (untuk sekolah)
+1. Buka halaman pengenalan dan klik **Buat salinan SiDIA**. Google Sheet SiDIA akan disalin ke Drive anda.
+2. Dalam Google Sheet itu, klik menu **SiDIA › 🚀 Mula di sini**. Wizard akan membantu anda:
+   - isi nama sekolah, kod akses dan kod admin
+   - muat naik senarai murid (Excel/CSV/ODS; satu fail, satu tab setiap kelas, atau satu fail setiap kelas)
+   - semak senarai kesalahan & mata demerit
+   - aktifkan web app (**Deploy › New deployment › Web app**, sekali sahaja), kemudian dapatkan pautan + kod QR untuk dikongsi
+3. Kongsi pautan kepada guru, warden dan pengawas. Di telefon: *Add to Home Screen*.
 
-Sistem rekod disiplin murid berasaskan **Google Sheet + Google Apps Script**. Percuma, tiada pelayan, dan boleh digunakan dengan akaun DELIMa.
+Kali pertama, Google akan meminta kebenaran. Jika keluar amaran *"Google hasn't verified this app"*, klik **Advanced › Go to SiDIA**. Skrip itu berjalan dalam akaun anda sendiri.
 
 ## Fail
 | Fail | Fungsi |
 |---|---|
-| `Code.gs` | Kod pelayan (baca murid, simpan rekod, laporan) |
-| `Index.html` | Paparan web app (telefon & komputer) |
+| `Code.gs` | Kod pelayan (baca murid, simpan rekod, laporan, wizard) |
+| `Index.html` | Web app untuk merekod (telefon & komputer) |
+| `Setup.html` | Wizard persediaan dalam Google Sheet |
 | `appsscript.json` | Tetapan projek (zon waktu Malaysia) |
+| `docs/` | Halaman pengenalan (GitHub Pages) |
 
-## Pemasangan (±10 minit, sekali sahaja)
-1. Buka Google Sheet yang mengandungi senarai murid (atau cipta yang baharu).
-2. **Extensions › Apps Script**.
-3. Padam isi `Code.gs`, tampal isi `Code.gs` daripada folder ini.
-4. Klik **＋ › HTML**, namakan `Index`, kemudian tampal isi `Index.html`.
-5. (Pilihan) Project Settings › tandakan *Show "appsscript.json"* dan tampal isinya.
-6. Simpan, kembali ke Sheet, dan muat semula. Menu **SiDIA** akan muncul.
-7. Pilih **SiDIA › 1. Sediakan sistem** dan benarkan akses (Allow). Tab TETAPAN, KESALAHAN, PENGGUNA, REKOD dan MURID akan dicipta.
-8. Isi tab **TETAPAN**: nama sekolah, `KOD_AKSES` (cth 4821) dan `KOD_ADMIN`.
-9. Tampal senarai murid ke tab **MURID**. Sistem mengesan tajuk lajur secara automatik: *Nama*, *Kelas*, *Rumah / Rumah Sukan* dan *ID / No. MyKid / No. KP*.
-   Jika senarai murid berada dalam fail lain, isi `ID_SPREADSHEET_MURID` dan `TAB_MURID`.
-10. **SiDIA › 2. Semak senarai murid** untuk memastikan semua lajur dikesan.
-11. Di Apps Script: **Deploy › New deployment › Web app**
-    - Execute as: **Me**
-    - Who has access: **Anyone within moe-dl.edu.my** (atau *Anyone* jika pengawas tiada akaun DELIMa; kod akses akan melindungi sistem)
-12. Salin pautan web app dan kongsikan dalam kumpulan WhatsApp guru, warden dan pengawas. Di telefon: *Add to Home Screen*.
+## Pemasangan manual (tanpa templat)
+1. Cipta Google Sheet baharu › **Extensions › Apps Script**.
+2. Tampal `Code.gs`. Tambah fail HTML `Index` dan `Setup`, kemudian tampal isinya. (Pilihan) tampal `appsscript.json`.
+3. Simpan, muat semula Google Sheet, kemudian klik **SiDIA › 🚀 Mula di sini**.
 
-> Selepas mengubah kod, gunakan **Deploy › Manage deployments › Edit › New version** supaya pautan kekal sama.
+> Selepas mengubah kod, gunakan **Deploy › Manage deployments › ✎ Edit › Version: New version** supaya pautan kekal sama.
+
+## Untuk penyelenggara: menyediakan templat "Buat salinan"
+1. Pasang SiDIA secara manual dalam Google Sheet baharu bernama **SiDIA (Templat)**. Buka wizard sekali supaya semua tab dicipta, kemudian tutup tanpa mengisi apa-apa. Padam tab kosong *Sheet1* jika ada.
+2. **Share › General access › Anyone with the link › Viewer**.
+3. Salin ID fail (bahagian antara `/d/` dan `/edit` dalam URL) dan isikan dalam `TEMPLATE_ID` di `docs/index.html`.
+4. Uji pautan `https://docs.google.com/spreadsheets/d/<ID>/copy` dalam tetingkap Incognito.
+   Jika akaun DELIMa anda tidak dibenarkan berkongsi di luar domain, simpan templat dalam akaun Gmail peribadi.
 
 ## Cara merekod ramai murid dengan pantas (cth: tidak turun solat)
 1. Pilih kesalahan (cth *Tidak hadir solat Subuh berjemaah*). Pilihan ini kekal untuk rekod seterusnya.
@@ -65,5 +71,5 @@ Jumlah mata ditolak bagi setiap rumah = jumlah lajur *Mata* dalam tab KESALAHAN.
 - **Mod mudah** (tab PENGGUNA kosong): sesiapa yang mempunyai pautan dan `KOD_AKSES` boleh merekod. Pengguna mengisi nama dan peranan sekali sahaja.
 - **Mod senarai emel**: isi tab PENGGUNA (Emel, Nama, Peranan). Hanya emel dalam senarai boleh masuk, dan peranan *Admin / Guru Disiplin* boleh melihat laporan.
 
-## Untuk sekolah lain
-Kongsi Google Sheet anda sebagai **templat** (File › Make a copy; kosongkan tab MURID dan REKOD dahulu). Sekolah lain cuma perlu membuat salinan, mengisi TETAPAN dan MURID, kemudian melakukan Deploy sendiri. Data setiap sekolah kekal dalam Google Drive sekolah masing-masing.
+## Privasi
+Setiap sekolah menyimpan data dalam salinan Google Sheet sendiri, dalam Google Drive sekolah masing-masing. Pembangun SiDIA tidak boleh mengakses data mana-mana sekolah.

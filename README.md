@@ -126,6 +126,9 @@ Jumlah mata ditolak bagi setiap rumah = jumlah lajur *Mata* dalam tab KESALAHAN.
 - **Mod senarai emel (pilihan):** isi tab PENGGUNA (Emel, Nama, Peranan). Hanya emel dalam senarai boleh masuk, dan PIN Guru/Murid tidak digunakan.
 - Sekolah yang menggunakan `KOD_AKSES` (sebelum v1.2) tidak terjejas: kod itu kekal sah sehingga admin menetapkan PIN baharu.
 
+## Import ke Infomurid
+Extension Chrome dalam folder [`infomurid-extension/`](infomurid-extension/) membolehkan guru disiplin mengimport rekod tab REKOD ke **Infomurid › Kemaskini salah laku** secara pukal. Muat turun [`sidia-infomurid.zip`](https://g-03355699-tech.github.io/sidia/sidia-infomurid.zip) dan ikut [arahan pemasangan](infomurid-extension/README.md).
+
 ## Panduan pengguna (PDF)
 - [Panduan Guru](https://github.com/g-03355699-tech/sidia/raw/main/docs/panduan/Panduan-SiDIA-Guru.pdf)
 - [Panduan Warden](https://github.com/g-03355699-tech/sidia/raw/main/docs/panduan/Panduan-SiDIA-Warden.pdf)

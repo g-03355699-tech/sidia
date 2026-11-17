@@ -1,5 +1,10 @@
 # Senarai Perubahan SiDIA
 
+## Extension SiDIA → Infomurid 1.0.0 (17 Nov 2026)
+- Extension Chrome baharu (`infomurid-extension/`, muat turun `sidia-infomurid.zip`) untuk **import rekod kesalahan dari tab REKOD ke Infomurid** (Kemaskini salah laku) secara pukal
+- Padanan murid ikut nama (+ kelas), padanan kod kesalahan automatik, pemetaan kod tambahan (cth W01–W05) diingat
+- Langkau rekod yang sudah ada dalam Infomurid atau pernah diimport
+
 ## 1.4.0 (17 Nov 2026)
 Reka bentuk semula UI/UX web app berdasarkan garis panduan UI UX Pro Max (produk pendidikan/LMS):
 - **Sistem reka bentuk**: token warna semantik (teal pendidikan + amber), fon Inter, skala jejari/bayang/pergerakan yang konsisten

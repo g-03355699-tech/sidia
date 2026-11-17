@@ -1,5 +1,8 @@
 # Senarai Perubahan SiDIA
 
+## 1.2.1 (17 Nov 2026)
+- Kemas kini satu klik: mesej ralat kini menerangkan punca sebenar (suis Apps Script API OFF, API projek dinyahaktifkan, disekat pentadbir domain, atau kebenaran tidak lengkap) dan memaparkan mesej asal Google
+
 ## 1.2.0 (17 Nov 2026)
 - **PIN berbeza mengikut peranan:** Guru & Warden, Murid (Pengawas) dan Admin. Pengawas tidak boleh log masuk sebagai guru
 - **Tab Admin** (menggantikan tab Laporan) dengan submenu: Laporan, **PIN akses** (tukar PIN), **Tetapan sekolah**, **Kongsi pautan** (kod QR & mesej WhatsApp berasingan untuk guru dan pengawas), **Sistem** (versi & kemas kini dari telefon)

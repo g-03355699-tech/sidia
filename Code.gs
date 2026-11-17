@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.2.0';
+var SIDIA_VERSION = '1.2.1';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 
@@ -1211,15 +1211,34 @@ function scriptApi_(method, url, body) {
   var r = UrlFetchApp.fetch(url, opt);
   var code = r.getResponseCode(), txt = r.getContentText();
   if (code >= 200 && code < 300) return txt ? JSON.parse(txt) : {};
-  if (code === 403 && /Apps Script API|has not been used|is disabled|not enabled/i.test(txt)) {
-    throw new Error('Google Apps Script API belum dihidupkan untuk akaun anda.\n\n' +
-      'Buka https://script.google.com/home/usersettings › hidupkan "Google Apps Script API" (ON), ' +
-      'tunggu 1–2 minit, kemudian cuba lagi.\n\nJika suis itu tidak dibenarkan oleh pentadbir domain, ' +
-      'gunakan kaedah kemas kini manual dalam README.');
-  }
   var msg = txt;
-  try { msg = JSON.parse(txt).error.message; } catch (e) {}
-  throw new Error('Apps Script API (' + code + '): ' + msg);
+  try { msg = JSON.parse(txt).error.message || txt; } catch (e) {}
+  throw new Error(scriptApiHelp_(code, txt) + '\n\nMesej Google (' + code + '): ' + String(msg).slice(0, 300));
+}
+
+/** Terangkan ralat Apps Script API mengikut punca sebenar. */
+function scriptApiHelp_(code, txt) {
+  var manual = 'Sebagai alternatif, kemas kini secara manual: tampal semula Code.gs, Index.html, Setup.html dan appsscript.json dari GitHub, ' +
+    'kemudian Deploy › Manage deployments › ✎ Edit › Version: New version › Deploy.';
+  if (/User has not enabled the Apps Script API/i.test(txt)) {
+    return 'Suis "Google Apps Script API" untuk akaun anda masih OFF.\n\n' +
+      '1. Buka https://script.google.com/home/usersettings\n2. Hidupkan "Google Apps Script API" (ON)\n' +
+      '3. Tunggu 2–5 minit, kemudian cuba lagi.\n\nPastikan anda log masuk dengan akaun yang sama dengan pemilik Google Sheet ini.';
+  }
+  if (/has not been used in project|SERVICE_DISABLED|accessNotConfigured|it is disabled/i.test(txt)) {
+    return 'Apps Script API tidak diaktifkan untuk projek Google Cloud skrip ini.\n\n' +
+      'Jika anda baru menghidupkan suis di https://script.google.com/home/usersettings, tunggu 5–10 minit dan cuba lagi. ' +
+      'Jika masih gagal, akaun ini tidak dapat menggunakan kemas kini satu klik.\n\n' + manual;
+  }
+  if (code === 403) {
+    return 'Google menolak permintaan kemas kini (tiada kebenaran). Kemungkinan pentadbir domain menyekat Apps Script API untuk akaun sekolah, ' +
+      'atau anda bukan pemilik/editor projek skrip ini.\n\n' + manual;
+  }
+  if (code === 401) {
+    return 'Kebenaran (authorization) tidak lengkap. Muat semula Google Sheet, buka mana-mana menu SiDIA, dan klik Allow jika diminta. ' +
+      'Pastikan appsscript.json mengandungi kebenaran script.projects dan script.deployments.';
+  }
+  return 'Kemas kini gagal semasa menghubungi Apps Script API.\n\n' + manual;
 }
 
 /** Jalankan persediaan tab yang baharu selepas kemas kini (sekali bagi setiap versi). */

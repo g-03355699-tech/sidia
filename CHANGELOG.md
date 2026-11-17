@@ -1,5 +1,10 @@
 # Senarai Perubahan SiDIA
 
+## 1.1.1 (17 Nov 2026)
+- Keluaran ujian untuk kemas kini satu klik (tiada perubahan fungsi web app)
+- Halaman pengenalan dikemas kini: pemilih kesalahan, ciri mesra telefon & kemas kini satu klik
+- Ditambah: kerangka ujian `tests/` dan panduan projek `CLAUDE.md`
+
 ## 1.1.0 (17 Nov 2026)
 - **Kemas kini satu klik**: menu *SiDIA › Semak kemas kini* dan notis dalam wizard
 - **142 kesalahan standard** (Ringan / Sederhana / Berat), termasuk W01–W05 tidak hadir solat berjemaah

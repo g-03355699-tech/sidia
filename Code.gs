@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.1.0';
+var SIDIA_VERSION = '1.1.1';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 

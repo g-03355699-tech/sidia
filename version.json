@@ -1,11 +1,10 @@
 {
-  "version": "1.2.3",
-  "ref": "ce4a520eec2be066db6ef2d6e6f17bcc6efd2076",
+  "version": "1.3.0",
+  "ref": "5b540aeee40abafbebea93eebb0f33f26537d6ff",
   "tarikh": "2026-11-17",
   "nota": [
-    "Baiki iPhone: kotak carian murid tidak lagi menjadikan skrin kosong",
-    "Telefon: skrin carian penuh dengan butang Selesai",
-    "Ikon SiDIA baharu; PIN ikut peranan & tab Admin (dari 1.2.x)",
-    "Selepas kemas kini: buka Admin › PIN akses dan tetapkan PIN untuk setiap peranan"
+    "Laporan PDF rasmi: Admin › Laporan › Muat turun PDF",
+    "Header & footer setiap halaman, carta kedudukan rumah, ruang tandatangan, lampiran rekod (pilihan)",
+    "Skrin carian penuh di telefon (dari 1.2.3)"
   ]
 }

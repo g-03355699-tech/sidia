@@ -43,7 +43,7 @@ const LOGIN = (n, peranan, pinNama, gambar) => step(n, 'Log masuk',
 
 const KESALAHAN = n => step(n, 'Pilih kesalahan',
   `<p>Kesalahan disusun dalam tab:</p>
-   <ul><li><b>⭐ Pantas</b>: kesalahan harian (tidak hadir solat, datang lewat, pakaian, rambut, telefon) dan kesalahan yang paling kerap <i>anda</i> rekod.</li>
+   <ul><li><b>⭐ Pantas</b>: kesalahan harian (lewat ke surau, datang lewat, pakaian, rambut, telefon) dan kesalahan yang paling kerap <i>anda</i> rekod.</li>
    <li><b>Ringan · Sederhana · Berat</b>: semua kesalahan mengikut tahap. Warna kod: <span class="sev r">hijau</span> Ringan, <span class="sev s">oren</span> Sederhana, <span class="sev b">merah</span> Berat.</li></ul>
    <p>Atau <b>cari</b> ikut nama atau kod, contohnya <code>rokok</code>, <code>ponteng</code> atau <code>R16</code>, kemudian ketik kesalahan itu.</p>
    ${tip('Kesalahan yang dipilih kekal untuk rekod seterusnya. Ketik <b>Tukar</b> untuk memilih kesalahan lain.')}`, ['kesalahan', 'kesalahan-cari']);
@@ -118,14 +118,9 @@ const PANDUAN = [
     isi: () =>
       seksyen('Bermula') + BUKA('PIN Guru & Warden') + LOGIN('2', 'Warden', 'PIN Guru & Warden', 'login') +
       seksyen('Senario: semakan solat Subuh berjemaah', 'Selepas solat Subuh, 40 murid tidak turun ke surau. Begini cara merekod mereka dalam masa kurang seminit.') +
-      step('3', 'Pilih kesalahan solat dari tab ⭐ Pantas',
-        `<p>Dalam tab <b>⭐ Pantas</b>, ketik kesalahan mengikut waktu solat:</p>
-         <table class="mini"><tr><th>Kod</th><th>Kesalahan</th></tr>
-         <tr><td>W01</td><td>Tidak hadir solat Subuh berjemaah</td></tr><tr><td>W02</td><td>… Zohor</td></tr>
-         <tr><td>W03</td><td>… Asar</td></tr><tr><td>W04</td><td>… Maghrib</td></tr><tr><td>W05</td><td>… Isyak</td></tr>
-         <tr><td>R28</td><td>Lewat ke surau/masjid</td></tr></table>
-         <p>Kemudian pilih lokasi <b>Surau</b>.</p>
-         ${tip('Setiap waktu solat mempunyai kod sendiri. Murid yang ponteng Subuh dan Isyak pada hari yang sama direkod sebagai dua kesalahan yang berbeza.')}`, ['kesalahan', 'kesalahan-pilih']) +
+      step('3', 'Pilih kesalahan dari tab ⭐ Pantas',
+        `<p>Dalam tab <b>⭐ Pantas</b>, ketik <b>R28 Lewat ke surau/masjid</b>, kemudian pilih lokasi <b>Surau</b> dan isi masa (cth 05:45).</p>
+         ${tip('Senarai kesalahan SiDIA sama dengan senarai salah laku Infomurid, jadi rekod boleh diimport terus ke Infomurid. Admin boleh menambah kod khas sekolah dalam tab KESALAHAN, tetapi kod itu tidak akan diimport ke Infomurid.')}`, ['kesalahan', 'kesalahan-pilih']) +
       step('4', 'Pilih kelas, Pilih semua, buang yang hadir',
         `<ol><li>Pilih kelas atau dorm (ikut senarai kelas sekolah).</li><li>Ketik <b>Pilih semua</b>.</li>
          <li>Ketik nama murid yang <b>hadir</b> untuk membuang tanda.</li>
@@ -178,7 +173,7 @@ const PANDUAN = [
       lebar('2', 'Muat naik senarai murid',
         `<p>Muat naik fail Excel/CSV. Lajur Nama, Kelas, Rumah dan No. MyKid dikesan secara automatik. Fail boleh mengandungi satu tab setiap kelas. Semak pratonton (No. KP mesti 12 digit), kemudian simpan.</p>`, 'wizard-2') +
       lebar('3', 'Kesalahan & mata demerit',
-        `<p>Semak 142 kesalahan standard. Ubah mata, nyahaktifkan kesalahan yang tidak digunakan, tandakan <b>⭐</b> untuk pilihan pantas, atau <b>tampal senarai sekolah anda dari Excel</b>.</p>`, 'wizard-3') +
+        `<p>Semak 137 kesalahan standard. Ubah mata, nyahaktifkan kesalahan yang tidak digunakan, tandakan <b>⭐</b> untuk pilihan pantas, atau <b>tampal senarai sekolah anda dari Excel</b>.</p>`, 'wizard-3') +
       lebar('4', 'Aktifkan web app & kongsi',
         `<p>Ikut arahan dalam wizard: <b>Deploy › New deployment › Web app</b>, dengan <i>Execute as: Me</i> dan <i>Who has access: Anyone</i> (dilindungi PIN). Kemudian kongsi pautan atau kod QR.</p>`, 'wizard-4b') +
       seksyen('Menu Admin di telefon', 'Tab <b>🛡️ Admin</b> dibuka dengan PIN Admin, atau dengan log masuk menggunakan peranan Admin.') +

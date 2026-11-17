@@ -6,7 +6,7 @@ Import rekod kesalahan daripada tab **REKOD** Google Sheet SiDIA ke **Infomurid 
 - Extension menambah butang hijau **Import SiDIA** di sebelah butang **Excel** (dan di penjuru kanan bawah) dalam halaman `infomurid.com/Discipline/…`. Klik ikon SiDIA pada toolbar Chrome juga membuka panel import.
 - Data dibaca daripada fail CSV tab REKOD (atau ditampal terus dari Google Sheet).
 - Murid dipadankan dengan senarai murid Infomurid mengikut **nama** (dan **kelas** jika ada nama yang sama).
-- Kod kesalahan SiDIA (cth `S11`, `R14`, `884`) dipadankan dengan kod dalam senarai salah laku Infomurid. Kod yang tiada dalam Infomurid (cth `W01`–`W05` solat berjemaah) perlu dipilih sekali sahaja; pilihan itu diingat.
+- Kod kesalahan SiDIA (cth `S11`, `R14`, `884`) dipadankan dengan kod dalam senarai salah laku Infomurid. Rekod dengan kod yang tiada dalam Infomurid (cth kod khas sekolah) dilangkau secara automatik.
 - Rekod disimpan melalui fungsi **Tambah Rekod (Kelompok)** Infomurid, satu kumpulan bagi setiap tarikh + kesalahan.
 - Rekod yang sudah ada dalam Infomurid (nama + tarikh + kod sama) dan rekod yang pernah diimport akan dilangkau.
 
@@ -31,7 +31,6 @@ Semua permintaan dibuat terus dari pelayar anda ke Infomurid menggunakan log mas
 3. Klik **Import SiDIA** (sebelah butang Excel, atau ikon SiDIA pada toolbar) › **Pilih fail CSV** (atau tampal data, kemudian **Baca data yang ditampal**).
 4. Pilih **Tahun**, julat **Tarikh**, **Hukuman** (lalai: Amaran) dan klik **Semak dengan Infomurid**.
 5. Semak senarai:
-   - kumpulan berbingkai merah: pilih kesalahan Infomurid yang setara untuk kod tersebut
    - **Tidak dijumpai**: buka senarai murid dan pilih nama yang betul dalam kelas yang sama (diingat untuk kali seterusnya)
    - nyahtanda kumpulan yang tidak mahu diimport
 6. Klik **Import N rekod ke Infomurid** dan sahkan.

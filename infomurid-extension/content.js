@@ -323,9 +323,17 @@
   function analyse() {
     var dari = el.dari.value || '0000-00-00', hingga = el.hingga.value || '9999-99-99';
     var recs = state.records.filter(function (r) { return r.tarikh >= dari && r.tarikh <= hingga; });
-    state.groups = C.groupRecords(recs);
+    var semua = C.groupRecords(recs);
+    semua.forEach(function (g) { g.offence = C.offenceFor(state.offences, g.kod, state.store.peta); });
+    // kod yang tiada dalam Infomurid (cth W01–W05) dilangkau
+    state.dilangkau = { n: 0, kod: [] };
+    semua.forEach(function (g) {
+      if (g.offence) return;
+      state.dilangkau.n += g.rekod.length;
+      if (state.dilangkau.kod.indexOf(g.kod) < 0) state.dilangkau.kod.push(g.kod);
+    });
+    state.groups = semua.filter(function (g) { return g.offence; });
     state.groups.forEach(function (g) {
-      g.offence = C.offenceFor(state.offences, g.kod, state.store.peta);
       g.pilih = true;
       g.rekod.forEach(function (r) {
         r.status = ''; r.murid = null; r.ralat = '';
@@ -352,8 +360,11 @@
 
   function render() {
     el.result.textContent = '';
+    var dl = state.dilangkau || { n: 0, kod: [] };
+    var notaLangkau = dl.n ? h('p', { 'class': 'note', text: dl.n + ' rekod dilangkau kerana kod ' + dl.kod.join(', ') + ' tiada dalam senarai salah laku Infomurid.' }) : null;
     if (!state.groups.length) {
-      el.result.appendChild(h('p', { 'class': 'note', text: 'Tiada rekod dalam julat tarikh yang dipilih.' }));
+      el.result.appendChild(h('p', { 'class': 'note', text: dl.n ? 'Tiada rekod yang boleh diimport.' : 'Tiada rekod dalam julat tarikh yang dipilih.' }));
+      if (notaLangkau) el.result.appendChild(notaLangkau);
       updateImportBtn();
       return;
     }
@@ -361,11 +372,12 @@
     state.groups.forEach(function (g) { g.rekod.forEach(function (r) { tot[r.status === 'sedia' && !g.offence ? 'kod' : r.status]++; }); });
     el.result.appendChild(h('div', { 'class': 'chips' }, [
       chip('ok', tot.sedia + ' sedia diimport'),
-      tot.kod ? chip('err', tot.kod + ' menunggu pilihan kesalahan') : null,
       tot.tiada ? chip('err', tot.tiada + ' murid tidak sepadan') : null,
       tot.pendua ? chip('mut', tot.pendua + ' sudah ada dalam Infomurid') : null,
-      tot.diimport ? chip('mut', tot.diimport + ' pernah diimport') : null
+      tot.diimport ? chip('mut', tot.diimport + ' pernah diimport') : null,
+      dl.n ? chip('mut', dl.n + ' dilangkau (kod tiada dalam Infomurid)') : null
     ]));
+    if (notaLangkau) el.result.appendChild(notaLangkau);
 
     var list = h('div', { 'class': 'groups' });
     state.groups.forEach(function (g, gi) { list.appendChild(renderGroup(g, gi)); });
@@ -404,7 +416,6 @@
         h('span', { 'class': 'muted', text: g.kesalahan || '' })
       ]),
       sel,
-      g.offence ? null : h('p', { 'class': 'note err', text: 'Kod ' + g.kod + ' tiada dalam Infomurid. Pilih kesalahan yang setara; pilihan ini akan diingat.' }),
       details
     ]);
   }

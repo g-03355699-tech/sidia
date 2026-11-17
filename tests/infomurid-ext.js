@@ -51,7 +51,7 @@ async function route(r) {
       m = k.match(/^students\[(\d+)\]\[(\w+)\]$/); if (m) { st[m[1]] = st[m[1]] || {}; st[m[1]][m[2]] = v; }
     }
     saved.push({ vm, students: st, sessionid: body.get('sessionid') });
-    if (vm.OffenceID === '138') return html('<div>Error: simulasi ralat pelayan</div>');
+    if (vm.OffenceID === '53') return html('<div>Error: simulasi ralat pelayan</div>');
     st.forEach(s => existing.push([vm.DateCommitted, vm.TimeCommitted, s.Name, s.ClassCode, OFFENCES.find(o => o[0] === vm.OffenceID)[2], vm.Place]));
     return html('<div>OK</div>');
   }
@@ -68,7 +68,7 @@ const rows = [
   ['b2-4', '15/11/2026 07:40:00', '15/11/2026', '07:30', '0104', 'NAMA SALAH EJA', '4 BERLIAN', 'BIRU', 'R14', 'TIDAK MEMAKAI PAKAIAN', 'Ringan', '2', 'Cikgu B', '', 'Guru', '', 'Baju "tiada", nama', 'b2'],
   ['b3-1', '16/11/2026 05:50:00', '16/11/2026', '05:45', '0201', 'DANIEL HAKIM BIN ZAINAL', '4 BERLIAN', 'HIJAU', 'W01', 'TIDAK HADIR SOLAT SUBUH BERJEMAAH', 'Ringan', '3', 'Pengawas C', '', 'Pengawas', 'SURAU', '', 'b3'],
   ['b3-2', '16/11/2026 05:50:00', '16/11/2026', '05:45', '0202', 'MUHAMMAD FARIS BIN OMAR', '4 BERLIAN', 'HIJAU', 'W01', 'TIDAK HADIR SOLAT SUBUH BERJEMAAH', 'Ringan', '3', 'Pengawas C', '', 'Pengawas', 'SURAU', '', 'b3'],
-  ['b4-1', '01/10/2026 05:50:00', '01/10/2026', '', '0202', 'MUHAMMAD FARIS BIN OMAR', '4 BERLIAN', 'HIJAU', '884', 'PONTENG', 'Ringan', '3', 'Cikgu D', '', 'Guru', '', '', 'b4']
+  ['b4-1', '16/11/2026 22:10:00', '16/11/2026', '', '0202', 'MUHAMMAD FARIS BIN OMAR', '4 BERLIAN', 'HIJAU', '884', 'PONTENG', 'Ringan', '3', 'Cikgu D', '', 'Guru', '', '', 'b4']
 ];
 const csv = [H].concat(rows.map(r => r.map(c => /[",\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c).join(','))).join('\r\n');
 const csvPath = path.join(OUT, 'rekod-sidia.csv');
@@ -114,34 +114,32 @@ function assert(c, m) { if (!c) { throw new Error('GAGAL: ' + m); } console.log(
   const info = await p.locator('#sidia-import-host >> #sd-readinfo').textContent();
   console.log('     ' + info);
   assert(/8 rekod dibaca/.test(info), 'CSV dibaca (8 rekod)');
-  assert(await p.locator('#sidia-import-host >> #sd-dari').inputValue() === '2026-10-01', 'tarikh mula lalai');
+  assert(await p.locator('#sidia-import-host >> #sd-dari').inputValue() === '2026-11-10', 'tarikh mula lalai');
   await p.locator('#sidia-import-host >> #sd-dari').fill('2026-11-01');
   await p.locator('#sidia-import-host >> #sd-semak').click();
   await p.locator('#sidia-import-host >> .groups').waitFor({ timeout: 10000 });
   const chips = await p.locator('#sidia-import-host >> .chips').textContent();
   console.log('     ' + chips);
-  assert(/3 sedia diimport/.test(chips), '3 rekod sedia (Ali R14, Siti BT, Ahmad 1DELIMA)');
-  assert(/2 menunggu pilihan kesalahan/.test(chips), 'W01 menunggu pemetaan');
+  assert(/4 sedia diimport/.test(chips), '4 rekod sedia (Ali R14, Siti BT, Ahmad 1DELIMA, Faris 884)');
+  assert(/2 dilangkau/.test(chips), 'W01 (tiada dalam Infomurid) dilangkau');
+  assert(!/W01/.test(await p.locator('#sidia-import-host >> .groups').textContent()), 'kumpulan W01 tidak dipaparkan');
   assert(/1 murid tidak sepadan/.test(chips), '1 murid tidak sepadan');
   assert(/1 sudah ada/.test(chips), 'pendua dikesan (Ali S11 10/11)');
-  assert(await p.locator('#sidia-import-host >> .grp.warn').count() === 1, 'kod W01 perlu dipetakan');
   await p.screenshot({ path: path.join(OUT, 'ext-semak.png') });
 
-  // petakan W01 → R28 (Lewat ke surau)
-  await p.locator('#sidia-import-host >> .grp.warn select').first().selectOption('138');
   // padanan manual murid salah eja
   await p.locator('#sidia-import-host >> details').nth(1).evaluate(d => d.open = true);
   await p.locator('#sidia-import-host >> li.tiada select').selectOption('2001');
   const btn = await p.locator('#sidia-import-host >> #sd-import').textContent();
   console.log('     ' + btn);
-  assert(/Import 6 rekod/.test(btn), '6 rekod sedia selepas pemetaan');
+  assert(/Import 5 rekod/.test(btn), '5 rekod sedia selepas padanan manual');
   await p.screenshot({ path: path.join(OUT, 'ext-sedia.png') });
 
   await p.locator('#sidia-import-host >> #sd-import').click();
   await p.locator('#sidia-import-host >> .log li', { hasText: 'Selesai' }).waitFor({ timeout: 10000 });
   const logText = await p.locator('#sidia-import-host >> #sd-log').textContent();
   console.log('     ' + logText.replace(/\s+/g, ' '));
-  assert(saved.length === 2, '2 panggilan BulkSave (R14, W01→R28)');
+  assert(saved.length === 2, '2 panggilan BulkSave (R14, 884); W01 tidak dihantar');
   const r14 = saved.find(s => s.vm.OffenceID === '124');
   assert(r14 && r14.students.length === 4, 'R14: 4 murid');
   assert(r14.vm.DateCommitted === '2026-11-15' && r14.vm.TimeCommitted === '7.30am', 'tarikh & masa diformat');
@@ -158,8 +156,7 @@ function assert(c, m) { if (!c) { throw new Error('GAGAL: ' + m); } console.log(
   await p.waitForTimeout(800);
   const chips2 = await p.locator('#sidia-import-host >> .chips').textContent();
   console.log('     ' + chips2);
-  assert(/4 pernah diimport/.test(chips2) && /2 sedia/.test(chips2), 'rekod yang berjaya tidak diimport dua kali; yang gagal boleh dicuba semula');
-  assert(await p.locator('#sidia-import-host >> .grp.warn').count() === 0, 'pemetaan W01 diingat');
+  assert(/4 pernah diimport/.test(chips2) && /1 sedia/.test(chips2), 'rekod yang berjaya tidak diimport dua kali; yang gagal boleh dicuba semula');
 
   // paparan telefon
   await p.setViewportSize({ width: 390, height: 844 });

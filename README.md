@@ -88,7 +88,7 @@ Sekolah hanya menerima kod daripada **`ref`** (commit/tag) yang dinyatakan dalam
    Jika akaun DELIMa anda tidak dibenarkan berkongsi di luar domain, simpan templat dalam akaun Gmail peribadi.
 
 ## Cara merekod ramai murid dengan pantas (cth: tidak turun solat)
-1. Pilih kesalahan (cth *Tidak hadir solat Subuh berjemaah*). Pilihan ini kekal untuk rekod seterusnya.
+1. Pilih kesalahan (cth *Lewat ke surau/masjid*). Pilihan ini kekal untuk rekod seterusnya.
 2. Pilih murid menggunakan salah satu cara:
    - **Taip + Enter**: taip `hafiz 4a` dan tekan Enter untuk memilih murid teratas. Kotak carian dikosongkan supaya anda boleh terus taip nama seterusnya. Ejaan *Mohd/Muhd/Muhammad* dan *Nor/Noor/Nur* dianggap sama.
    - **Ikut kelas / dorm**: pilih kelas, tekan **Pilih semua**, kemudian buang tanda murid yang hadir.
@@ -99,7 +99,7 @@ Sekolah hanya menerima kod daripada **`ref`** (commit/tag) yang dinyatakan dalam
 - Rekod yang tersilap boleh dibatalkan serta-merta, atau dipadam di tab **Terkini** dalam tempoh 24 jam.
 
 ## Senarai kesalahan
-SiDIA disertakan dengan **142 kesalahan standard** (Ringan / Sederhana / Berat), termasuk 5 kesalahan tidak hadir solat berjemaah (W01–W05).
+SiDIA disertakan dengan **137 kesalahan standard** (Ringan / Sederhana / Berat), sama dengan senarai salah laku Infomurid. Untuk kehadiran surau gunakan *R28 Lewat ke surau/masjid*, atau tambah kod sekolah sendiri dalam tab KESALAHAN (kod yang tiada dalam Infomurid tidak akan diimport ke Infomurid).
 - Di web app, kesalahan dipilih melalui tab **⭐ Pantas / Ringan / Sederhana / Berat**, atau dicari ikut nama atau kod (cth `rokok`, `R16`). Kesalahan yang kerap digunakan oleh setiap pengguna dipaparkan paling atas.
 - Tandakan lajur **Pantas** dalam tab KESALAHAN (atau ⭐ dalam wizard) untuk kesalahan yang selalu direkod.
 - Sekolah yang mempunyai senarai sendiri boleh **tampal terus dari Excel** dalam wizard (langkah 3). Lajur Kod/Code, Kesalahan/Description, Kategori/Category (1/2/3) dan Mata/Demerit dikenal pasti secara automatik.

@@ -1,5 +1,10 @@
 # Senarai Perubahan SiDIA
 
+## 1.5.0 (17 Nov 2026)
+- Senarai kesalahan lalai kini **137 kesalahan**, sama dengan senarai salah laku Infomurid: W01–W05 (tidak hadir solat berjemaah) dibuang
+- Sekolah sedia ada: W01–W05 dinyahaktifkan secara automatik dalam tab KESALAHAN (Aktif = Tidak) selepas kemas kini. Rekod lama tidak diubah dan masih dikira dalam laporan
+- Extension SiDIA → Infomurid 1.0.2: rekod dengan kod yang tiada dalam Infomurid dilangkau secara automatik
+
 ## Extension SiDIA → Infomurid 1.0.1 (17 Nov 2026)
 - Butang **Import SiDIA** kini di sebelah butang Excel
 - Klik ikon SiDIA pada toolbar Chrome membuka panel import (berfungsi walaupun tab Infomurid dibuka sebelum extension dipasang)

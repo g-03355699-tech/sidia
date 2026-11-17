@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.4.0';
+var SIDIA_VERSION = '1.5.0';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 /** Ikon web app (dihoskan di GitHub Pages). */
@@ -58,11 +58,6 @@ var DEFAULT_TETAPAN = [
 
 var DEFAULT_KESALAHAN = [
   // [Kod, Kesalahan, Kategori, Mata, Aktif, Pantas]
-  ["W01", "TIDAK HADIR SOLAT SUBUH BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
-  ["W02", "TIDAK HADIR SOLAT ZOHOR BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
-  ["W03", "TIDAK HADIR SOLAT ASAR BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
-  ["W04", "TIDAK HADIR SOLAT MAGHRIB BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
-  ["W05", "TIDAK HADIR SOLAT ISYAK BERJEMAAH", "Ringan", 3, "Ya", "Ya"],
   ["111", "BERJUDI", "Berat", 9, "Ya", ""],
   ["114", "MELAWAN/MENGANCAM/MEMUKUL/MENCEDERAKAN PENGAWAS", "Berat", 9, "Ya", ""],
   ["115", "MEMERAS UGUT", "Berat", 9, "Ya", ""],
@@ -1245,14 +1240,43 @@ function scriptApiHelp_(code, txt) {
 }
 
 /** Jalankan persediaan tab yang baharu selepas kemas kini (sekali bagi setiap versi). */
+// Kod yang tiada dalam Infomurid dan dibuang daripada senarai lalai sejak 1.5.0
+var KOD_DIBUANG_1_5 = ['W01', 'W02', 'W03', 'W04', 'W05'];
+
+function versiLebihRendah_(a, b) {
+  var x = String(a).split('.'), y = String(b).split('.');
+  for (var i = 0; i < 3; i++) {
+    var d = (parseInt(x[i], 10) || 0) - (parseInt(y[i], 10) || 0);
+    if (d) return d < 0;
+  }
+  return false;
+}
+
+/** Tetapkan Aktif = Tidak (dan buang Pantas) bagi kod tertentu dalam tab KESALAHAN. Rekod lama tidak diubah. */
+function nyahaktifKod_(kodList) {
+  var sh = SpreadsheetApp.getActive().getSheetByName(SH.KESALAHAN);
+  if (!sh || sh.getLastRow() < 2) return 0;
+  var rg = sh.getRange(2, 1, sh.getLastRow() - 1, 6);
+  var vals = rg.getValues(), n = 0;
+  vals.forEach(function (r) {
+    if (kodList.indexOf(String(r[0]).trim().toUpperCase()) >= 0 && !/^tidak$/i.test(String(r[4]).trim())) {
+      r[4] = 'Tidak'; r[5] = ''; n++;
+    }
+  });
+  if (n) sh.getRange(2, 5, vals.length, 2).setValues(vals.map(function (r) { return [r[4], r[5]]; }));
+  return n;
+}
+
 function migrateIfNeeded_() {
   try {
     if (getSettings_().VERSI_DIPASANG === SIDIA_VERSION) return;
     var lock = LockService.getScriptLock();
     if (!lock.tryLock(5000)) return;
     try {
-      if (getSettings_().VERSI_DIPASANG === SIDIA_VERSION) return;
+      var dahulu = getSettings_().VERSI_DIPASANG;
+      if (dahulu === SIDIA_VERSION) return;
       ensureSetup_();
+      if (dahulu && versiLebihRendah_(dahulu, '1.5.0')) nyahaktifKod_(KOD_DIBUANG_1_5);
       setSetting_('VERSI_DIPASANG', SIDIA_VERSION);
     } finally { lock.releaseLock(); }
   } catch (e) { console.warn('migrasi: ' + e.message); }

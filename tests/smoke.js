@@ -104,7 +104,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(ids.length === 60, 'Excel 2 tab → 60 murid (baris judul & JUMLAH diabaikan)');
   ok(ids.every(id => /^\d{12}$/.test(id)), 'No. KP 12 digit penuh (bukan 1.3E+11)');
   await w.click('#btnNext'); await w.waitForSelector('#s3:not(.hidden)');
-  ok(/142 kesalahan/.test(await w.textContent('#offCount')), '142 kesalahan standard');
+  ok(/137 kesalahan/.test(await w.textContent('#offCount')), '137 kesalahan standard');
   await w.click('#btnNext'); await w.waitForSelector('#s4:not(.hidden)');
   await w.evaluate(() => { window.MOCK_URL = 'https://script.google.com/a/sekolah.edu.my/macros/s/AKfyTEST/exec'; });
   await w.click('#btnCheck'); await w.waitForTimeout(300);

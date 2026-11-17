@@ -1,11 +1,11 @@
 {
-  "version": "1.2.1",
-  "ref": "3e249d309c6b470010f21e39f7d06cb5a53565b2",
+  "version": "1.2.2",
+  "ref": "2a52d28187d21e3526eae38a1e2ae9a4cf636be7",
   "tarikh": "2026-11-17",
   "nota": [
-    "PIN berbeza untuk Guru & Warden, Pengawas dan Admin; tab Admin baharu (Laporan, Tukar PIN, Tetapan, Kongsi, Sistem)",
+    "Ikon SiDIA baharu di tab pelayar dan tajuk web app",
+    "PIN berbeza untuk Guru & Warden, Pengawas dan Admin; tab Admin (Laporan, Tukar PIN, Tetapan, Kongsi, Sistem)",
     "Panduan PDF untuk guru, warden, pengawas dan admin",
-    "Mesej ralat kemas kini yang lebih jelas",
     "Selepas kemas kini: buka Admin › PIN akses dan tetapkan PIN untuk setiap peranan"
   ]
 }

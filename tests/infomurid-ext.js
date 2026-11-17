@@ -28,7 +28,7 @@ const table = () => `<table class="table" id="table_sahsiah"><tbody><tr><th>BIL<
 const page = () => `<!DOCTYPE html><html><head><title>Infomurid</title></head><body><h2>Sahsiah Murid</h2>
 <select id="ddSession"><option value="">-Pilih Tahun-</option><option value="25">2025</option><option value="26" selected>2026</option></select>
 <select id="ddClassIndex"><option value="">-Pilih Kelas-</option>${KELAS.map(k => `<option value="${k.id}">${k.kod}</option>`).join('')}</select>
-<div id="main">${table()}</div></body></html>`;
+<div id="main"><div class="form-inline"><button class="btn">Tambah</button><button class="btn btn-info" id="btnexcel">Excel</button></div>${table()}</div></body></html>`;
 
 const saved = [];
 async function route(r) {
@@ -90,10 +90,26 @@ function assert(c, m) { if (!c) { throw new Error('GAGAL: ' + m); } console.log(
   p.on('dialog', d => d.accept());
   await p.goto('https://www.infomurid.com/Discipline/Index');
 
+  let [sw] = ctx.serviceWorkers();
+  if (!sw) sw = await ctx.waitForEvent('serviceworker');
+  assert(/background\.js$/.test(sw.url()), 'service worker extension dimuat');
+  // simulasi tab yang dibuka sebelum extension dipasang: masukkan skrip melalui chrome.scripting
+  const injected = await sw.evaluate(async () => {
+    const [t] = await chrome.tabs.query({ url: '*://www.infomurid.com/*' });
+    await chrome.scripting.executeScript({ target: { tabId: t.id }, files: ['sidia-core.js', 'content.js'] });
+    return t.id;
+  });
+  assert(injected > 0, 'chrome.scripting boleh memasukkan skrip semula tanpa ralat');
+  await p.waitForTimeout(200);
+  assert(await p.locator('#sidia-import-host >> .overlay:not([hidden])').count() === 1, 'suntikan semula membuka panel');
+  await p.keyboard.press('Escape');
+  assert(await p.locator('#sidia-import-host').count() === 1, 'tiada panel berganda');
   const fab = p.locator('#sidia-import-host >> .fab');
   await fab.waitFor({ timeout: 10000 });
   assert(true, 'butang Import SiDIA muncul');
-  await fab.click();
+  const inline = p.locator('#sidia-import-btn');
+  assert(await inline.count() === 1, 'butang Import SiDIA di sebelah Excel');
+  await inline.click();
   await p.locator('#sidia-import-host >> #sd-file').setInputFiles(csvPath);
   const info = await p.locator('#sidia-import-host >> #sd-readinfo').textContent();
   console.log('     ' + info);

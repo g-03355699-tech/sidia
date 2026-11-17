@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "SiDIA → Infomurid",
   "short_name": "SiDIA Import",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Import rekod kesalahan disiplin daripada Google Sheet SiDIA ke Infomurid (Kemaskini salah laku) secara pukal.",
   "icons": {
     "16": "icons/icon-16.png",
@@ -10,15 +10,35 @@
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
-  "permissions": ["storage"],
+  "permissions": [
+    "storage",
+    "scripting"
+  ],
   "content_scripts": [
     {
       "matches": [
-        "https://www.infomurid.com/Discipline/*",
-        "https://infomurid.com/Discipline/*"
+        "*://www.infomurid.com/*",
+        "*://infomurid.com/*"
       ],
-      "js": ["sidia-core.js", "content.js"],
+      "js": [
+        "sidia-core.js",
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "host_permissions": [
+    "*://infomurid.com/*",
+    "*://www.infomurid.com/*"
+  ],
+  "action": {
+    "default_title": "Import rekod SiDIA ke Infomurid",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
 }

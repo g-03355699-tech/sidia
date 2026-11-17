@@ -1,5 +1,9 @@
 # Senarai Perubahan SiDIA
 
+## Extension SiDIA → Infomurid 1.0.1 (17 Nov 2026)
+- Butang **Import SiDIA** kini di sebelah butang Excel
+- Klik ikon SiDIA pada toolbar Chrome membuka panel import (berfungsi walaupun tab Infomurid dibuka sebelum extension dipasang)
+
 ## Extension SiDIA → Infomurid 1.0.0 (17 Nov 2026)
 - Extension Chrome baharu (`infomurid-extension/`, muat turun `sidia-infomurid.zip`) untuk **import rekod kesalahan dari tab REKOD ke Infomurid** (Kemaskini salah laku) secara pukal
 - Padanan murid ikut nama (+ kelas), padanan kod kesalahan automatik, pemetaan kod tambahan (cth W01–W05) diingat

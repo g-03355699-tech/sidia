@@ -3,7 +3,8 @@
  * menggunakan sesi log masuk pengguna. Tiada data dihantar ke pihak lain. */
 (function () {
   'use strict';
-  if (window.__sidiaImport) return;
+  if (!/\/discipline\//i.test(location.pathname)) return; // hanya halaman salah laku
+  if (window.__sidiaImport) { if (window.__sidiaOpen) window.__sidiaOpen(); return; }
   window.__sidiaImport = true;
 
   var C = SidiaCore;
@@ -589,8 +590,38 @@
     ].join('\n');
   }
 
+  /** Butang dalam halaman, di sebelah butang Excel (lebih mudah dilihat). */
+  function addInlineButton() {
+    if (document.getElementById('sidia-import-btn')) return;
+    var excel = document.getElementById('btnexcel');
+    if (!excel || !excel.parentNode) return;
+    var b = document.createElement('button');
+    b.id = 'sidia-import-btn';
+    b.type = 'button';
+    b.className = 'btn btn-success';
+    b.style.marginLeft = '4px';
+    b.textContent = 'Import SiDIA';
+    b.addEventListener('click', function (e) { e.preventDefault(); openPanel(); });
+    excel.parentNode.insertBefore(b, excel.nextSibling);
+  }
+
+  var opened = false;
+  window.__sidiaOpen = function () { if (opened) openPanel(); else pendingOpen = true; };
+  var pendingOpen = false;
+  try {
+    chrome.runtime.onMessage.addListener(function (msg, _s, reply) {
+      if (msg && msg.type === 'sidia-open') { window.__sidiaOpen(); reply({ ok: true }); }
+    });
+  } catch (e) { /* abaikan */ }
+
   loadStore(function () {
     build();
     document.documentElement.appendChild(host);
+    opened = true;
+    addInlineButton();
+    // #main dimuat semula oleh Infomurid (AJAX) apabila tahun/kelas ditukar
+    var main = document.getElementById('main');
+    if (main && window.MutationObserver) new MutationObserver(addInlineButton).observe(main, { childList: true });
+    if (pendingOpen) openPanel();
   });
 })();

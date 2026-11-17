@@ -3,7 +3,7 @@
 Import rekod kesalahan daripada tab **REKOD** Google Sheet SiDIA ke **Infomurid › GURU DISIPLIN › Kemaskini salah laku**, secara pukal. Tidak perlu lagi menaip semula setiap murid.
 
 ## Cara ia berfungsi
-- Extension menambah butang **Import SiDIA** di penjuru kanan bawah halaman `infomurid.com/Discipline/…`.
+- Extension menambah butang hijau **Import SiDIA** di sebelah butang **Excel** (dan di penjuru kanan bawah) dalam halaman `infomurid.com/Discipline/…`. Klik ikon SiDIA pada toolbar Chrome juga membuka panel import.
 - Data dibaca daripada fail CSV tab REKOD (atau ditampal terus dari Google Sheet).
 - Murid dipadankan dengan senarai murid Infomurid mengikut **nama** (dan **kelas** jika ada nama yang sama).
 - Kod kesalahan SiDIA (cth `S11`, `R14`, `884`) dipadankan dengan kod dalam senarai salah laku Infomurid. Kod yang tiada dalam Infomurid (cth `W01`–`W05` solat berjemaah) perlu dipilih sekali sahaja; pilihan itu diingat.
@@ -18,6 +18,9 @@ Semua permintaan dibuat terus dari pelayar anda ke Infomurid menggunakan log mas
 3. Hidupkan **Developer mode** (penjuru kanan atas).
 4. Klik **Load unpacked** dan pilih folder yang diekstrak tadi (folder yang mengandungi `manifest.json`).
 5. Ikon SiDIA akan muncul dalam senarai extension. Jangan padam folder itu.
+6. **Muat semula (F5) tab Infomurid** yang sudah dibuka.
+
+**Kemas kini:** ekstrak zip baharu ke folder yang sama (ganti fail lama), klik ikon ↻ pada kad extension di `chrome://extensions`, kemudian muat semula tab Infomurid.
 
 > Microsoft Edge juga boleh: `edge://extensions` › **Developer mode** › **Load unpacked**.
 
@@ -25,7 +28,7 @@ Semua permintaan dibuat terus dari pelayar anda ke Infomurid menggunakan log mas
 1. Dalam Google Sheet SiDIA, buka tab **REKOD** › **Fail › Muat turun › Nilai dipisahkan koma (.csv)**.
    Atau pilih baris dalam tab REKOD (termasuk baris tajuk), tekan Ctrl+C.
 2. Log masuk Infomurid dan buka **GURU DISIPLIN › Kemaskini salah laku**.
-3. Klik **Import SiDIA** › **Pilih fail CSV** (atau tampal data, kemudian **Baca data yang ditampal**).
+3. Klik **Import SiDIA** (sebelah butang Excel, atau ikon SiDIA pada toolbar) › **Pilih fail CSV** (atau tampal data, kemudian **Baca data yang ditampal**).
 4. Pilih **Tahun**, julat **Tarikh**, **Hukuman** (lalai: Amaran) dan klik **Semak dengan Infomurid**.
 5. Semak senarai:
    - kumpulan berbingkai merah: pilih kesalahan Infomurid yang setara untuk kod tersebut

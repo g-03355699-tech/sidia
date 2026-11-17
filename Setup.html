@@ -172,6 +172,7 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
           <input type="text" id="appUrl" readonly>
           <button class="btn" id="btnCopy">Salin</button>
           <a class="btn pri" id="btnOpen" href="#">Buka ↗</a>
+          <button class="btn" id="btnChangeUrl">Tukar pautan</button>
         </div>
         <div class="share">
           <div id="qr"></div>
@@ -465,6 +466,11 @@ function renderDeploy() {
   else $('qr').innerHTML = '<div class="hint">Kod QR tidak dapat dijana (tiada internet).</div>';
 }
 $('btnCheck').onclick = function () { checkDeploy(); };
+$('btnChangeUrl').onclick = function () {
+  $('deployYes').classList.add('hidden'); $('deployNo').classList.remove('hidden');
+  $('deployMsg').innerHTML = '<div class="alert info">Dalam Apps Script, klik <b>Deploy › Manage deployments</b>, pilih deployment yang aktif, salin <b>Web app URL</b> dan tampal di atas. Uji pautan itu dahulu dalam pelayar.</div>';
+  $('manualUrl').value = ''; $('manualUrl').focus();
+};
 $('btnManual').onclick = function () { checkDeploy($('manualUrl').value); };
 function checkDeploy(manual) {
   loading(true, 'Menyemak…');

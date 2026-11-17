@@ -276,14 +276,18 @@ function wizCheckDeploy(manualUrl) {
   return detectWebAppUrl_();
 }
 
+/**
+ * Pautan web app. Pautan yang disimpan (ditampal pengguna) diutamakan, kerana
+ * ScriptApp.getService().getUrl() boleh memulangkan deployment lama jika
+ * projek mempunyai lebih daripada satu deployment.
+ */
 function detectWebAppUrl_() {
+  var saved = getSettings_().WEB_APP_URL || '';
+  if (saved) return saved;
   var url = '';
   try { url = ScriptApp.getService().getUrl() || ''; } catch (e) {}
-  if (/\/exec$/.test(url)) {
-    if (getSettings_().WEB_APP_URL !== url) setSetting_('WEB_APP_URL', url);
-    return url;
-  }
-  return getSettings_().WEB_APP_URL || '';
+  if (/\/exec$/.test(url)) { setSetting_('WEB_APP_URL', url); return url; }
+  return '';
 }
 
 function setSetting_(key, val) {

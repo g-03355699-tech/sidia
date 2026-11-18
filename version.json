@@ -1,11 +1,10 @@
 {
-  "version": "1.5.0",
-  "ref": "2ac2f1c9a49ab91b00de217cc9d21cce969155fc",
-  "tarikh": "2026-11-17",
+  "version": "1.6.0",
+  "ref": "57689b75e825c57416448e0b178e89a85583c20c",
+  "tarikh": "2026-11-18",
   "nota": [
-    "Guru, warden, guru disiplin dan admin kini boleh menyunting senarai kesalahan di web app (Admin › Senarai kesalahan)",
-    "Senarai kesalahan lalai kini sama dengan Infomurid (137 kesalahan); W01–W05 dinyahaktifkan secara automatik, rekod lama kekal",
-    "Kesalahan yang sudah ada rekod tidak boleh dipadam; nyahaktifkan sahaja supaya laporan lama kekal",
-    "Extension Chrome baharu untuk import rekod SiDIA ke Infomurid (muat turun di halaman SiDIA)"
+    "Jumlah rekod kesalahan di sebelah nama murid: NAMA [tahun semasa] [keseluruhan], untuk semua pengguna",
+    "Laporan Kesalahan Murid: cari murid, lihat semua kesalahannya, muat turun PDF atau CSV (Admin › Laporan dan tab Terkini)",
+    "Sunting senarai kesalahan di web app untuk guru, warden, guru disiplin dan admin (dari 1.5.0)"
   ]
 }

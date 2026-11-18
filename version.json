@@ -1,10 +1,10 @@
 {
-  "version": "1.6.0",
-  "ref": "57689b75e825c57416448e0b178e89a85583c20c",
+  "version": "1.6.1",
+  "ref": "cbce43e08cac00d662083dfb7b82054c13938d8e",
   "tarikh": "2026-11-18",
   "nota": [
-    "Jumlah rekod kesalahan di sebelah nama murid: NAMA [tahun semasa] [keseluruhan], untuk semua pengguna",
-    "Laporan Kesalahan Murid: cari murid, lihat semua kesalahannya, muat turun PDF atau CSV (Admin › Laporan dan tab Terkini)",
+    "Jumlah rekod kesalahan di sebelah nama murid kini dua lencana bulat: tahun semasa (hijau, merah jika lebih 3) dan keseluruhan (biru, jingga jika lebih 10)",
+    "Laporan Kesalahan Murid: cari murid, lihat semua kesalahannya, muat turun PDF atau CSV (dari 1.6.0)",
     "Sunting senarai kesalahan di web app untuk guru, warden, guru disiplin dan admin (dari 1.5.0)"
   ]
 }

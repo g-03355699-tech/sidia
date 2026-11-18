@@ -113,6 +113,12 @@ Buka tab **🛡️ Admin › Laporan** (perlukan PIN Admin) dan pilih tempoh. Pa
 - **📄 Laporan PDF rasmi**: header & footer pada setiap halaman (logo, nama sekolah, tempoh, SULIT, nombor halaman), kotak ringkasan, kedudukan rumah dengan carta, tahap kesalahan, kesalahan, kelas, murid paling kerap, ruang tandatangan, dan lampiran rekod penuh (pilihan)
 - Eksport **CSV** (dibuka dalam Excel/Sheets) atau **Tulis ke tab LAPORAN** dalam Google Sheet
 
+### Laporan Kesalahan Murid
+Cari seorang murid untuk melihat **semua kesalahan yang pernah direkod** (tarikh, masa, kod, kesalahan, mata, pelapor, lokasi, catatan), jumlah kes dan mata demerit, kemudian muat turun **PDF** (dengan ringkasan dan ruang tandatangan) atau **CSV**. Boleh digunakan oleh **semua pengguna**: di **🛡️ Admin › Laporan**, dan di tab **Terkini** (untuk guru, warden dan pengawas).
+
+### Jumlah rekod di sebelah nama murid
+Semasa merekod, guru, warden dan admin melihat jumlah rekod kesalahan setiap murid di sebelah nama (cth **FADLINA QISTINA BINTI FADLY AZLINE `5`**; merah jika 5 atau lebih). Jumlah dikira terus daripada tab REKOD semasa web app dibuka, jadi tiada lajur tambahan diperlukan dalam tab MURID dan jumlahnya sentiasa tepat. Pengawas tidak melihat jumlah ini.
+
 Jumlah mata ditolak bagi setiap rumah = jumlah lajur *Mata* dalam tab KESALAHAN. Ubah nilai mata dalam tab itu mengikut dasar sekolah.
 
 ## PIN & peranan

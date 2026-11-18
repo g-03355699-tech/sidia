@@ -183,7 +183,8 @@ const PANDUAN = [
         `<p>Pilih tempoh (Minggu ini, Bulan ini, Tahun ini, atau tarikh sendiri), kemudian ketik <b>Jana laporan</b>. Laporan menunjukkan:</p>
          <ul><li>jumlah kes, murid terlibat dan <b>mata ditolak bagi setiap rumah</b></li><li>pecahan mengikut kesalahan dan kelas</li><li>20 murid dengan mata tertinggi</li></ul>
          <p><b>📄 Muat turun PDF</b>: laporan rasmi dengan header & footer setiap halaman, carta kedudukan rumah dan ruang tandatangan, sesuai untuk mesyuarat atau fail rasmi. Isi nama dan jawatan penyedia, dan tandakan <i>lampiran</i> untuk menyertakan senarai penuh rekod.</p>
-         <p>Anda juga boleh eksport ke CSV (dibuka dalam Excel), atau <b>Tulis ke tab LAPORAN</b> dalam Google Sheet.</p>`, 'laporan') +
+         <p>Anda juga boleh eksport ke CSV (dibuka dalam Excel), atau <b>Tulis ke tab LAPORAN</b> dalam Google Sheet.</p>
+         <p><b>Laporan Kesalahan Murid</b>: taip nama murid dalam kotak carian untuk melihat semua kesalahannya, kemudian muat turun PDF atau CSV. Kotak carian ini juga ada di tab <b>Terkini</b> untuk semua pengguna.</p>`, 'laporan') +
       step('7', 'Tukar PIN',
         `<p>Tukar PIN apabila PIN bocor, pada awal penggal, atau apabila pengawas bertukar. Ketik <b>🎲 Jana</b> untuk PIN rawak, kemudian <b>Simpan PIN</b>.</p>
          <p>Semua pengguna dalam kumpulan yang PIN-nya ditukar perlu log masuk semula. SiDIA terus membuka <b>Kongsi pautan</b> supaya PIN baharu boleh dihantar melalui WhatsApp.</p>

@@ -1,5 +1,9 @@
 # Senarai Perubahan SiDIA
 
+## Belum diterbitkan
+- **Jumlah rekod kesalahan di sebelah nama murid** semasa merekod (guru, warden & admin). Dikira terus daripada tab REKOD, dikemas kini selepas simpan/batal/padam. Merah jika 5 rekod atau lebih
+- **Laporan Kesalahan Murid**: cari murid dan lihat semua kesalahannya, dengan eksport **PDF** (header/footer rasmi, ringkasan mengikut kesalahan, ruang tandatangan) dan **CSV**. Untuk semua pengguna: di Admin › Laporan dan tab Terkini
+
 ## 1.5.0 (17 Nov 2026)
 - Senarai kesalahan lalai kini **137 kesalahan**, sama dengan senarai salah laku Infomurid: W01–W05 (tidak hadir solat berjemaah) dibuang
 - Sekolah sedia ada: W01–W05 dinyahaktifkan secara automatik dalam tab KESALAHAN (Aktif = Tidak) selepas kemas kini. Rekod lama tidak diubah dan masih dikira dalam laporan

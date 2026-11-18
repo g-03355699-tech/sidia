@@ -542,8 +542,32 @@ function getBootstrap(ctx) {
     user: user,
     students: info.students,
     offenses: readOffenses_(),
+    kiraan: bolehLihatKiraan_(user) ? kiraanMurid_() : null,
     warnings: info.warnings
   };
+}
+
+/** Jumlah rekod kesalahan dipaparkan kepada guru, warden dan admin sahaja (bukan pengawas). */
+function bolehLihatKiraan_(user) { return user.group !== 'murid' || user.isAdmin; }
+
+/**
+ * Bilangan rekod bagi setiap ID murid, dikira terus daripada tab REKOD.
+ * Hanya satu lajur dibaca, jadi pantas walaupun puluhan ribu rekod, dan sentiasa tepat
+ * (termasuk selepas rekod dipadam terus dalam Google Sheet).
+ * ids (pilihan): hanya pulangkan kiraan bagi ID ini (0 jika tiada rekod).
+ */
+function kiraanMurid_(ids) {
+  var sh = rekodSheet_(), last = sh.getLastRow(), all = {};
+  if (last >= 2) {
+    sh.getRange(2, R.ID_MURID + 1, last - 1, 1).getDisplayValues().forEach(function (r) {
+      var id = String(r[0]).trim();
+      if (id) all[id] = (all[id] || 0) + 1;
+    });
+  }
+  if (!ids) return all;
+  var out = {};
+  ids.forEach(function (id) { id = String(id); out[id] = all[id] || 0; });
+  return out;
 }
 
 /**
@@ -604,7 +628,8 @@ function saveRecords(ctx, payload) {
       sh.getRange(sh.getLastRow() + 1, 1, rows.length, REKOD_HEADERS.length).setValues(rows);
       SpreadsheetApp.flush();
     }
-    return { disimpan: rows.length, pendua: skipped, tidakDijumpai: notFound, batch: rows.length ? batch : null };
+    return { disimpan: rows.length, pendua: skipped, tidakDijumpai: notFound, batch: rows.length ? batch : null,
+      kiraan: bolehLihatKiraan_(user) ? kiraanMurid_(ids) : null };
   } finally {
     lock.releaseLock();
   }
@@ -656,7 +681,7 @@ function deleteBatch(ctx, batch, idMurid) {
     var last = sh.getLastRow();
     if (last < 2) return { dipadam: 0 };
     var vals = sh.getRange(2, 1, last - 1, REKOD_HEADERS.length).getValues();
-    var rowsToDelete = [];
+    var rowsToDelete = [], idTerlibat = {};
     vals.forEach(function (r, i) {
       if (String(r[R.KUMPULAN]) !== batch) return;
       if (idMurid && String(r[R.ID_MURID]) !== String(idMurid)) return;
@@ -665,6 +690,7 @@ function deleteBatch(ctx, batch, idMurid) {
         throw new Error('Anda tidak dibenarkan memadam rekod ini (bukan rekod anda atau melebihi had masa).');
       }
       rowsToDelete.push(i + 2);
+      idTerlibat[String(r[R.ID_MURID]).replace(/^'/, '')] = 1;
     });
     // padam dari bawah, gabungkan baris berturutan
     for (var j = rowsToDelete.length - 1; j >= 0;) {
@@ -673,7 +699,7 @@ function deleteBatch(ctx, batch, idMurid) {
       sh.deleteRows(rowsToDelete[k], end - rowsToDelete[k] + 1);
       j = k - 1;
     }
-    return { dipadam: rowsToDelete.length };
+    return { dipadam: rowsToDelete.length, kiraan: bolehLihatKiraan_(user) ? kiraanMurid_(Object.keys(idTerlibat)) : null };
   } finally {
     lock.releaseLock();
   }
@@ -684,6 +710,35 @@ function getReport(ctx, from, to) {
   var user = auth_(ctx);
   if (!user.isAdmin) throw new Error('ADMIN_DIPERLUKAN: Laporan memerlukan kod admin.');
   return buildReport_(from, to);
+}
+
+/**
+ * Laporan Kesalahan Murid: semua rekod bagi seorang murid. Boleh digunakan oleh semua pengguna yang log masuk.
+ * Pulangan: {murid:{id,nama,kelas,rumah}, rekod:[...], jumlahMata, tahap:{Ringan:n,...}}
+ */
+function getStudentReport(ctx, idMurid) {
+  auth_(ctx);
+  idMurid = String(idMurid || '').trim();
+  if (!idMurid) throw new Error('Sila pilih murid.');
+  var murid = null;
+  try { readStudents_().students.forEach(function (s) { if (String(s[0]) === idMurid) murid = { id: s[0], nama: s[1], kelas: s[2], rumah: s[3] }; }); } catch (e) {}
+  var sh = rekodSheet_(), last = sh.getLastRow();
+  var vals = last >= 2 ? sh.getRange(2, 1, last - 1, REKOD_HEADERS.length).getValues() : [];
+  var rekod = [], jumlahMata = 0, tahap = {};
+  vals.forEach(function (r) {
+    if (String(r[R.ID_MURID]).replace(/^'/, '').trim() !== idMurid) return;
+    var mata = parseFloat(r[R.MATA]) || 0;
+    var kat = String(r[R.KATEGORI] || '');
+    jumlahMata += mata;
+    tahap[kat] = (tahap[kat] || 0) + 1;
+    if (!murid) murid = { id: idMurid, nama: r[R.NAMA], kelas: r[R.KELAS], rumah: r[R.RUMAH] };
+    rekod.push({ tarikh: dateStr_(r[R.TARIKH]), masa: String(r[R.MASA] || '').replace(/^'/, ''), kod: String(r[R.KOD]), kesalahan: String(r[R.KESALAHAN]),
+      kategori: kat, mata: mata, pelapor: String(r[R.PELAPOR] || ''), peranan: String(r[R.PERANAN] || ''),
+      lokasi: String(r[R.LOKASI] || ''), catatan: String(r[R.CATATAN] || '') });
+  });
+  if (!murid) throw new Error('Murid tidak dijumpai.');
+  rekod.sort(function (a, b) { return (b.tarikh + b.masa).localeCompare(a.tarikh + a.masa); });
+  return { murid: murid, rekod: rekod, jumlahMata: Math.round(jumlahMata * 10) / 10, tahap: tahap };
 }
 
 /** Tulis laporan ke tab LAPORAN dan pulangkan pautan. */

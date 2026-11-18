@@ -41,6 +41,11 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   await p.click('text=Rekod seterusnya');
   await p.selectOption('#fKelas', '3 CEMERLANG'); await p.click('[data-act=all]'); await p.click('#btnSave'); await p.click('#btnDoSave'); await p.waitForTimeout(400);
   ok(/0 rekod disimpan/.test(await p.textContent('#modalBody')), 'rekod berganda dihalang');
+  // ---------- jumlah rekod di sebelah nama ----------
+  const idK = await p.evaluate(() => Object.keys(S.done)[0]);
+  ok(await p.evaluate(id => S.kiraan[id], idK) === 1, 'kiraan rekod murid dikemas kini selepas simpan');
+  ok(await p.evaluate(id => /class="kc[^"]*"[^>]*>1</.test(itemHtml(S.byId[id], '')), idK), 'jumlah rekod dipaparkan di sebelah nama');
+  ok(await p.evaluate(() => { const k = kiraanMurid_(); return Object.keys(k).length > 0 && Object.keys(getBootstrap({ nama: 'X', peranan: 'Guru', pin: '1234' }).kiraan).length === Object.keys(k).length; }), 'getBootstrap memulangkan kiraan untuk guru');
   await p.click('text=Rekod seterusnya');
   // ---------- menu Admin ----------
   // ---------- senarai kesalahan (guru tanpa PIN Admin) ----------
@@ -96,6 +101,21 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   const pdfPath = path.join(out, 'laporan.pdf'); await dl.saveAs(pdfPath);
   const txt = require('child_process').execFileSync('pdftotext', ['-layout', pdfPath, '-']).toString();
   const nPages = (txt.match(/\f/g) || []).length;
+  // ---------- Laporan Kesalahan Murid ----------
+  ok(await p.isVisible('#subLaporan #lmCard'), 'kotak carian Laporan Kesalahan Murid dalam Admin › Laporan');
+  const top = await p.evaluate(() => { const k = kiraanMurid_(); return Object.keys(k).sort((a, b) => k[b] - k[a])[0]; });
+  const topNama = await p.evaluate(id => S.byId[id].nama, top), topN = await p.evaluate(id => kiraanMurid_()[id], top);
+  await p.fill('#lmQ', topNama); await p.waitForSelector('#lmRes [data-lm]');
+  await p.click('#lmRes [data-lm="' + top + '"]'); await p.waitForSelector('#lmOut table');
+  ok(await p.locator('#lmOut tbody tr').count() === topN, 'semua kesalahan murid dipaparkan (' + topN + ' rekod)');
+  await p.screenshot({ path: path.join(out, 'app-laporan-murid.png'), fullPage: true });
+  const [dlc] = await Promise.all([p.waitForEvent('download'), p.click('#lmCsv')]);
+  const csvM = require('fs').readFileSync(await dlc.path(), 'utf8');
+  ok(csvM.trim().split('\n').length === topN + 1 && csvM.indexOf(topNama) > 0, 'CSV laporan murid');
+  const [dlp] = await Promise.all([p.waitForEvent('download', { timeout: 20000 }), p.click('#lmPdf')]);
+  const pdfM = path.join(out, 'laporan-murid.pdf'); await dlp.saveAs(pdfM);
+  const txtM = require('child_process').execFileSync('pdftotext', ['-layout', pdfM, '-']).toString();
+  ok(/LAPORAN KESALAHAN MURID/.test(txtM) && txtM.indexOf(topNama) >= 0 && /Ringkasan Mengikut Kesalahan/.test(txtM) && /SULIT/.test(txtM), 'PDF laporan murid: tajuk, nama, ringkasan, header/footer');
   ok(/LAPORAN DISIPLIN MURID/.test(txt) && /Kedudukan Rumah/.test(txt) && /Lampiran/.test(txt), 'PDF: tajuk, bahagian & lampiran ada');
   ok(nPages >= 3 && (txt.match(/SULIT/g) || []).length === nPages && new RegExp('Halaman ' + nPages + ' / ' + nPages).test(txt), 'PDF: header/footer & nombor halaman pada setiap halaman (' + nPages + ' halaman)');
   await p.click('#subLaporan [data-back]');
@@ -122,6 +142,10 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(!(await p.isVisible('#tabAdmin')), 'tab Admin disorok untuk pengawas');
   await p.click('nav.tabs button[data-v=vTerkini]'); await p.waitForTimeout(400);
   ok(/Belum ada rekod/.test(await p.textContent('#recentList')), 'pengawas hanya melihat rekod sendiri');
+  ok(await p.evaluate(() => S.kiraan === null), 'pengawas: jumlah rekod tidak dihantar');
+  ok(await p.isVisible('#vTerkini #lmCard'), 'pengawas: Laporan Kesalahan Murid di tab Terkini');
+  await p.fill('#lmQ', topNama); await p.waitForSelector('#lmRes [data-lm]'); await p.click('#lmRes [data-lm="' + top + '"]'); await p.waitForSelector('#lmOut table');
+  ok(await p.locator('#lmOut tbody tr').count() === topN, 'pengawas boleh melihat laporan kesalahan murid');
 
   // ---------- wizard ----------
   const w = await b.newPage({ viewport: { width: 920, height: 660 } }); w.on('pageerror', e => errs.push('wizard: ' + e.message));

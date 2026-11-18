@@ -117,7 +117,7 @@ Buka tab **🛡️ Admin › Laporan** (perlukan PIN Admin) dan pilih tempoh. Pa
 Cari seorang murid untuk melihat **semua kesalahan yang pernah direkod** (tarikh, masa, kod, kesalahan, mata, pelapor, lokasi, catatan), jumlah kes dan mata demerit, kemudian muat turun **PDF** (dengan ringkasan dan ruang tandatangan) atau **CSV**. Boleh digunakan oleh **semua pengguna**: di **🛡️ Admin › Laporan**, dan di tab **Terkini** (untuk guru, warden dan pengawas).
 
 ### Jumlah rekod di sebelah nama murid
-Semasa merekod, semua pengguna (termasuk pengawas) melihat jumlah rekod kesalahan setiap murid di sebelah nama dalam format **NAMA MURID [tahun semasa] [keseluruhan]**, cth **FADLINA QISTINA BINTI FADLY AZLINE [3] [5]** (merah jika 5 atau lebih pada tahun semasa). Jumlah dikira terus daripada tab REKOD semasa web app dibuka, jadi tiada lajur tambahan diperlukan dalam tab MURID dan jumlahnya sentiasa tepat.
+Semasa merekod, semua pengguna (termasuk pengawas) melihat jumlah rekod kesalahan setiap murid di sebelah nama sebagai dua lencana bulat: **tahun semasa** (hijau, bertukar merah jika lebih daripada 3) dan **keseluruhan** (biru, bertukar jingga jika lebih daripada 10). Jumlah dikira terus daripada tab REKOD semasa web app dibuka, jadi tiada lajur tambahan diperlukan dalam tab MURID dan jumlahnya sentiasa tepat.
 
 Jumlah mata ditolak bagi setiap rumah = jumlah lajur *Mata* dalam tab KESALAHAN. Ubah nilai mata dalam tab itu mengikut dasar sekolah.
 

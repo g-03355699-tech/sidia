@@ -44,7 +44,9 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   // ---------- jumlah rekod di sebelah nama ----------
   const idK = await p.evaluate(() => Object.keys(S.done)[0]);
   ok(JSON.stringify(await p.evaluate(id => S.kiraan[id], idK)) === '[1,1]', 'kiraan rekod murid (tahun semasa, keseluruhan) dikemas kini selepas simpan');
-  ok(await p.evaluate(id => /class="kc[^"]*"[^>]*>\[1\] \[1\]</.test(itemHtml(S.byId[id], '')), idK), 'NAMA [tahun semasa] [keseluruhan] dipaparkan');
+  ok(await p.evaluate(id => /<i class="t"[^>]*>1<\/i><i class="a"[^>]*>1<\/i>/.test(itemHtml(S.byId[id], '')), idK), 'lencana tahun semasa (hijau) & keseluruhan (biru) di sebelah nama');
+  ok(await p.evaluate(() => { const o = S.kiraan; S.kiraan = { z: [4, 11] }; const h = kcHtml('z'); S.kiraan = o; return /class="t hi"/.test(h) && /class="a hi"/.test(h); }) &&
+     await p.evaluate(() => { const o = S.kiraan; S.kiraan = { z: [3, 10] }; const h = kcHtml('z'); S.kiraan = o; return !/hi/.test(h); }), 'merah jika tahun semasa > 3, jingga jika keseluruhan > 10');
   ok(await p.evaluate(id => { saveRecords({ nama: 'X', peranan: 'Guru', pin: '1234' }, { kod: 'R14', tarikh: '2024-03-04', ids: [id] }); const k = kiraanMurid_([id])[id]; return k[0] === 1 && k[1] === 2; }, idK), 'rekod tahun lepas dikira dalam keseluruhan sahaja');
   ok(await p.evaluate(() => { const k = kiraanMurid_(); return Object.keys(k).length > 0 && Object.keys(getBootstrap({ nama: 'X', peranan: 'Guru', pin: '1234' }).kiraan).length === Object.keys(k).length; }), 'getBootstrap memulangkan kiraan untuk guru');
   await p.click('text=Rekod seterusnya');

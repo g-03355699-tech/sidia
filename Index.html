@@ -28,6 +28,7 @@
   /* semantik */
   --danger:#b42318; --danger-soft:#fdecea; --danger-line:#f3c1bb;
   --warn:#92400e; --warn-soft:#fff4e0; --ok:#166534; --ok-soft:#e8f6ec; --info:#0b5a54; --info-soft:#e6f6f3;
+  --kc-thn:#15803d; --kc-thn-hi:#b42318; --kc-all:#1d4ed8; --kc-all-hi:#c2410c; --kc-ink:#ffffff;
   --sev-r:#166534; --sev-r-bg:#e3f5e8; --sev-s:#92400e; --sev-s-bg:#fff0d4; --sev-b:#b42318; --sev-b-bg:#fde3df; --sev-x:#526360; --sev-x-bg:#eef2f2;
   /* bentuk & elevasi */
   --r-sm:8px; --r:12px; --r-lg:16px; --r-pill:999px;
@@ -51,6 +52,7 @@
     --tick:#4b6662; --mark:#715c0f; --scrim:rgba(0,0,0,.6); --toast:#e6f0ee; --on-toast:#0a1513;
     --danger:#fca5a5; --danger-soft:#3b1414; --danger-line:#6b2525;
     --warn:#fcd34d; --warn-soft:#3a2a0a; --ok:#86efac; --ok-soft:#0f2e1c; --info:#5eead4; --info-soft:#123a36;
+    --kc-thn:#15803d; --kc-thn-hi:#b42318; --kc-all:#1d4ed8; --kc-all-hi:#c2410c; --kc-ink:#ffffff;
     --sev-r:#86efac; --sev-r-bg:#0f2e1c; --sev-s:#fcd34d; --sev-s-bg:#3a2a0a; --sev-b:#fca5a5; --sev-b-bg:#3b1414; --sev-x:#9db0ac; --sev-x-bg:#1b2b29;
     --sh-1:0 1px 2px rgba(0,0,0,.4); --sh-2:0 4px 16px rgba(0,0,0,.45); --sh-3:0 12px 32px rgba(0,0,0,.6);
     --ring:#5eead4;
@@ -265,8 +267,10 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .ck input{width:22px;height:22px;accent-color:var(--pri);flex:none}
 .frm2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
 #kKod{text-transform:uppercase}
-.kc{display:inline-block;margin-left:6px;padding:0 7px;border-radius:var(--r-pill);background:var(--sev-x-bg);color:var(--sev-x);font-size:12px;font-weight:700;line-height:20px;vertical-align:1px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.kc.hi{background:var(--sev-b-bg);color:var(--sev-b)}
+.kc{display:inline-flex;gap:4px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.kc i{display:inline-block;min-width:22px;height:22px;padding:0 6px;border-radius:var(--r-pill);font-style:normal;font-size:12px;font-weight:700;line-height:22px;text-align:center;color:var(--kc-ink);font-variant-numeric:tabular-nums}
+.kc .t{background:var(--kc-thn)}.kc .t.hi{background:var(--kc-thn-hi)}
+.kc .a{background:var(--kc-all)}.kc .a.hi{background:var(--kc-all-hi)}
 .lmres{margin-top:8px}
 .lmres .item{width:100%;border:0;border-bottom:1px solid var(--line);text-align:left;font:inherit;color:inherit}
 .lmres .item:last-child{border-bottom:0}
@@ -994,13 +998,14 @@ function itemHtml(o, q, first) {
     '<div class="meta">' + esc(o.kelas) + (o.rumah ? ' · ' + esc(o.rumah) : '') + '</div></div>' +
     (S.done[o.id] ? '<span class="done">sudah direkod</span>' : '') + '</div>';
 }
-/** NAMA [jumlah tahun semasa] [jumlah keseluruhan] — rekod kesalahan murid. */
+/** Dua lencana bulat di sebelah nama: tahun semasa (hijau, merah jika > 3) dan keseluruhan (biru, jingga jika > 10). */
 function kcHtml(id) {
   var k = S.kiraan && S.kiraan[id];
   if (!k || !k[1]) return '';
   var thn = new Date().getFullYear();
-  var lbl = k[0] + ' rekod tahun ' + thn + ', ' + k[1] + ' rekod keseluruhan';
-  return ' <span class="kc' + (k[0] >= 5 ? ' hi' : '') + '" title="' + lbl + '" aria-label="' + lbl + '">[' + k[0] + '] [' + k[1] + ']</span>';
+  return ' <span class="kc">' +
+    '<i class="t' + (k[0] > 3 ? ' hi' : '') + '" title="' + k[0] + ' rekod tahun ' + thn + '" aria-label="' + k[0] + ' rekod tahun ' + thn + '">' + k[0] + '</i>' +
+    '<i class="a' + (k[1] > 10 ? ' hi' : '') + '" title="' + k[1] + ' rekod keseluruhan" aria-label="' + k[1] + ' rekod keseluruhan">' + k[1] + '</i></span>';
 }
 function setKiraan(k) {
   if (!k) return;

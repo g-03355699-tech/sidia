@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.5.0';
+var SIDIA_VERSION = '1.6.0';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 /** Ikon web app (dihoskan di GitHub Pages). */
@@ -542,31 +542,34 @@ function getBootstrap(ctx) {
     user: user,
     students: info.students,
     offenses: readOffenses_(),
-    kiraan: bolehLihatKiraan_(user) ? kiraanMurid_() : null,
+    kiraan: kiraanMurid_(),
     warnings: info.warnings
   };
 }
 
-/** Jumlah rekod kesalahan dipaparkan kepada guru, warden dan admin sahaja (bukan pengawas). */
-function bolehLihatKiraan_(user) { return user.group !== 'murid' || user.isAdmin; }
-
 /**
- * Bilangan rekod bagi setiap ID murid, dikira terus daripada tab REKOD.
- * Hanya satu lajur dibaca, jadi pantas walaupun puluhan ribu rekod, dan sentiasa tepat
- * (termasuk selepas rekod dipadam terus dalam Google Sheet).
- * ids (pilihan): hanya pulangkan kiraan bagi ID ini (0 jika tiada rekod).
+ * Bilangan rekod bagi setiap ID murid: {id: [tahun semasa, keseluruhan]}, dikira terus daripada tab REKOD.
+ * Hanya lajur Tarikh Kejadian dan ID Murid dibaca, jadi pantas walaupun puluhan ribu rekod, dan sentiasa tepat
+ * (termasuk selepas rekod dipadam terus dalam Google Sheet). Dipaparkan kepada semua pengguna.
+ * ids (pilihan): hanya pulangkan kiraan bagi ID ini ([0, 0] jika tiada rekod).
  */
 function kiraanMurid_(ids) {
   var sh = rekodSheet_(), last = sh.getLastRow(), all = {};
+  var tahun = todayStr_().slice(0, 4);
   if (last >= 2) {
-    sh.getRange(2, R.ID_MURID + 1, last - 1, 1).getDisplayValues().forEach(function (r) {
-      var id = String(r[0]).trim();
-      if (id) all[id] = (all[id] || 0) + 1;
-    });
+    var idv = sh.getRange(2, R.ID_MURID + 1, last - 1, 1).getDisplayValues();
+    var tv = sh.getRange(2, R.TARIKH + 1, last - 1, 1).getValues();
+    for (var i = 0; i < idv.length; i++) {
+      var id = String(idv[i][0]).trim();
+      if (!id) continue;
+      var k = all[id] || (all[id] = [0, 0]);
+      k[1]++;
+      if (dateStr_(tv[i][0]).slice(0, 4) === tahun) k[0]++;
+    }
   }
   if (!ids) return all;
   var out = {};
-  ids.forEach(function (id) { id = String(id); out[id] = all[id] || 0; });
+  ids.forEach(function (id) { id = String(id); out[id] = all[id] || [0, 0]; });
   return out;
 }
 
@@ -629,7 +632,7 @@ function saveRecords(ctx, payload) {
       SpreadsheetApp.flush();
     }
     return { disimpan: rows.length, pendua: skipped, tidakDijumpai: notFound, batch: rows.length ? batch : null,
-      kiraan: bolehLihatKiraan_(user) ? kiraanMurid_(ids) : null };
+      kiraan: kiraanMurid_(ids) };
   } finally {
     lock.releaseLock();
   }
@@ -699,7 +702,7 @@ function deleteBatch(ctx, batch, idMurid) {
       sh.deleteRows(rowsToDelete[k], end - rowsToDelete[k] + 1);
       j = k - 1;
     }
-    return { dipadam: rowsToDelete.length, kiraan: bolehLihatKiraan_(user) ? kiraanMurid_(Object.keys(idTerlibat)) : null };
+    return { dipadam: rowsToDelete.length, kiraan: kiraanMurid_(Object.keys(idTerlibat)) };
   } finally {
     lock.releaseLock();
   }

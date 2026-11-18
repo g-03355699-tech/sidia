@@ -994,15 +994,18 @@ function itemHtml(o, q, first) {
     '<div class="meta">' + esc(o.kelas) + (o.rumah ? ' · ' + esc(o.rumah) : '') + '</div></div>' +
     (S.done[o.id] ? '<span class="done">sudah direkod</span>' : '') + '</div>';
 }
-/** Jumlah rekod kesalahan murid di sebelah nama (guru, warden & admin sahaja). */
+/** NAMA [jumlah tahun semasa] [jumlah keseluruhan] — rekod kesalahan murid. */
 function kcHtml(id) {
-  var n = S.kiraan && S.kiraan[id];
-  if (!n) return '';
-  return ' <span class="kc' + (n >= 5 ? ' hi' : '') + '" title="' + n + ' rekod kesalahan" aria-label="' + n + ' rekod kesalahan">' + n + '</span>';
+  var k = S.kiraan && S.kiraan[id];
+  if (!k || !k[1]) return '';
+  var thn = new Date().getFullYear();
+  var lbl = k[0] + ' rekod tahun ' + thn + ', ' + k[1] + ' rekod keseluruhan';
+  return ' <span class="kc' + (k[0] >= 5 ? ' hi' : '') + '" title="' + lbl + '" aria-label="' + lbl + '">[' + k[0] + '] [' + k[1] + ']</span>';
 }
 function setKiraan(k) {
-  if (!S.kiraan || !k) return;
-  for (var id in k) { if (k[id]) S.kiraan[id] = k[id]; else delete S.kiraan[id]; }
+  if (!k) return;
+  S.kiraan = S.kiraan || {};
+  for (var id in k) { if (k[id] && k[id][1]) S.kiraan[id] = k[id]; else delete S.kiraan[id]; }
 }
 function select(id, forceOn) {
   if (S.sel.has(id) && !forceOn) S.sel.delete(id); else S.sel.set(id, 1);

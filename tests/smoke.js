@@ -43,8 +43,9 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(/0 rekod disimpan/.test(await p.textContent('#modalBody')), 'rekod berganda dihalang');
   // ---------- jumlah rekod di sebelah nama ----------
   const idK = await p.evaluate(() => Object.keys(S.done)[0]);
-  ok(await p.evaluate(id => S.kiraan[id], idK) === 1, 'kiraan rekod murid dikemas kini selepas simpan');
-  ok(await p.evaluate(id => /class="kc[^"]*"[^>]*>1</.test(itemHtml(S.byId[id], '')), idK), 'jumlah rekod dipaparkan di sebelah nama');
+  ok(JSON.stringify(await p.evaluate(id => S.kiraan[id], idK)) === '[1,1]', 'kiraan rekod murid (tahun semasa, keseluruhan) dikemas kini selepas simpan');
+  ok(await p.evaluate(id => /class="kc[^"]*"[^>]*>\[1\] \[1\]</.test(itemHtml(S.byId[id], '')), idK), 'NAMA [tahun semasa] [keseluruhan] dipaparkan');
+  ok(await p.evaluate(id => { saveRecords({ nama: 'X', peranan: 'Guru', pin: '1234' }, { kod: 'R14', tarikh: '2024-03-04', ids: [id] }); const k = kiraanMurid_([id])[id]; return k[0] === 1 && k[1] === 2; }, idK), 'rekod tahun lepas dikira dalam keseluruhan sahaja');
   ok(await p.evaluate(() => { const k = kiraanMurid_(); return Object.keys(k).length > 0 && Object.keys(getBootstrap({ nama: 'X', peranan: 'Guru', pin: '1234' }).kiraan).length === Object.keys(k).length; }), 'getBootstrap memulangkan kiraan untuk guru');
   await p.click('text=Rekod seterusnya');
   // ---------- menu Admin ----------
@@ -103,8 +104,8 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   const nPages = (txt.match(/\f/g) || []).length;
   // ---------- Laporan Kesalahan Murid ----------
   ok(await p.isVisible('#subLaporan #lmCard'), 'kotak carian Laporan Kesalahan Murid dalam Admin › Laporan');
-  const top = await p.evaluate(() => { const k = kiraanMurid_(); return Object.keys(k).sort((a, b) => k[b] - k[a])[0]; });
-  const topNama = await p.evaluate(id => S.byId[id].nama, top), topN = await p.evaluate(id => kiraanMurid_()[id], top);
+  const top = await p.evaluate(() => { const k = kiraanMurid_(); return Object.keys(k).sort((a, b) => k[b][1] - k[a][1])[0]; });
+  const topNama = await p.evaluate(id => S.byId[id].nama, top), topN = await p.evaluate(id => kiraanMurid_()[id][1], top);
   await p.fill('#lmQ', topNama); await p.waitForSelector('#lmRes [data-lm]');
   await p.click('#lmRes [data-lm="' + top + '"]'); await p.waitForSelector('#lmOut table');
   ok(await p.locator('#lmOut tbody tr').count() === topN, 'semua kesalahan murid dipaparkan (' + topN + ' rekod)');
@@ -142,7 +143,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(!(await p.isVisible('#tabAdmin')), 'tab Admin disorok untuk pengawas');
   await p.click('nav.tabs button[data-v=vTerkini]'); await p.waitForTimeout(400);
   ok(/Belum ada rekod/.test(await p.textContent('#recentList')), 'pengawas hanya melihat rekod sendiri');
-  ok(await p.evaluate(() => S.kiraan === null), 'pengawas: jumlah rekod tidak dihantar');
+  ok(await p.evaluate(id => !!S.kiraan && S.kiraan[id][1] >= 1, top), 'pengawas juga melihat jumlah rekod');
   ok(await p.isVisible('#vTerkini #lmCard'), 'pengawas: Laporan Kesalahan Murid di tab Terkini');
   await p.fill('#lmQ', topNama); await p.waitForSelector('#lmRes [data-lm]'); await p.click('#lmRes [data-lm="' + top + '"]'); await p.waitForSelector('#lmOut table');
   ok(await p.locator('#lmOut tbody tr').count() === topN, 'pengawas boleh melihat laporan kesalahan murid');

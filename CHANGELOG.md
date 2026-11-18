@@ -1,7 +1,7 @@
 # Senarai Perubahan SiDIA
 
-## Belum diterbitkan
-- **Jumlah rekod kesalahan di sebelah nama murid** semasa merekod (guru, warden & admin). Dikira terus daripada tab REKOD, dikemas kini selepas simpan/batal/padam. Merah jika 5 rekod atau lebih
+## 1.6.0 (18 Nov 2026)
+- **Jumlah rekod kesalahan di sebelah nama murid**: NAMA MURID [tahun semasa] [keseluruhan], untuk semua pengguna. Dikira terus daripada tab REKOD, dikemas kini selepas simpan/batal/padam. Merah jika 5 rekod atau lebih pada tahun semasa
 - **Laporan Kesalahan Murid**: cari murid dan lihat semua kesalahannya, dengan eksport **PDF** (header/footer rasmi, ringkasan mengikut kesalahan, ruang tandatangan) dan **CSV**. Untuk semua pengguna: di Admin › Laporan dan tab Terkini
 
 ## 1.5.0 (17 Nov 2026)

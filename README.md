@@ -144,6 +144,14 @@ Extension Chrome dalam folder [`infomurid-extension/`](infomurid-extension/) mem
 
 Panduan dijana daripada web app sebenar. Selepas paparan berubah, jana semula dengan `node panduan/jana.js` (perlu `cd tests && npm install` sekali).
 
+## Khidmat bakti
+Tab **Khidmat** (menu bawah) merekod sumbangan murid seperti gotong-royong, yang memberi **mata merit** kepada rumah.
+- **Guru, warden, guru disiplin dan admin** boleh merekod khidmat bakti untuk ramai murid sekaligus (pilih jenis, tarikh, catatan, kemudian pilih murid seperti merekod kesalahan).
+- **Pengawas** boleh **melihat sahaja**: rekod terkini dan mata khidmat bakti mengikut rumah.
+- **Guru dan admin** boleh menambah atau mengubah jenis khidmat bakti melalui **Urus jenis khidmat bakti**.
+- Senarai lalai: 17 jenis (KB01–KB17), cth gotong-royong sekolah/asrama, membersihkan surau, membantu majlis sekolah, bertugas di pintu pagar, sukarelawan program komuniti.
+- Data disimpan dalam tab **KHIDMAT_BAKTI** (jenis) dan **REKOD_KHIDMAT** (rekod). Murid yang sama, jenis yang sama dan tarikh yang sama tidak direkod dua kali. Rekod melalui peti keluar yang sama (selamat ketika talian lemah).
+
 ## Talian lemah: peti keluar
 Setiap simpanan disimpan dahulu dalam telefon (localStorage) dengan ID unik, kemudian dihantar ke Google Sheet.
 - Jika talian putus atau tiada jawapan dalam 30 saat, skrin memaparkan **Disimpan dalam telefon** dan guru boleh terus merekod.

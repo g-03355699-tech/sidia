@@ -80,6 +80,15 @@ const SIMPAN = n => step(n, 'Simpan & sahkan',
    <p><b>Talian lemah?</b> Jika skrin menunjukkan <i>Disimpan dalam telefon</i>, rekod selamat dalam telefon dan akan dihantar secara automatik apabila talian pulih, walaupun app ditutup dan dibuka semula. Status <i>rekod belum dihantar</i> dipaparkan di bahagian atas skrin; ketik <b>Hantar sekarang</b> untuk mencuba segera. Jangan kosongkan data pelayar sehingga rekod dihantar.</p>
    ${tip('Murid yang sudah direkod untuk kesalahan yang sama pada tarikh yang sama <b>tidak</b> direkod dua kali, walaupun direkod oleh orang lain. SiDIA memaparkan nama murid tersebut.')}`, ['sahkan', 'selesai']);
 
+const KHIDMAT = n => step(n, 'Rekod khidmat bakti',
+  `<p>Khidmat bakti ialah sumbangan murid (cth gotong-royong) yang memberi <b>mata merit</b> kepada rumah.</p>
+   <ol><li>Ketik tab <b>Khidmat</b> di bawah.</li>
+   <li>Pilih <b>jenis khidmat bakti</b> (cth <i>KB01 Gotong-royong membersihkan kawasan sekolah</i>). Mata merit dipaparkan di sebelah.</li>
+   <li>Semak tarikh dan isi catatan jika perlu.</li>
+   <li>Pilih murid sama seperti merekod kesalahan (ikut kelas, carian nama atau <b>Tampal senarai</b>), kemudian ketik <b>Simpan</b>.</li></ol>
+   <p>Bahagian bawah tab memaparkan <b>mata khidmat bakti mengikut rumah</b> (tahun semasa) dan rekod terkini.</p>
+   ${tip('Ketik <b>Urus jenis khidmat bakti</b> untuk menambah jenis baharu atau mengubah mata. Pengawas hanya boleh melihat rekod khidmat bakti.')}`, ['khidmat', 'khidmat-sahkan']);
+
 const TERKINI = (n, murid) => step(n, 'Semak rekod terkini',
   `<p>Tab <b>🕘 Terkini</b> memaparkan rekod yang baru disimpan${murid ? ' oleh <b>anda</b>' : ''}: kesalahan, tarikh, lokasi, pelapor dan senarai murid.</p>
    <p>Rekod anda sendiri boleh <b>dipadam</b> dalam tempoh 24 jam (tempoh ditetapkan oleh admin). Selepas itu, minta admin memadamnya.</p>
@@ -104,7 +113,8 @@ const PANDUAN = [
       seksyen('Merekod kesalahan', 'Contoh: semasa perhimpunan, beberapa murid didapati berambut panjang.') +
       KESALAHAN('3') + BUTIRAN('4') + PILIH_MURID('5') + SIMPAN('6') +
       seksyen('Selepas merekod') + TERKINI('7') +
-      step('8', 'Menu Admin (Guru Disiplin / PK HEM)',
+      KHIDMAT('8') +
+      step('9', 'Menu Admin (Guru Disiplin / PK HEM)',
         `<p>Guru yang diberi <b>PIN Admin</b> boleh membuka tab <b>🛡️ Admin</b> untuk:</p>
          <ul><li><b>Laporan</b> mata demerit mengikut rumah, kelas, kesalahan dan murid, termasuk eksport ke Excel (CSV)</li>
          <li><b>PIN akses</b>, <b>Tetapan sekolah</b>, <b>Kongsi pautan</b> dan <b>Sistem</b></li></ul>
@@ -134,6 +144,7 @@ const PANDUAN = [
       step('7', 'Taip nama & tekan Enter',
         `<p>Untuk beberapa murid sahaja (cth lewat masuk dewan makan atau bising selepas waktu tidur): taip sebahagian nama dan tekan <b>Enter</b>. Murid teratas terus dipilih, dan anda boleh terus menaip nama seterusnya.</p>`, 'cari') +
       seksyen('Selepas merekod') + TERKINI('8') +
+      KHIDMAT('9') +
       SOALAN(`<p><b>Dua warden merekod murid yang sama?</b> Tiada masalah. SiDIA tidak menyimpan rekod kedua bagi murid, kesalahan dan tarikh yang sama.</p>
               <p><b>Kesalahan asrama tiada dalam senarai?</b> Minta admin menambahnya dalam senarai kesalahan (Google Sheet › SiDIA › Mula di sini › Kesalahan).</p>`)
   },
@@ -159,6 +170,9 @@ const PANDUAN = [
          ${tip('Jika murid yang dipilih salah, ketik namanya dalam senarai untuk membuang tanda.')}`, 'pengawas-rekod') +
       SIMPAN('5') +
       seksyen('Selepas merekod') + TERKINI('6', true) +
+      step('7', 'Lihat khidmat bakti',
+        `<p>Tab <b>Khidmat</b> memaparkan rekod khidmat bakti terkini dan <b>mata khidmat bakti mengikut rumah</b> bagi tahun semasa.</p>
+         <p>Pengawas boleh <b>melihat sahaja</b>. Rekod khidmat bakti ditambah oleh guru, warden dan admin.</p>`, 'pengawas-khidmat') +
       SOALAN(`<p><b>Kenapa saya tidak nampak tab Admin atau laporan?</b> Laporan hanya untuk guru dan admin. Pengawas boleh merekod dan melihat rekod sendiri sahaja.</p>
               <p><b>Tersilap rekod selepas 24 jam?</b> Maklumkan kepada guru penasihat pengawas untuk dipadam.</p>`)
   },

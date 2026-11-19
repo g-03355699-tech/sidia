@@ -266,7 +266,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .ck{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer;font-size:15px}
 .ck input{width:22px;height:22px;accent-color:var(--pri);flex:none}
 .frm2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
-#kKod{text-transform:uppercase}
+#kKod,#kjKod{text-transform:uppercase}
 .kc{display:inline-flex;gap:4px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 .kc i{display:inline-block;min-width:22px;height:22px;padding:0 6px;border-radius:var(--r-pill);font-style:normal;font-size:12px;font-weight:700;line-height:22px;text-align:center;color:var(--kc-ink);font-variant-numeric:tabular-nums}
 .kc .t{background:var(--kc-thn)}.kc .t.hi{background:var(--kc-thn-hi)}
@@ -318,6 +318,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
   <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1Z"/></symbol>
   <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
 </svg>
 <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
@@ -371,7 +372,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
       <input type="text" id="inCatatan" placeholder="cth: Dorm B, blok lelaki">
     </div>
 
-    <div class="card">
+    <div class="card" id="pickCard">
       <h2><span class="step">2</span> Pilih murid</h2>
       <div class="searchwrap">
         <svg class="ico sicon" aria-hidden="true"><use href="#i-search"/></svg>
@@ -401,6 +402,38 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
       </h2>
       <div id="recentList"><div class="empty">Memuatkan…</div></div>
       <div class="actions"><button class="btn sm" id="btnRefreshRecent"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>Muat semula</button></div>
+    </div>
+  </section>
+
+  <!-- KHIDMAT BAKTI -->
+  <section id="vKhidmat" class="hidden">
+    <div class="card" id="kbForm">
+      <h2><span class="step">1</span> Khidmat bakti</h2>
+      <div id="kbChosen" class="hidden"></div>
+      <div id="kbPicker">
+        <input type="search" class="offsearch" id="kbQ" autocomplete="off" placeholder="Cari khidmat bakti atau kod… (cth: gotong, KB03)">
+        <div class="offlist" id="kbList"></div>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <div><label class="f" for="kbTarikh">Tarikh</label><input type="date" id="kbTarikh"></div>
+      </div>
+      <label class="f" for="kbCatatan">Catatan (pilihan)</label>
+      <input type="text" id="kbCatatan" maxlength="300" placeholder="cth: Gotong-royong blok A">
+      <div class="tools"><button class="btn sm" id="btnKbJenis"><svg class="ico" aria-hidden="true"><use href="#i-list"/></svg>Urus jenis khidmat bakti</button></div>
+    </div>
+    <div id="kbPickSlot"></div>
+    <div class="card hidden" id="kbViewOnly">
+      <div class="alert info" style="margin:0">Rekod khidmat bakti ditambah oleh guru, warden dan admin. Anda boleh melihat rekod sahaja.</div>
+    </div>
+    <div class="card">
+      <h2><svg class="ico" aria-hidden="true"><use href="#i-bar"/></svg>Mata khidmat bakti mengikut rumah</h2>
+      <p class="muted" style="margin:0 0 8px" id="kbRumahSub"></p>
+      <div id="kbRumah"><div class="empty">Memuatkan…</div></div>
+    </div>
+    <div class="card">
+      <h2><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>Rekod khidmat bakti terkini</h2>
+      <div id="kbRecent"><div class="empty">Memuatkan…</div></div>
+      <div class="actions"><button class="btn sm" id="btnKbRefresh"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg>Muat semula</button></div>
     </div>
   </section>
 
@@ -529,6 +562,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 <nav class="tabs hidden" id="tabs" aria-label="Navigasi utama">
   <button data-v="vRekod" class="on" aria-current="page"><span class="pill"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></span>Rekod</button>
   <button data-v="vTerkini"><span class="pill"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></span>Terkini</button>
+  <button data-v="vKhidmat" id="tabKhidmat"><span class="pill"><svg class="ico" aria-hidden="true"><use href="#i-award"/></svg></span>Khidmat</button>
   <button data-v="vAdmin" id="tabAdmin"><span class="pill"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></span>Admin</button>
 </nav>
 
@@ -564,7 +598,8 @@ function api(fn) {
 /* ============ STATE ============ */
 var S = {
   cfg: null, user: null, ctx: {}, students: [], byId: {}, offenses: [], kiraan: null,
-  off: null, sel: new Map(), done: {}, kelasList: [], view: 'vRekod'
+  off: null, sel: new Map(), done: {}, kelasList: [], view: 'vRekod',
+  mode: 'd', selD: null, doneD: null, selK: new Map(), doneK: {}, kbJ: null
 };
 var LS = {
   get: function (k, d) { try { var v = localStorage.getItem('sidia_' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
@@ -670,12 +705,15 @@ function highlight(name, q) {
 
 /* ============ LOG MASUK ============ */
 function showView(v) {
-  ['vLogin', 'vRekod', 'vTerkini', 'vAdmin'].forEach(function (x) { $(x).classList.toggle('hidden', x !== v); });
+  ['vLogin', 'vRekod', 'vTerkini', 'vKhidmat', 'vAdmin'].forEach(function (x) { $(x).classList.toggle('hidden', x !== v); });
+  if (v === 'vRekod') setMode('d');
+  if (v === 'vKhidmat') setMode(KBD && KBD.bolehTambah ? 'k' : 'd');
   S.view = v;
   document.querySelectorAll('nav.tabs button').forEach(function (b) { var on = b.dataset.v === v; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-  $('saveBar').classList.toggle('hidden', v !== 'vRekod');
+  $('saveBar').classList.toggle('hidden', !(v === 'vRekod' || (v === 'vKhidmat' && KBD && KBD.bolehTambah)));
   if (v === 'vTerkini') { placeLm('vTerkini'); loadRecent(); }
   if (v === 'vAdmin') initAdmin();
+  if (v === 'vKhidmat') loadKhidmat();
   window.scrollTo(0, 0);
 }
 
@@ -746,6 +784,12 @@ function boot() {
     $('onlyMine').closest('label').classList.toggle('hidden', isMurid);
     A = null;
     if (d.warnings && d.warnings.length) toast('Amaran: ' + d.warnings[0], true);
+    KBD = null; S.kbJ = null; S.selK = new Map(); S.doneK = {};
+    // tukar pengguna: sorok borang khidmat bakti sehingga kebenaran pengguna baharu diketahui
+    $('kbForm').classList.add('hidden'); $('kbViewOnly').classList.add('hidden');
+    $('kbRecent').innerHTML = '<div class="empty">Memuatkan…</div>'; $('kbRumah').innerHTML = '<div class="empty">Memuatkan…</div>';
+    if ($('pickCard').parentNode !== $('vRekod')) $('vRekod').appendChild($('pickCard'));
+    if (S.mode === 'k') { S.sel = S.selD || new Map(); S.done = S.doneD || {}; S.mode = 'd'; }
     initRekod();
     showView('vRekod');
     renderOutbox();
@@ -827,7 +871,7 @@ function initRekod() {
     S.sel.clear(); renderList(); updateSaveBar(); saveDraft();
   };
   $('selCount').onclick = showSelected;
-  $('btnSave').onclick = confirmSave;
+  $('btnSave').onclick = function () { if (S.mode === 'k') confirmKb(); else confirmSave(); };
   $('btnPaste').onclick = pasteDialog;
   $('inLokasi').onchange = saveDraft;
 }
@@ -971,7 +1015,7 @@ function renderList() {
   var q = qInput().value.trim(), kelas = $('fKelas').value, rumah = $('fRumah').value;
   var el = listEl();
   if (S.srch) {
-    $('srchSub').textContent = (S.off ? nice(S.off.kesalahan) : 'Pilih kesalahan dahulu') + (kelas ? ' · Kelas ' + kelas : '') + (rumah ? ' · Rumah ' + rumah : '');
+    $('srchSub').textContent = curChoice().label + (kelas ? ' · Kelas ' + kelas : '') + (rumah ? ' · Rumah ' + rumah : '');
     if (!q && !kelas && !rumah) {
       var sel2 = Array.from(S.sel.keys()).map(function (id) { return S.byId[id]; }).filter(Boolean).reverse();
       el.innerHTML = '<div class="empty">Taip sebahagian nama dan/atau kelas, cth <b>hafiz 4</b>, kemudian tekan <b>Enter</b> atau ketik nama. Ketik <b>Selesai</b> untuk kembali dan simpan.</div>' +
@@ -1011,7 +1055,7 @@ function itemHtml(o, q, first) {
 }
 /** Dua lencana bulat di sebelah nama: tahun semasa (hijau, merah jika > 3) dan keseluruhan (biru, jingga jika > 10). */
 function kcHtml(id) {
-  var k = S.kiraan && S.kiraan[id];
+  var k = S.mode !== 'k' && S.kiraan && S.kiraan[id];
   if (!k || !k[1]) return '';
   var thn = new Date().getFullYear();
   return ' <span class="kc">' +
@@ -1032,8 +1076,9 @@ function updateSaveBar() {
   var names = Array.from(S.sel.keys()).slice(-4).reverse().map(function (id) { var o = S.byId[id]; return o ? o.nama.split(' ').slice(0, 2).join(' ') : id; });
   $('qN').innerHTML = ic('check', 'sm') + n; $('qN').classList.toggle('hidden', !n);
   $('q2N').innerHTML = ic('check', 'sm') + n; $('q2N').classList.toggle('hidden', !n);
-  $('selCount').innerHTML = n + ' murid dipilih <small>' + (n ? esc(names.join(', ')) + (n > 4 ? '…' : '') + ' · ketik untuk lihat' : (S.off ? esc(nice(S.off.kesalahan)) : 'Pilih kesalahan dahulu')) + '</small>';
-  $('btnSave').disabled = !n || !S.off;
+  var pilihan = curChoice();
+  $('selCount').innerHTML = n + ' murid dipilih <small>' + (n ? esc(names.join(', ')) + (n > 4 ? '…' : '') + ' · ketik untuk lihat' : esc(pilihan.label)) + '</small>';
+  $('btnSave').disabled = !n || !pilihan.ok;
   $('btnSave').textContent = n ? 'Simpan (' + n + ')' : 'Simpan';
 }
 function showSelected() {
@@ -1049,14 +1094,18 @@ function showSelected() {
 }
 
 function saveDraft() {
-  LS.set('draft', { ids: Array.from(S.sel.keys()), kod: S.off && S.off.kod, t: Date.now(),
+  if (S.mode === 'k') return; // draf hanya untuk rekod kesalahan
+  LS.set('draft', { ids: Array.from(S.sel.keys()), kod: S.off && S.off.kod, t: Date.now(), u: draftUser(),
     tarikh: $('inTarikh').value, masa: $('inMasa').value, lokasi: $('inLokasi').value, catatan: $('inCatatan').value });
   LS.set('last', { kod: S.off && S.off.kod, lokasi: $('inLokasi').value });
 }
+/** Draf milik pengguna tertentu: jangan pulihkan pilihan guru kepada pengawas pada telefon yang sama. */
+function draftUser() { return lower(S.ctx.nama) + '|' + lower(S.ctx.peranan || (S.user && S.user.peranan)); }
+function lower(x) { return String(x || '').trim().toLowerCase(); }
 function restoreDraft() {
   var d = LS.get('draft', null);
   S.sel.clear();
-  if (d && d.ids && d.ids.length && Date.now() - d.t < 12 * 3600e3) {
+  if (d && d.ids && d.ids.length && Date.now() - d.t < 12 * 3600e3 && (!d.u || d.u === draftUser())) {
     d.ids.forEach(function (id) { if (S.byId[id]) S.sel.set(id, 1); });
     if (S.sel.size) {
       // pulihkan juga tarikh, masa, lokasi & catatan supaya rekod tidak tersimpan dengan tarikh hari lain
@@ -1121,6 +1170,181 @@ function doSave() {
   });
 }
 
+/* ============ KHIDMAT BAKTI ============
+ * Guru, warden & admin: pilih jenis + murid (pemilih murid dikongsi dengan skrin Rekod), simpan melalui peti keluar.
+ * Pengawas: lihat rekod & mata rumah sahaja. */
+var KBD = null, kbReady = false;
+/** Pilihan semasa (kesalahan atau khidmat bakti) untuk bar Simpan & skrin carian. */
+function curChoice() {
+  if (S.mode === 'k') return S.kbJ ? { ok: true, label: nice(S.kbJ.nama) } : { ok: false, label: 'Pilih khidmat bakti dahulu' };
+  return S.off ? { ok: true, label: nice(S.off.kesalahan) } : { ok: false, label: 'Pilih kesalahan dahulu' };
+}
+/** Tukar mod pemilih murid: 'd' (kesalahan) atau 'k' (khidmat bakti). Setiap mod ada pilihan murid sendiri. */
+function setMode(m) {
+  if (!S.selD) { S.selD = S.sel; S.doneD = S.done; }
+  if (S.mode !== m) {
+    if (m === 'k') { S.selD = S.sel; S.doneD = S.done; S.sel = S.selK; S.done = S.doneK; }
+    else { S.selK = S.sel; S.doneK = S.done; S.sel = S.selD; S.done = S.doneD; }
+    S.mode = m;
+  }
+  var card = $('pickCard');
+  if (m === 'k') $('kbPickSlot').appendChild(card);
+  else if (card.parentNode !== $('vRekod')) $('vRekod').appendChild(card);
+  if (rekodReady) { renderList(); updateSaveBar(); }
+}
+function loadKhidmat() {
+  if (!kbReady) {
+    kbReady = true;
+    $('kbTarikh').value = ymd(new Date());
+    $('kbQ').addEventListener('input', renderKbList);
+    $('kbQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); var f = $('kbList').querySelector('.off'); if (f) f.click(); } });
+    $('btnKbJenis').onclick = kbJenisDialog;
+    $('btnKbRefresh').onclick = loadKhidmat;
+  }
+  api('getKhidmat', S.ctx).then(function (d) {
+    var awal = !KBD;
+    KBD = d;
+    if (S.kbJ) S.kbJ = d.jenis.filter(function (j) { return j.kod === S.kbJ.kod && j.aktif; })[0] || null;
+    $('kbForm').classList.toggle('hidden', !d.bolehTambah);
+    $('kbViewOnly').classList.toggle('hidden', d.bolehTambah);
+    if (S.view === 'vKhidmat') {
+      $('saveBar').classList.toggle('hidden', !d.bolehTambah);
+      if (awal) setMode(d.bolehTambah ? 'k' : 'd');
+    }
+    setKbJenis(S.kbJ); renderKbList(); renderKbData();
+  }).catch(function (e) { $('kbRecent').innerHTML = '<div class="alert err">' + esc(errMsg(e)) + '</div>'; });
+}
+function kbRowHtml(j) {
+  return '<button class="off" data-kb="' + esc(j.kod) + '"><span class="kd sev-r">' + esc(j.kod) + '</span><span class="tx">' + esc(nice(j.nama)) + '</span><span class="pt">+' + j.mata + ' mata</span></button>';
+}
+function renderKbList() {
+  if (!KBD) return;
+  var q = $('kbQ').value.trim().toLowerCase();
+  var l = KBD.jenis.filter(function (j) { return j.aktif && (!q || (j.kod + ' ' + j.nama).toLowerCase().indexOf(q) >= 0); });
+  $('kbList').innerHTML = l.length ? l.map(kbRowHtml).join('') : '<div class="empty">' + (q ? 'Tiada khidmat bakti sepadan dengan "' + esc(q) + '".' : 'Tiada jenis khidmat bakti aktif.') + '</div>';
+  $('kbList').querySelectorAll('[data-kb]').forEach(function (b) {
+    b.onclick = function () { setKbJenis(KBD.jenis.filter(function (j) { return j.kod === b.dataset.kb; })[0]); $('kbQ').value = ''; };
+  });
+}
+function setKbJenis(j) {
+  S.kbJ = j || null;
+  $('kbPicker').classList.toggle('hidden', !!j);
+  $('kbChosen').classList.toggle('hidden', !j);
+  if (j) {
+    $('kbChosen').innerHTML = '<div class="selected-off"><span class="kd sev-r">' + esc(j.kod) + '</span>' +
+      '<span class="tx">' + esc(nice(j.nama)) + '<small>+' + j.mata + ' mata khidmat bakti</small></span>' +
+      '<button class="btn link" id="btnKbTukar">Tukar</button></div>';
+    $('btnKbTukar').onclick = function () { setKbJenis(null); renderKbList(); $('kbQ').focus(); };
+  }
+  if (S.mode === 'k' && rekodReady) updateSaveBar();
+}
+function renderKbData() {
+  var d = KBD;
+  $('kbRumahSub').textContent = 'Tahun ' + d.tahun + ' · jumlah mata merit daripada khidmat bakti';
+  $('kbRumah').innerHTML = d.rumah.length ? tbl(['Rumah', 'Rekod', 'Mata'], d.rumah.map(function (x) { return [x.rumah, x.kes, x.mata]; }), [1, 2], 2)
+    : '<div class="empty">Tiada data rumah.</div>';
+  $('kbRecent').innerHTML = d.rekod.length ? d.rekod.map(function (b) {
+    return '<div class="batch"><div class="t">' + esc(nice(b.jenis)) + ' — ' + b.murid.length + ' murid (+' + b.mata + ' mata)</div>' +
+      '<div class="m">' + dmy(b.tarikh) + ' · oleh ' + esc(b.pelapor) + '</div>' +
+      (b.catatan ? '<div class="m">Catatan: ' + esc(b.catatan) + '</div>' : '') +
+      '<details><summary>Senarai murid</summary><ol>' + b.murid.map(function (m) { return '<li>' + esc(m[0]) + ' <span class="muted">' + esc(m[1]) + '</span></li>'; }).join('') + '</ol></details>' +
+      (b.bolehPadam ? '<div class="actions" style="margin-top:6px"><button class="btn sm danger" data-kbdel="' + esc(b.batch) + '" data-n="' + b.murid.length + '">Padam</button></div>' : '') + '</div>';
+  }).join('') : '<div class="empty">' + ic('inbox') + 'Belum ada rekod khidmat bakti.</div>';
+  $('kbRecent').querySelectorAll('[data-kbdel]').forEach(function (btn) {
+    btn.onclick = function () {
+      if (!confirm('Padam ' + btn.dataset.n + ' rekod khidmat bakti ini?')) return;
+      loading(true, 'Memadam…');
+      api('deleteKhidmat', S.ctx, btn.dataset.kbdel).then(function (r) { loading(false); toast(r.dipadam + ' rekod dipadam'); loadKhidmat(); })
+        .catch(function (e) { loading(false); toast(errMsg(e), true); });
+    };
+  });
+}
+function confirmKb() {
+  var j = S.kbJ;
+  if (!j) { toast('Pilih khidmat bakti dahulu', true); return; }
+  if (!$('kbTarikh').value) { toast('Isi tarikh', true); return; }
+  modal('<h3>Sahkan khidmat bakti</h3>' +
+    '<p style="margin:0 0 6px"><span class="kd sev-r">' + esc(j.kod) + '</span> <b>' + esc(nice(j.nama)) + '</b> (+' + j.mata + ' mata)</p>' +
+    '<p class="muted" style="margin:0">' + dmy($('kbTarikh').value) + ($('kbCatatan').value.trim() ? ' · ' + esc($('kbCatatan').value.trim()) : '') + '</p>' +
+    '<p style="font-size:22px;font-weight:700;margin:12px 0">' + S.sel.size + ' murid</p>' +
+    '<div class="actions"><button class="btn" onclick="closeModal()">Batal</button><button class="btn pri" id="btnDoSaveKb">Sahkan & simpan</button></div>');
+  $('btnDoSaveKb').onclick = doSaveKb;
+}
+function doSaveKb() {
+  closeModal();
+  var ids = Array.from(S.sel.keys()), j = S.kbJ;
+  var it = obItem({ kod: j.kod, tarikh: $('kbTarikh').value, catatan: $('kbCatatan').value.trim(), ids: ids }, { kod: j.kod, kesalahan: 'Khidmat bakti: ' + j.nama }, 'saveKhidmat');
+  obAdd(it);
+  loading(true, 'Menyimpan ' + ids.length + ' rekod…');
+  var selesai = function () { ids.forEach(function (id) { S.done[id] = 1; }); S.sel.clear(); $('kbCatatan').value = ''; renderList(); updateSaveBar(); };
+  sendItem(it).then(function (r) {
+    loading(false); selesai(); loadKhidmat();
+    var msg = '<div class="alert ok"><b>' + r.disimpan + ' rekod khidmat bakti disimpan.</b></div>';
+    if (r.pendua.length) msg += '<div class="alert warn">' + r.pendua.length + ' murid tidak disimpan kerana sudah direkod untuk khidmat bakti yang sama pada tarikh ini:<br><small>' + esc(r.pendua.join(', ')) + '</small></div>';
+    if (r.tidakDijumpai.length) msg += '<div class="alert err">' + r.tidakDijumpai.length + ' ID murid tidak dijumpai dalam senarai.</div>';
+    modal('<h3>Selesai</h3>' + msg + '<div class="actions">' + (r.batch ? '<button class="btn danger" id="btnUndoKb">Batal rekod ini</button>' : '') +
+      '<button class="btn pri" onclick="closeModal()">Rekod seterusnya</button></div>');
+    if (r.batch) $('btnUndoKb').onclick = function () {
+      closeModal(); loading(true, 'Membatalkan…');
+      api('deleteKhidmat', S.ctx, r.batch).then(function (x) {
+        loading(false); ids.forEach(function (id) { delete S.done[id]; S.sel.set(id, 1); }); renderList(); updateSaveBar(); loadKhidmat();
+        toast(x.dipadam + ' rekod dibatalkan. Pilihan murid dipulihkan.');
+      }).catch(function (e) { loading(false); toast(errMsg(e), true); });
+    };
+  }).catch(function (e) {
+    loading(false);
+    if (obIsTransient(e)) {
+      selesai();
+      modal('<h3>Disimpan dalam telefon</h3><div class="alert warn">' + ic('alert', 'sm') + ' Talian lemah atau tiada jawapan daripada pelayan. <b>' + ids.length + ' rekod</b> disimpan dalam telefon ini dan akan <b>dihantar secara automatik</b> apabila talian pulih.</div>' +
+        '<div class="actions"><button class="btn pri" onclick="closeModal()">Rekod seterusnya</button></div>');
+    } else {
+      obRemove(it.cid);
+      toast('Gagal simpan: ' + errMsg(e) + '. Pilihan anda masih disimpan — cuba lagi.', true);
+    }
+  });
+}
+/** Senarai & sunting jenis khidmat bakti (guru, warden & admin). */
+function kbJenisDialog() {
+  if (!KBD) return;
+  modal('<h3>Jenis khidmat bakti</h3><p class="muted" style="margin:0 0 8px">Ketik untuk mengubah. Jenis yang sudah ada rekod tidak boleh ditukar kodnya; nyahaktifkan sahaja.</p>' +
+    '<div class="offlist" id="kbjList" style="max-height:50vh">' + KBD.jenis.map(function (j) {
+      return '<button class="off' + (j.aktif ? '' : ' off-x') + '" data-kbj="' + esc(j.kod) + '"><span class="kd sev-r">' + esc(j.kod) + '</span><span class="tx">' + esc(nice(j.nama)) +
+        '<small>' + esc(['+' + j.mata + ' mata', j.aktif ? '' : 'Tidak aktif', j.guna ? j.guna + ' rekod' : ''].filter(Boolean).join(' · ')) + '</small></span></button>';
+    }).join('') + '</div><div class="actions"><button class="btn" onclick="closeModal()">Tutup</button><button class="btn pri" id="kbjBaru">' + ic('plus') + 'Tambah jenis</button></div>');
+  $('kbjBaru').onclick = function () { editKbJenis(null); };
+  $('kbjList').querySelectorAll('[data-kbj]').forEach(function (b) {
+    b.onclick = function () { editKbJenis(KBD.jenis.filter(function (j) { return j.kod === b.dataset.kbj; })[0]); };
+  });
+}
+function editKbJenis(j) {
+  var baru = !j;
+  if (baru) {
+    var n = KBD.jenis.reduce(function (m, x) { var k = /^KB(\d+)$/i.exec(x.kod); return k ? Math.max(m, +k[1]) : m; }, 0) + 1;
+    j = { kod: 'KB' + (n < 10 ? '0' : '') + n, nama: '', mata: 2, aktif: true, guna: 0 };
+  }
+  var kunci = !baru && j.guna > 0;
+  modal('<h3>' + (baru ? 'Tambah jenis khidmat bakti' : 'Ubah ' + esc(j.kod)) + '</h3>' +
+    '<div class="frm2"><div><label class="f" for="kjKod">Kod</label><input type="text" id="kjKod" maxlength="10" autocapitalize="characters" autocomplete="off" value="' + esc(j.kod) + '"' + (kunci ? ' readonly' : '') + '></div>' +
+    '<div><label class="f" for="kjMata">Mata merit</label><input type="text" id="kjMata" inputmode="decimal" value="' + esc(j.mata) + '"></div></div>' +
+    '<label class="f" for="kjNama">Khidmat bakti</label><textarea id="kjNama" rows="2" maxlength="200">' + esc(j.nama) + '</textarea>' +
+    '<label class="ck" style="margin-top:8px"><input type="checkbox" id="kjAktif"' + (j.aktif ? ' checked' : '') + '> Aktif (boleh dipilih semasa merekod)</label>' +
+    '<div class="actions"><button class="btn" id="kjBatal">Batal</button><button class="btn pri" id="kjSimpan">Simpan</button></div>');
+  $('kjBatal').onclick = kbJenisDialog;
+  $('kjSimpan').onclick = function () {
+    var d = { kod: $('kjKod').value.trim().toUpperCase(), nama: $('kjNama').value.trim(), mata: $('kjMata').value.trim().replace(',', '.'), aktif: $('kjAktif').checked };
+    if (!d.kod || !d.nama) { toast('Sila isi kod dan nama khidmat bakti.', true); return; }
+    if (d.mata === '' || isNaN(Number(d.mata))) { toast('Mata mesti nombor.', true); return; }
+    $('kjSimpan').disabled = true;
+    api('saveJenisKhidmat', S.ctx, d, baru ? '' : j.kod).then(function (r) {
+      KBD = r;
+      if (S.kbJ) S.kbJ = r.jenis.filter(function (x) { return x.kod === S.kbJ.kod && x.aktif; })[0] || null;
+      setKbJenis(S.kbJ); renderKbList(); renderKbData();
+      toast(baru ? 'Jenis ' + d.kod + ' ditambah' : 'Jenis ' + d.kod + ' dikemas kini');
+      kbJenisDialog();
+    }).catch(function (e) { $('kjSimpan').disabled = false; toast(errMsg(e), true); });
+  };
+}
+
 /* ============ PETI KELUAR: rekod yang belum sampai ke pelayan ============
  * Setiap simpanan disimpan dahulu dalam localStorage dengan ID unik (cid), kemudian dihantar.
  * Jika talian putus atau tiada jawapan, ia dihantar semula secara automatik (semasa app dibuka,
@@ -1132,11 +1356,11 @@ function obSet(l) { LS.set('outbox', l); renderOutbox(); }
 function obAdd(it) { var l = obGet(); l.push(it); obSet(l); }
 function obRemove(cid) { obSet(obGet().filter(function (x) { return x.cid !== cid; })); }
 function obUpdate(cid, f) { obSet(obGet().map(function (x) { if (x.cid === cid) f(x); return x; })); }
-function obItem(payload, off) {
+function obItem(payload, off, fn) {
   var cid = (Date.now().toString(36) + Math.random().toString(36).slice(2, 12)).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20);
   payload.cid = cid;
   var ctx = {}; for (var k in S.ctx) ctx[k] = S.ctx[k];
-  return { cid: cid, t: Date.now(), ctx: ctx, kod: off.kod, kesalahan: nice(off.kesalahan), payload: payload };
+  return { cid: cid, t: Date.now(), ctx: ctx, fn: fn || 'saveRecords', kod: off.kod, kesalahan: nice(off.kesalahan), payload: payload };
 }
 /** Ralat sementara (talian/pelayan sibuk) → cuba semula. Ralat lain (PIN, data tidak sah) → perlu tindakan pengguna. */
 function obIsTransient(e) {
@@ -1150,10 +1374,11 @@ function sendItem(it) {
     var settled = false;
     obInFlight[it.cid] = Date.now();
     var tm = setTimeout(function () { if (!settled) { settled = true; rej(new Error('TAMAT_MASA: tiada jawapan daripada pelayan')); } }, OB_TIMEOUT);
-    api('saveRecords', it.ctx, it.payload).then(function (r) {
+    api(it.fn || 'saveRecords', it.ctx, it.payload).then(function (r) {
       delete obInFlight[it.cid];
       obRemove(it.cid); setKiraan(r.kiraan);
       if (rekodReady) renderList();
+      if (it.fn === 'saveKhidmat' && S.view === 'vKhidmat') loadKhidmat();
       if (settled) { toast(r.disimpan + ' rekod tertunda berjaya dihantar'); return; } // jawapan lewat
       settled = true; clearTimeout(tm); res(r);
     }, function (e) {

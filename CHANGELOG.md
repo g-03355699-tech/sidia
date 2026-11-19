@@ -1,5 +1,13 @@
 # Senarai Perubahan SiDIA
 
+## 1.8.0 (19 Nov 2026)
+- **Khidmat bakti**: tab baharu **Khidmat** di menu bawah untuk merekod sumbangan murid (mata merit)
+  - guru, warden, guru disiplin dan admin boleh merekod; pengawas boleh melihat sahaja
+  - guru dan admin boleh menambah dan mengubah jenis khidmat bakti
+  - 17 jenis khidmat bakti lalai (KB01–KB17), tab baharu KHIDMAT_BAKTI dan REKOD_KHIDMAT dicipta secara automatik
+  - mata khidmat bakti mengikut rumah (tahun semasa) dan rekod terkini
+- Baiki: pilihan murid yang belum disimpan tidak lagi dipulihkan kepada pengguna lain pada telefon yang sama
+
 ## 1.7.0 (19 Nov 2026)
 - **Peti keluar untuk talian lemah**: setiap simpanan disimpan dahulu dalam telefon. Jika talian putus atau tiada jawapan dalam 30 saat, rekod dihantar semula secara automatik (apabila talian pulih, app dibuka semula, kembali ke skrin, dan setiap minit)
 - Rekod tidak berganda walaupun dihantar semula: setiap simpanan mempunyai ID unik yang disemak oleh pelayan

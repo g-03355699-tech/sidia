@@ -25,7 +25,7 @@ Pengguna dan penyelenggara berbahasa Melayu. **Semua teks UI, mesej ralat, dokum
 | `panduan/` | Penjana panduan PDF: `node panduan/jana.js` → `docs/panduan/Panduan-SiDIA-{Guru,Warden,Pengawas,Admin}.pdf`. Tangkapan skrin diambil daripada web app simulasi (`tangkap.js`) |
 
 ### Tab Google Sheet
-`MULA`, `TETAPAN` (kunci/nilai), `MURID` (ID, Nama, Kelas, Rumah), `KESALAHAN` (Kod, Kesalahan, Kategori, Mata, Aktif, Pantas), `PENGGUNA` (pilihan: senarai emel), `REKOD`, `LAPORAN`.
+`MULA`, `TETAPAN` (kunci/nilai), `MURID` (ID, Nama, Kelas, Rumah), `KESALAHAN` (Kod, Kesalahan, Kategori, Mata, Aktif, Pantas), `PENGGUNA` (pilihan: senarai emel), `REKOD`, `LAPORAN`, `KHIDMAT_BAKTI` (Kod, Khidmat Bakti, Mata, Aktif; lalai `DEFAULT_KB`), `REKOD_KHIDMAT` (`KB_HEADERS` / indeks `KB`, susunan tetap seperti REKOD).
 - **Susunan lajur `REKOD` adalah tetap** (`REKOD_HEADERS` / indeks `R`). Jangan ubah susunannya; lajur baharu hanya boleh ditambah di hujung.
 - `readStudents_()` mengesan lajur MURID melalui tajuk (Nama/Kelas/Rumah/No. MyKid…), jadi sekolah boleh menggunakan format sendiri.
 - Kategori kesalahan: `Ringan` / `Sederhana` / `Berat` (1/2/3 juga diterima). Kod mesti unik.
@@ -45,7 +45,8 @@ Berdasarkan garis panduan **UI UX Pro Max** (github.com/nextlevelbuilder/ui-ux-p
 - Fungsi peribadi pelayan berakhir dengan `_` (tidak boleh dipanggil dari klien). Fungsi yang dipanggil melalui `google.script.run` tidak mempunyai `_`.
 - Pengesahan: setiap fungsi web app memanggil `auth_(ctx)`. Peranan → kumpulan melalui `groupOf_()`: `admin`, `murid` (Pengawas/murid/ketua…), `guru` (lain-lain). PIN setiap kumpulan: `KOD_ADMIN`, `KOD_MURID`, `KOD_GURU` (`KOD_AKSES` lama menjadi PIN guru/murid jika kosong; `savePins_` mengosongkannya). PIN 4–8 digit dan mesti berbeza. Fungsi khas admin memanggil `requireAdmin_(ctx)`.
 - Klien: setiap log masuk/tukar pengguna mesti bermula dengan `ctx` bersih (tiada `adminPin`/`pin` lama). Pernah menjadi pepijat keselamatan: pengawas mewarisi akses Admin.
-- Web app ada 3 tab bawah: Rekod, Terkini, **Admin** (submenu: Laporan, PIN akses, Tetapan sekolah, Kongsi pautan, Sistem). Tab Admin disorok untuk kumpulan `murid`, dan pengawas hanya melihat rekod sendiri dalam Terkini.
+- Web app ada 4 tab bawah: Rekod, Terkini, **Khidmat**, **Admin** (submenu: Laporan, PIN akses, Tetapan sekolah, Senarai kesalahan, Kongsi pautan, Sistem). Tab Admin disorok untuk kumpulan `murid`, dan pengawas hanya melihat rekod sendiri dalam Terkini. Khidmat: pengawas lihat sahaja; tambah rekod/jenis melalui `requireEditor_`.
+- Pemilih murid (`#pickCard`) dikongsi oleh Rekod dan Khidmat: `setMode('d'|'k')` memindahkan kad dan menukar `S.sel`/`S.done`. Draf (`saveDraft`) hanya untuk mod kesalahan dan disimpan bersama pengguna (`draftUser()`).
 - Pustaka luar hanya dengan versi tetap, dimuat dari cdnjs: `xlsx@0.18.5`, `qrcodejs@1.0.0` (Setup.html & Index.html), dan `jspdf@2.5.1` + `jspdf-autotable@3.8.2` untuk Laporan PDF (`janaPdf()` dalam Index.html, dimuat apabila diperlukan, dengan jsDelivr sebagai sandaran). PDF menggunakan fon Helvetica (WinAnsi), jadi **jangan guna emoji atau aksara di luar Latin-1** dalam teks PDF.
 - Tulisan ke Sheet guna `LockService` + `setValues` pukal.
 

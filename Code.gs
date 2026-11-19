@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.7.0';
+var SIDIA_VERSION = '1.8.0';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 /** Ikon web app (dihoskan di GitHub Pages). */
@@ -25,8 +25,38 @@ var SH = {
   PENGGUNA: 'PENGGUNA',
   REKOD: 'REKOD',
   LAPORAN: 'LAPORAN',
-  MULA: 'MULA'
+  MULA: 'MULA',
+  KB_JENIS: 'KHIDMAT_BAKTI',
+  KB_REKOD: 'REKOD_KHIDMAT'
 };
+
+/* ---------- Khidmat bakti (mata merit / sumbangan murid) ---------- */
+var KB_JENIS_HEADERS = ['Kod', 'Khidmat Bakti', 'Mata', 'Aktif'];
+var KB_HEADERS = ['ID Rekod', 'Masa Rekod', 'Tarikh', 'ID Murid', 'Nama Murid', 'Kelas', 'Rumah',
+  'Kod', 'Khidmat Bakti', 'Mata', 'Pelapor', 'Emel Pelapor', 'Peranan', 'Catatan', 'ID Kumpulan'];
+// indeks lajur REKOD_KHIDMAT (0-based). Susunan tetap: lajur baharu hanya di hujung.
+var KB = { ID: 0, MASA_REKOD: 1, TARIKH: 2, ID_MURID: 3, NAMA: 4, KELAS: 5, RUMAH: 6, KOD: 7, JENIS: 8,
+  MATA: 9, PELAPOR: 10, EMEL: 11, PERANAN: 12, CATATAN: 13, KUMPULAN: 14 };
+var DEFAULT_KB = [
+  // [Kod, Khidmat Bakti, Mata, Aktif]
+  ['KB01', 'GOTONG-ROYONG MEMBERSIHKAN KAWASAN SEKOLAH', 2, 'Ya'],
+  ['KB02', 'GOTONG-ROYONG ASRAMA / DORM', 2, 'Ya'],
+  ['KB03', 'MEMBERSIHKAN SURAU / MASJID', 2, 'Ya'],
+  ['KB04', 'MEMBERSIHKAN DEWAN MAKAN', 2, 'Ya'],
+  ['KB05', 'MENCERIAKAN / MENGECAT KELAS ATAU BANGUNAN', 3, 'Ya'],
+  ['KB06', 'KERJA KEBUN / LANDSKAP SEKOLAH', 2, 'Ya'],
+  ['KB07', 'MEMBANTU PERSIAPAN MAJLIS ATAU PROGRAM SEKOLAH', 3, 'Ya'],
+  ['KB08', 'BERTUGAS SEMASA MAJLIS RASMI SEKOLAH', 3, 'Ya'],
+  ['KB09', 'MEMBANTU URUSAN HARI SUKAN / KOKURIKULUM', 3, 'Ya'],
+  ['KB10', 'MEMBANTU DI PERPUSTAKAAN / PUSAT SUMBER', 2, 'Ya'],
+  ['KB11', 'MEMBANTU GURU DI MAKMAL / BENGKEL', 2, 'Ya'],
+  ['KB12', 'BERTUGAS DI PINTU PAGAR / KAWALAN TRAFIK', 2, 'Ya'],
+  ['KB13', 'MENGANGKAT / MENYUSUN PERALATAN SEKOLAH', 2, 'Ya'],
+  ['KB14', 'MEMBANTU PENGURUSAN ASRAMA', 2, 'Ya'],
+  ['KB15', 'SUKARELAWAN PROGRAM KOMUNITI / AMAL', 5, 'Ya'],
+  ['KB16', 'MEWAKILI SEKOLAH DALAM PROGRAM KHIDMAT MASYARAKAT', 5, 'Ya'],
+  ['KB17', 'LAIN-LAIN KHIDMAT BAKTI', 1, 'Ya']
+];
 
 var REKOD_HEADERS = [
   'ID Rekod', 'Masa Rekod', 'Tarikh Kejadian', 'Masa Kejadian', 'ID Murid',
@@ -254,6 +284,14 @@ function ensureSetup_() {
   }
 
   ensureSheet_(ss, SH.REKOD, REKOD_HEADERS).setFrozenRows(1);
+
+  var kj = ensureSheet_(ss, SH.KB_JENIS, KB_JENIS_HEADERS);
+  if (kj.getLastRow() < 2) {
+    kj.getRange(2, 1, DEFAULT_KB.length, 1).setNumberFormat('@');
+    kj.getRange(2, 1, DEFAULT_KB.length, 4).setValues(DEFAULT_KB);
+    kj.setColumnWidth(2, 420);
+  }
+  ensureSheet_(ss, SH.KB_REKOD, KB_HEADERS).setFrozenRows(1);
   ensureMulaSheet_(ss);
 }
 
@@ -1023,9 +1061,9 @@ function readOffenses_() {
 /* ============ SUNTING SENARAI KESALAHAN (web app) ============ */
 
 /** Guru, warden, guru disiplin dan admin boleh mengubah senarai kesalahan; pengawas tidak. */
-function requireEditor_(ctx) {
+function requireEditor_(ctx, apa) {
   var user = auth_(ctx);
-  if (user.group === 'murid' && !user.isAdmin) throw new Error('AKSES_DITOLAK: Pengawas tidak boleh mengubah senarai kesalahan.');
+  if (user.group === 'murid' && !user.isAdmin) throw new Error('AKSES_DITOLAK: Pengawas tidak boleh ' + (apa || 'mengubah senarai kesalahan') + '.');
   return user;
 }
 
@@ -1139,6 +1177,193 @@ function deleteOffense(ctx, kod) {
     lock.releaseLock();
   }
   return { offenses: readOffensesSafe_() };
+}
+
+/* =========================================================
+ *  KHIDMAT BAKTI
+ *  Rekod: guru, warden, guru disiplin & admin (requireEditor_). Pengawas: lihat sahaja.
+ *  Jenis khidmat bakti: guru & admin boleh tambah/ubah.
+ * ========================================================= */
+function kbJenisSheet_() { var ss = SpreadsheetApp.getActive(); return ss.getSheetByName(SH.KB_JENIS) || (ensureSetup_(), ss.getSheetByName(SH.KB_JENIS)); }
+function kbSheet_() { var ss = SpreadsheetApp.getActive(); return ss.getSheetByName(SH.KB_REKOD) || ensureSheet_(ss, SH.KB_REKOD, KB_HEADERS); }
+
+function kbJenisRows_(sh) {
+  var last = sh.getLastRow();
+  if (last < 2) return [];
+  return sh.getRange(2, 1, last - 1, 4).getDisplayValues().map(function (r, i) {
+    return { row: i + 2, kod: String(r[0]).trim(), nama: String(r[1]).trim(), mata: parseFloat(r[2]) || 0, aktif: !isNo_(r[3]) };
+  }).filter(function (o) { return o.kod && o.nama; });
+}
+
+function kbOwner_(user, r) {
+  var em = String(r[KB.EMEL] || '').toLowerCase();
+  if (user.email && em) return em === user.email;
+  return lower_(r[KB.PELAPOR]) === lower_(user.nama);
+}
+
+/**
+ * Data tab Khidmat bakti: jenis, rekod terkini (ikut kumpulan), mata mengikut rumah (tahun semasa).
+ * Semua pengguna boleh melihat; bolehTambah = guru/warden/admin.
+ */
+function getKhidmat(ctx) {
+  var user = auth_(ctx);
+  var boleh = user.group !== 'murid' || user.isAdmin;
+  var use = {};
+  var sh = kbSheet_(), last = sh.getLastRow();
+  var vals = last >= 2 ? sh.getRange(2, 1, last - 1, KB_HEADERS.length).getValues() : [];
+  var tahun = todayStr_().slice(0, 4);
+  var rumah = {}, map = {}, order = [];
+  try { readStudents_().students.forEach(function (st) { var h = st[3] || '(Tiada rumah)'; if (!rumah[h]) rumah[h] = { rumah: h, kes: 0, mata: 0 }; }); } catch (e) {}
+  var hadMs = (parseFloat(getSettings_().HAD_PADAM_JAM) || 24) * 3600 * 1000;
+  for (var i = 0; i < vals.length; i++) {
+    var r = vals[i], kod = String(r[KB.KOD]).trim().toUpperCase();
+    use[kod] = (use[kod] || 0) + 1;
+    if (dateStr_(r[KB.TARIKH]).slice(0, 4) === tahun) {
+      var h = String(r[KB.RUMAH] || '(Tiada rumah)');
+      if (!rumah[h]) rumah[h] = { rumah: h, kes: 0, mata: 0 };
+      rumah[h].kes++; rumah[h].mata += parseFloat(r[KB.MATA]) || 0;
+    }
+  }
+  for (var j = vals.length - 1; j >= 0 && order.length < 40; j--) {
+    var x = vals[j], b = String(x[KB.KUMPULAN] || x[KB.ID]);
+    if (!map[b]) {
+      var t = x[KB.MASA_REKOD] instanceof Date ? x[KB.MASA_REKOD] : new Date(x[KB.MASA_REKOD]);
+      map[b] = { batch: b, tarikh: dateStr_(x[KB.TARIKH]), kod: String(x[KB.KOD]), jenis: String(x[KB.JENIS]), mata: parseFloat(x[KB.MATA]) || 0,
+        pelapor: String(x[KB.PELAPOR] || ''), catatan: String(x[KB.CATATAN] || ''), murid: [],
+        bolehPadam: boleh && (user.isAdmin || (kbOwner_(user, x) && (new Date() - t) < hadMs)) };
+      order.push(b);
+    }
+    map[b].murid.push([String(x[KB.NAMA]), String(x[KB.KELAS])]);
+  }
+  return {
+    bolehTambah: boleh,
+    jenis: kbJenisRows_(kbJenisSheet_()).map(function (o) { delete o.row; o.guna = use[o.kod.toUpperCase()] || 0; return o; }),
+    rekod: order.map(function (b) { map[b].murid.reverse(); return map[b]; }),
+    rumah: Object.keys(rumah).map(function (k) { var o = rumah[k]; o.mata = Math.round(o.mata * 10) / 10; return o; })
+      .sort(function (a, c) { return c.mata - a.mata || c.kes - a.kes; }),
+    tahun: tahun
+  };
+}
+
+/** Simpan rekod khidmat bakti secara pukal. payload = {kod, tarikh, catatan, ids, cid}. */
+function saveKhidmat(ctx, payload) {
+  var user = requireEditor_(ctx, 'menambah rekod khidmat bakti');
+  if (!user.nama) throw new Error('Sila isi nama pelapor.');
+  payload = payload || {};
+  var ids = (payload.ids || []).map(String);
+  if (!ids.length) throw new Error('Tiada murid dipilih.');
+  if (ids.length > 1000) throw new Error('Terlalu banyak murid dalam satu rekod (maksimum 1000).');
+  var kod = String(payload.kod || '').trim().toUpperCase();
+  var j = kbJenisRows_(kbJenisSheet_()).filter(function (o) { return o.kod.toUpperCase() === kod && o.aktif; })[0];
+  if (!j) throw new Error('Jenis khidmat bakti "' + kod + '" tidak dijumpai atau tidak aktif.');
+  var tarikh = String(payload.tarikh || todayStr_());
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tarikh)) throw new Error('Format tarikh tidak sah.');
+  var cid = /^[a-z0-9]{8,24}$/.test(String(payload.cid || '')) ? String(payload.cid) : '';
+  var byId = {};
+  readStudents_().students.forEach(function (st) { byId[st[0]] = st; });
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var sh = kbSheet_(), last = sh.getLastRow(), existing = {}, sudahAda = 0;
+    if (last >= 2) {
+      var start = Math.max(2, last - 4000);
+      sh.getRange(start, 1, last - start + 1, KB_HEADERS.length).getValues().forEach(function (r) {
+        if (cid && String(r[KB.KUMPULAN]) === cid) sudahAda++;
+        if (dateStr_(r[KB.TARIKH]) === tarikh && String(r[KB.KOD]).toUpperCase() === kod) existing[String(r[KB.ID_MURID])] = 1;
+      });
+    }
+    if (sudahAda) return { disimpan: sudahAda, sudahDiterima: true, pendua: [], tidakDijumpai: [], batch: cid };
+    var batch = cid || Utilities.getUuid().replace(/-/g, '').slice(0, 10);
+    var now = new Date(), p = tarikh.split('-'), tDate = new Date(+p[0], +p[1] - 1, +p[2]);
+    var rows = [], skipped = [], notFound = [], seen = {};
+    ids.forEach(function (id) {
+      if (seen[id]) return; seen[id] = 1;
+      var st = byId[id];
+      if (!st) { notFound.push(id); return; }
+      if (existing[id]) { skipped.push(st[1] + ' (' + st[2] + ')'); return; }
+      rows.push([batch + '-' + (rows.length + 1), now, tDate, "'" + id, st[1], st[2], st[3], j.kod, j.nama, j.mata,
+        user.nama, user.email, user.peranan, String(payload.catatan || '').slice(0, 300), batch]);
+    });
+    if (rows.length) {
+      sh.getRange(sh.getLastRow() + 1, 1, rows.length, KB_HEADERS.length).setValues(rows);
+      SpreadsheetApp.flush();
+    }
+    return { disimpan: rows.length, pendua: skipped, tidakDijumpai: notFound, batch: rows.length ? batch : null };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Padam satu kumpulan rekod khidmat bakti (pemilik dalam had masa, atau admin). */
+function deleteKhidmat(ctx, batch) {
+  var user = requireEditor_(ctx, 'memadam rekod khidmat bakti');
+  batch = String(batch || '');
+  if (!batch) throw new Error('Tiada ID kumpulan.');
+  var hadMs = (parseFloat(getSettings_().HAD_PADAM_JAM) || 24) * 3600 * 1000;
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var sh = kbSheet_(), last = sh.getLastRow();
+    if (last < 2) return { dipadam: 0 };
+    var vals = sh.getRange(2, 1, last - 1, KB_HEADERS.length).getValues(), rowsDel = [];
+    vals.forEach(function (r, i) {
+      if (String(r[KB.KUMPULAN]) !== batch) return;
+      var t = r[KB.MASA_REKOD] instanceof Date ? r[KB.MASA_REKOD] : new Date(r[KB.MASA_REKOD]);
+      if (!user.isAdmin && !(kbOwner_(user, r) && (new Date() - t) < hadMs)) {
+        throw new Error('Anda tidak dibenarkan memadam rekod ini (bukan rekod anda atau melebihi had masa).');
+      }
+      rowsDel.push(i + 2);
+    });
+    for (var k = rowsDel.length - 1; k >= 0;) {
+      var end = rowsDel[k], m = k;
+      while (m > 0 && rowsDel[m - 1] === rowsDel[m] - 1) m--;
+      sh.deleteRows(rowsDel[m], end - rowsDel[m] + 1);
+      k = m - 1;
+    }
+    return { dipadam: rowsDel.length };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Tambah atau ubah jenis khidmat bakti (guru & admin). o = {kod, nama, mata, aktif}. */
+function saveJenisKhidmat(ctx, o, kodAsal) {
+  requireEditor_(ctx, 'mengubah jenis khidmat bakti');
+  o = o || {};
+  var kod = String(o.kod || '').trim().toUpperCase();
+  var nama = String(o.nama || '').replace(/\s+/g, ' ').trim();
+  kodAsal = String(kodAsal || '').trim().toUpperCase();
+  if (!/^[A-Z0-9][A-Z0-9\-]{0,9}$/.test(kod)) throw new Error('Kod mesti 1–10 aksara (huruf, nombor atau -), cth KB18.');
+  if (nama.length < 3) throw new Error('Sila isi nama khidmat bakti.');
+  if (nama.length > 200) throw new Error('Nama terlalu panjang (maksimum 200 aksara).');
+  var mata = Number(o.mata);
+  if (!isFinite(mata) || mata < 0 || mata > 100) throw new Error('Mata mesti nombor antara 0 hingga 100.');
+  mata = Math.round(mata * 10) / 10;
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var sh = kbJenisSheet_(), rows = kbJenisRows_(sh), asal = null, dup = null;
+    rows.forEach(function (r) {
+      var k = r.kod.toUpperCase();
+      if (kodAsal && k === kodAsal) asal = r;
+      if (k === kod && k !== kodAsal) dup = r;
+    });
+    if (dup) throw new Error('Kod ' + kod + ' sudah digunakan untuk "' + dup.nama + '".');
+    if (kodAsal && !asal) throw new Error('Jenis ' + kodAsal + ' tidak dijumpai. Muat semula senarai.');
+    if (asal && kod !== kodAsal) {
+      var n = kbSheet_().getLastRow() >= 2 ? kbSheet_().getRange(2, KB.KOD + 1, kbSheet_().getLastRow() - 1, 1).getDisplayValues()
+        .filter(function (r) { return String(r[0]).trim().toUpperCase() === kodAsal; }).length : 0;
+      if (n) throw new Error('Kod ' + kodAsal + ' sudah digunakan dalam ' + n + ' rekod, jadi kod tidak boleh ditukar.');
+    }
+    var r0 = asal ? asal.row : Math.max(sh.getLastRow(), 1) + 1;
+    sh.getRange(r0, 1, 1, 1).setNumberFormat('@');
+    sh.getRange(r0, 1, 1, 4).setValues([[kod, nama, mata, o.aktif === false ? 'Tidak' : 'Ya']]);
+    SpreadsheetApp.flush();
+  } finally {
+    lock.releaseLock();
+  }
+  return getKhidmat(ctx);
 }
 
 function readOffensesSafe_() {

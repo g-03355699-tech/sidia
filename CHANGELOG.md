@@ -1,5 +1,12 @@
 # Senarai Perubahan SiDIA
 
+## 1.7.0 (19 Nov 2026)
+- **Peti keluar untuk talian lemah**: setiap simpanan disimpan dahulu dalam telefon. Jika talian putus atau tiada jawapan dalam 30 saat, rekod dihantar semula secara automatik (apabila talian pulih, app dibuka semula, kembali ke skrin, dan setiap minit)
+- Rekod tidak berganda walaupun dihantar semula: setiap simpanan mempunyai ID unik yang disemak oleh pelayan
+- Status *rekod belum dihantar* di bahagian atas skrin, dengan butang **Hantar sekarang** dan **Butiran** (cuba semula atau buang simpanan yang gagal)
+- Skrin "Menyimpan…" tidak lagi berpusing tanpa henti (had 30 saat)
+- Pilihan murid yang dipulihkan kini termasuk tarikh, masa, lokasi dan catatan asal
+
 ## 1.6.1 (18 Nov 2026)
 - Jumlah rekod di sebelah nama murid kini dua **lencana bulat**: tahun semasa (hijau, merah jika > 3) dan keseluruhan (biru, jingga jika > 10)
 

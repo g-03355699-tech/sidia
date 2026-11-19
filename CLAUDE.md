@@ -55,6 +55,7 @@ Berdasarkan garis panduan **UI UX Pro Max** (github.com/nextlevelbuilder/ui-ux-p
 - **Papan kekunci telefon / iframe Apps Script**: web app berjalan dalam iframe Google. Di iOS, memfokuskan input di tengah halaman membuatkan Safari menolak seluruh halaman ke atas; **jangan** gulir secara manual selepas fokus (pernah menyebabkan skrin kosong) dan jangan bergantung pada `visualViewport` dalam iframe. Penyelesaian semasa: di telefon, `#q` adalah `readonly` dan membuka **skrin carian penuh** (`#srch`, input `#q2` di bahagian atas). Gunakan `qInput()`/`listEl()` untuk input & senarai aktif.
 - **`ScriptApp.getService().getUrl()` tidak boleh dipercayai** jika ada beberapa deployment. Pautan yang disimpan/ditampal pengguna (`WEB_APP_URL`) diutamakan.
 - **Pautan `/a/<domain>/macros/…`** gagal ("Sorry, unable to open the file") jika pelayar log masuk dengan beberapa akaun. Kongsikan pautan `/macros/s/…/exec`.
+- **Simpan rekod mesti melalui peti keluar** (`obAdd` → `sendItem`): payload disimpan dalam `localStorage` dengan `cid` unik sebelum dihantar, dan `saveRecords` menolak `cid` yang sudah ada (lajur ID Kumpulan). Jangan panggil `saveRecords` terus dari UI, dan jangan buang semakan `cid` di pelayan (penghantaran semula akan menjadi rekod berganda).
 - Tajuk fail Excel seperti "SENARAI NAMA MURID…" bukan baris tajuk lajur. Pengesanan baris tajuk memerlukan ≥2 sel dan memilih baris yang paling banyak lajur dikenali.
 
 ## Ujian

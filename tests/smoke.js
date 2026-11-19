@@ -167,6 +167,50 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   ok(await w.inputValue('#appUrl') === 'https://script.google.com/macros/s/AKfyTEST/exec', 'pautan web app tanpa /a/domain/');
   await w.screenshot({ path: path.join(out, 'wizard-siap.png') });
 
+  // ---------- peti keluar: talian putus / skrin tergantung ----------
+  const ctx2 = await b.newContext({ ...devices['iPhone 13'] }); const q = await ctx2.newPage();
+  q.on('pageerror', e => errs.push('peti keluar: ' + e.message)); q.on('dialog', d => d.accept());
+  await q.goto(url('app.html')); await q.waitForSelector('#vLogin:not(.hidden)');
+  await q.fill('#inNama', 'Warden Ujian'); await q.fill('#inPin', '1234'); await q.click('#btnLogin'); await q.waitForSelector('#vRekod:not(.hidden)');
+  const rekodN = () => q.evaluate(() => _ss.sheets.REKOD.d.length - 1);
+  const obN = () => q.evaluate(() => obGet().length);
+  const pilih = async (kelas, kod) => {
+    await q.evaluate(k => setOffense(S.offenses.filter(o => o.kod === k)[0]), kod);
+    await q.selectOption('#fKelas', kelas); await q.click('[data-act=all]'); return q.evaluate(() => S.sel.size);
+  };
+  const simpan = async () => { await q.click('#btnSave'); await q.click('#btnDoSave'); };
+  const n0 = await rekodN();
+  await q.evaluate(() => { window.MOCK_NET = 'down'; });
+  const nA = await pilih('1 AMANAH', 'R16'); await simpan(); await q.waitForTimeout(300);
+  ok(/Disimpan dalam telefon/.test(await q.textContent('#modalBody')) && await obN() === 1 && await rekodN() === n0, 'talian putus: ' + nA + ' rekod disimpan dalam telefon (peti keluar)');
+  ok(await q.isVisible('#obBar') && new RegExp(nA + ' rekod belum dihantar').test(await q.textContent('#obBar')), 'penunjuk "rekod belum dihantar" di atas skrin');
+  await q.screenshot({ path: path.join(out, 'app-peti-keluar.png') });
+  await q.click('#modalBody .btn.pri'); await q.evaluate(() => window.scrollTo(0, 0));
+  await q.screenshot({ path: path.join(out, 'app-peti-keluar-bar.png') });
+  await q.evaluate(() => { window.MOCK_NET = 'ok'; window.dispatchEvent(new Event('online')); }); await q.waitForTimeout(400);
+  ok(await obN() === 0 && await rekodN() === n0 + nA && !(await q.isVisible('#obBar')), 'talian pulih: dihantar secara automatik');
+  await q.evaluate(() => { OB_TIMEOUT = 600; window.MOCK_NET = 'lost'; });
+  const nB = await pilih('1 BESTARI', 'R16'); await simpan(); await q.waitForTimeout(1000);
+  ok(/Disimpan dalam telefon/.test(await q.textContent('#modalBody')) && await obN() === 1 && await rekodN() === n0 + nA + nB, 'tiada jawapan dalam 30 saat: kekal dalam peti keluar (pelayan sebenarnya sudah simpan)');
+  await q.click('#modalBody .btn.pri');
+  await q.evaluate(() => { window.MOCK_NET = 'ok'; flushOutbox(true); }); await q.waitForTimeout(400);
+  ok(await obN() === 0 && await rekodN() === n0 + nA + nB, 'hantar semula: tiada rekod berganda (ID simpanan unik)');
+  await q.evaluate(() => { obAdd(obItem({ kod: 'TIADA', tarikh: '2026-11-19', masa: '', lokasi: '', catatan: '', ids: [S.students[0].id] }, { kod: 'TIADA', kesalahan: 'UJIAN' })); flushOutbox(false); });
+  await q.waitForTimeout(300);
+  ok(await q.evaluate(() => !!obGet()[0].gagal && $('obBar').classList.contains('err')), 'ralat kekal: ditanda "perlu tindakan", tidak dicuba tanpa henti');
+  await q.click('#obInfo'); await q.click('[data-obdel]'); await q.waitForTimeout(100);
+  ok(await obN() === 0, 'simpanan yang gagal boleh dibuang');
+  await q.evaluate(() => { closeModal(); window.MOCK_NET = 'down'; });
+  const nC = await pilih('1 CEMERLANG', 'R14'); await simpan(); await q.waitForTimeout(300);
+  ok(await obN() === 1, 'talian putus sebelum app ditutup');
+  await q.reload(); await q.waitForSelector('#vRekod:not(.hidden)'); await q.waitForTimeout(2200);
+  ok(await obN() === 0 && await q.evaluate(() => _ss.sheets.REKOD.d.filter(r => r[8] === 'R14').length) === nC, 'app dibuka semula: rekod tertunda dihantar secara automatik');
+  await q.fill('#inTarikh', '2026-11-17'); await q.dispatchEvent('#inTarikh', 'change');
+  const nD = await pilih('2 AMANAH', 'R16');
+  await q.reload(); await q.waitForSelector('#vRekod:not(.hidden)'); await q.waitForTimeout(300);
+  ok(await q.evaluate(() => S.sel.size) === nD && await q.inputValue('#inTarikh') === '2026-11-17', 'pilihan belum disimpan dipulihkan bersama tarikh asal');
+  await ctx2.close();
+
   ok(!errs.length, 'tiada ralat JavaScript' + (errs.length ? ': ' + errs.join(' | ') : ''));
   await b.close();
   console.log(fails ? `\n${fails} ujian GAGAL` : '\nSemua ujian lulus');

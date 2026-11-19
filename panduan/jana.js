@@ -77,6 +77,7 @@ const SIMPAN = n => step(n, 'Simpan & sahkan',
   `<ol><li>Ketik <b>Simpan (bilangan)</b> di bahagian bawah skrin.</li>
    <li>Semak ringkasan (kesalahan, tarikh, bilangan murid), kemudian ketik <b>Sahkan & simpan</b>.</li></ol>
    <p>Selesai! Semua murid direkod sekaligus. Jika tersilap, ketik <b>Batal rekod ini</b> dengan segera: pilihan murid akan dipulihkan untuk dibetulkan.</p>
+   <p><b>Talian lemah?</b> Jika skrin menunjukkan <i>Disimpan dalam telefon</i>, rekod selamat dalam telefon dan akan dihantar secara automatik apabila talian pulih, walaupun app ditutup dan dibuka semula. Status <i>rekod belum dihantar</i> dipaparkan di bahagian atas skrin; ketik <b>Hantar sekarang</b> untuk mencuba segera. Jangan kosongkan data pelayar sehingga rekod dihantar.</p>
    ${tip('Murid yang sudah direkod untuk kesalahan yang sama pada tarikh yang sama <b>tidak</b> direkod dua kali, walaupun direkod oleh orang lain. SiDIA memaparkan nama murid tersebut.')}`, ['sahkan', 'selesai']);
 
 const TERKINI = (n, murid) => step(n, 'Semak rekod terkini',

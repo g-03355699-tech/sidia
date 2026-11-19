@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.6.1';
+var SIDIA_VERSION = '1.7.0';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 /** Ikon web app (dihoskan di GitHub Pages). */
@@ -600,18 +600,24 @@ function saveRecords(ctx, payload) {
   lock.waitLock(30000);
   try {
     var sh = rekodSheet_();
+    // ID simpanan daripada telefon (peti keluar): jika sudah diterima sebelum ini, jangan tulis semula
+    var cid = /^[a-z0-9]{8,24}$/.test(String(payload.cid || '')) ? String(payload.cid) : '';
     // semak pendua: murid + kesalahan + tarikh yang sama
-    var existing = {};
+    var existing = {}, sudahAda = 0;
     var last = sh.getLastRow();
     if (last >= 2) {
       var start = Math.max(2, last - 4000);
       var vals = sh.getRange(start, 1, last - start + 1, REKOD_HEADERS.length).getValues();
       vals.forEach(function (r) {
+        if (cid && String(r[R.KUMPULAN]) === cid) sudahAda++;
         if (dateStr_(r[R.TARIKH]) === tarikh && String(r[R.KOD]) === off.kod) existing[String(r[R.ID_MURID])] = 1;
       });
     }
+    if (sudahAda) {
+      return { disimpan: sudahAda, sudahDiterima: true, pendua: [], tidakDijumpai: [], batch: cid, kiraan: kiraanMurid_(ids) };
+    }
 
-    var batch = Utilities.getUuid().replace(/-/g, '').slice(0, 10);
+    var batch = cid || Utilities.getUuid().replace(/-/g, '').slice(0, 10);
     var now = new Date();
     var parts = tarikh.split('-');
     var tarikhDate = new Date(+parts[0], +parts[1] - 1, +parts[2]);

@@ -278,6 +278,13 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .lmhd b{font-size:17px;display:block;overflow-wrap:anywhere}
 .statgrid.five{grid-template-columns:repeat(5,1fr)}
 @media (max-width:480px){.statgrid.five{grid-template-columns:repeat(3,1fr)}}
+.obbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin:0 0 12px;border-radius:var(--r);background:var(--warn-soft);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 25%,transparent);font-size:14px}
+.obbar.err{background:var(--danger-soft);color:var(--danger);border-color:var(--danger-line)}
+.obbar .tx{flex:1;min-width:180px;line-height:1.4}
+.obbar .btn{min-height:44px}
+.oblist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.oblist li{border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.oblist .st{font-size:13px;color:var(--muted)}.oblist .st.err{color:var(--danger)}
 .kbd{font-size:11.5px;border:1px solid var(--line-strong);border-radius:4px;padding:0 5px;color:var(--muted);font-family:inherit}
 @media (min-width:1024px){main{padding-top:24px}}
 </style>
@@ -324,6 +331,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 </header>
 
 <main id="main">
+  <div id="obBar" class="obbar hidden" role="status"></div>
   <!-- LOG MASUK -->
   <section id="vLogin" class="hidden">
     <div class="card">
@@ -740,6 +748,8 @@ function boot() {
     if (d.warnings && d.warnings.length) toast('Amaran: ' + d.warnings[0], true);
     initRekod();
     showView('vRekod');
+    renderOutbox();
+    setTimeout(function () { flushOutbox(false); }, 1500);
   }).catch(function (e) {
     loading(false);
     var m = String(e.message || e);
@@ -766,6 +776,7 @@ function initRekod() {
   if (rekodReady) return;
   rekodReady = true;
 
+  ['inTarikh', 'inMasa', 'inLokasi', 'inCatatan'].forEach(function (id) { $(id).addEventListener('change', saveDraft); });
   $('offQ').addEventListener('input', renderOffList);
   $('offQ').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') { e.preventDefault(); var f = $('offList').querySelector('.off'); if (f) f.click(); }
@@ -1038,7 +1049,8 @@ function showSelected() {
 }
 
 function saveDraft() {
-  LS.set('draft', { ids: Array.from(S.sel.keys()), kod: S.off && S.off.kod, t: Date.now() });
+  LS.set('draft', { ids: Array.from(S.sel.keys()), kod: S.off && S.off.kod, t: Date.now(),
+    tarikh: $('inTarikh').value, masa: $('inMasa').value, lokasi: $('inLokasi').value, catatan: $('inCatatan').value });
   LS.set('last', { kod: S.off && S.off.kod, lokasi: $('inLokasi').value });
 }
 function restoreDraft() {
@@ -1046,7 +1058,14 @@ function restoreDraft() {
   S.sel.clear();
   if (d && d.ids && d.ids.length && Date.now() - d.t < 12 * 3600e3) {
     d.ids.forEach(function (id) { if (S.byId[id]) S.sel.set(id, 1); });
-    if (S.sel.size) toast('Pilihan belum disimpan dipulihkan (' + S.sel.size + ' murid)');
+    if (S.sel.size) {
+      // pulihkan juga tarikh, masa, lokasi & catatan supaya rekod tidak tersimpan dengan tarikh hari lain
+      if (d.tarikh) $('inTarikh').value = d.tarikh;
+      if (d.masa) $('inMasa').value = d.masa;
+      if (d.lokasi != null) $('inLokasi').value = d.lokasi;
+      if (d.catatan) $('inCatatan').value = d.catatan;
+      toast('Pilihan belum disimpan dipulihkan (' + S.sel.size + ' murid' + (d.tarikh ? ', ' + dmy(d.tarikh) : '') + ')');
+    }
   }
 }
 
@@ -1066,17 +1085,18 @@ function confirmSave() {
 function doSave() {
   closeModal();
   var ids = Array.from(S.sel.keys());
+  var off = S.off;
+  // 1. simpan dalam telefon (peti keluar) sebelum dihantar
+  var it = obItem({ kod: off.kod, tarikh: $('inTarikh').value, masa: $('inMasa').value,
+    lokasi: $('inLokasi').value, catatan: $('inCatatan').value.trim(), ids: ids }, off);
+  obAdd(it);
   loading(true, 'Menyimpan ' + ids.length + ' rekod…');
-  api('saveRecords', S.ctx, {
-    kod: S.off.kod, tarikh: $('inTarikh').value, masa: $('inMasa').value,
-    lokasi: $('inLokasi').value, catatan: $('inCatatan').value.trim(), ids: ids
-  }).then(function (r) {
+  // 2. hantar ke Google Sheet
+  sendItem(it).then(function (r) {
     loading(false);
-    if (r.disimpan) bumpOffUse(S.off.kod);
-    setKiraan(r.kiraan);
+    if (r.disimpan) bumpOffUse(off.kod);
     ids.forEach(function (id) { S.done[id] = 1; });
-    S.sel.clear(); saveDraft(); renderList(); updateSaveBar();
-    $('inCatatan').value = '';
+    S.sel.clear(); $('inCatatan').value = ''; saveDraft(); renderList(); updateSaveBar();
     var msg = '<div class="alert ok"><b>' + r.disimpan + ' rekod disimpan.</b></div>';
     if (r.pendua.length) msg += '<div class="alert warn">' + r.pendua.length + ' murid tidak disimpan kerana sudah direkod untuk kesalahan yang sama pada tarikh ini:<br><small>' + esc(r.pendua.join(', ')) + '</small></div>';
     if (r.tidakDijumpai.length) msg += '<div class="alert err">' + r.tidakDijumpai.length + ' ID murid tidak dijumpai dalam senarai.</div>';
@@ -1086,9 +1106,125 @@ function doSave() {
     if (r.batch) $('btnUndo').onclick = function () { undoBatch(r.batch, ids); };
   }).catch(function (e) {
     loading(false);
-    toast('Gagal simpan: ' + errMsg(e) + '. Pilihan anda masih disimpan — cuba lagi.', true);
+    if (obIsTransient(e)) {
+      // kekal dalam peti keluar: akan dihantar semula secara automatik
+      ids.forEach(function (id) { S.done[id] = 1; });
+      S.sel.clear(); $('inCatatan').value = ''; saveDraft(); renderList(); updateSaveBar();
+      modal('<h3>Disimpan dalam telefon</h3><div class="alert warn">' + ic('alert', 'sm') + ' Talian lemah atau tiada jawapan daripada pelayan. <b>' + ids.length + ' rekod</b> disimpan dalam telefon ini dan akan <b>dihantar secara automatik</b> apabila talian pulih.</div>' +
+        '<p class="muted" style="margin:0">Jangan kosongkan data pelayar sehingga rekod dihantar. Status dipaparkan di bahagian atas skrin.</p>' +
+        '<div class="actions"><button class="btn pri" onclick="closeModal()">Rekod seterusnya</button></div>');
+    } else {
+      obRemove(it.cid); // ralat kekal (cth PIN atau kesalahan tidak sah): pilihan kekal di skrin
+      saveDraft();
+      toast('Gagal simpan: ' + errMsg(e) + '. Pilihan anda masih disimpan — cuba lagi.', true);
+    }
   });
 }
+
+/* ============ PETI KELUAR: rekod yang belum sampai ke pelayan ============
+ * Setiap simpanan disimpan dahulu dalam localStorage dengan ID unik (cid), kemudian dihantar.
+ * Jika talian putus atau tiada jawapan, ia dihantar semula secara automatik (semasa app dibuka,
+ * apabila talian pulih, apabila app kembali ke skrin, dan setiap minit). Pelayan menolak cid yang
+ * sudah diterima, jadi penghantaran semula tidak menyebabkan rekod berganda. */
+var OB_TIMEOUT = 30000, obInFlight = {}, obBusy = false;
+function obGet() { var l = LS.get('outbox', []); return Array.isArray(l) ? l : []; }
+function obSet(l) { LS.set('outbox', l); renderOutbox(); }
+function obAdd(it) { var l = obGet(); l.push(it); obSet(l); }
+function obRemove(cid) { obSet(obGet().filter(function (x) { return x.cid !== cid; })); }
+function obUpdate(cid, f) { obSet(obGet().map(function (x) { if (x.cid === cid) f(x); return x; })); }
+function obItem(payload, off) {
+  var cid = (Date.now().toString(36) + Math.random().toString(36).slice(2, 12)).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20);
+  payload.cid = cid;
+  var ctx = {}; for (var k in S.ctx) ctx[k] = S.ctx[k];
+  return { cid: cid, t: Date.now(), ctx: ctx, kod: off.kod, kesalahan: nice(off.kesalahan), payload: payload };
+}
+/** Ralat sementara (talian/pelayan sibuk) → cuba semula. Ralat lain (PIN, data tidak sah) → perlu tindakan pengguna. */
+function obIsTransient(e) {
+  var m = String(e && e.message || e || '');
+  if (/^(KOD_SALAH|AKSES_DITOLAK|ADMIN_DIPERLUKAN)/.test(m)) return false;
+  return (typeof navigator !== 'undefined' && navigator.onLine === false) ||
+    /TAMAT_MASA|network|connection|HTTP 0|timed? ?out|failed to fetch|offline|unable to (connect|reach)|server error|try again|too many|exceeded maximum|\block\b|kunci|sibuk|unavailable|\b50[0-9]\b/i.test(m);
+}
+function sendItem(it) {
+  return new Promise(function (res, rej) {
+    var settled = false;
+    obInFlight[it.cid] = Date.now();
+    var tm = setTimeout(function () { if (!settled) { settled = true; rej(new Error('TAMAT_MASA: tiada jawapan daripada pelayan')); } }, OB_TIMEOUT);
+    api('saveRecords', it.ctx, it.payload).then(function (r) {
+      delete obInFlight[it.cid];
+      obRemove(it.cid); setKiraan(r.kiraan);
+      if (rekodReady) renderList();
+      if (settled) { toast(r.disimpan + ' rekod tertunda berjaya dihantar'); return; } // jawapan lewat
+      settled = true; clearTimeout(tm); res(r);
+    }, function (e) {
+      delete obInFlight[it.cid];
+      if (!obIsTransient(e)) obUpdate(it.cid, function (x) { x.gagal = errMsg(e); });
+      if (settled) return;
+      settled = true; clearTimeout(tm); rej(e);
+    });
+  });
+}
+/** Hantar semua rekod dalam peti keluar. manual = pengguna menekan "Hantar sekarang" (termasuk yang gagal). */
+function flushOutbox(manual) {
+  if (obBusy || !S.user) return;
+  var l = obGet().filter(function (x) {
+    // automatik: jangan hantar semula yang masih menunggu jawapan; manual: sentiasa hantar (pelayan menolak cid berganda)
+    if (!manual && obInFlight[x.cid] && Date.now() - obInFlight[x.cid] < 2 * OB_TIMEOUT) return false;
+    return manual || !x.gagal;
+  });
+  if (!l.length) return;
+  obBusy = true; renderOutbox();
+  var ok = 0;
+  (function next(i) {
+    if (i >= l.length) { obBusy = false; renderOutbox(); if (ok) toast(ok + ' rekod tertunda berjaya dihantar'); return; }
+    var it = l[i];
+    if (manual && it.gagal) {
+      // cuba semula dengan PIN semasa jika pengguna yang sama (cth PIN telah ditukar)
+      if (it.ctx.nama === S.ctx.nama && it.ctx.peranan === S.ctx.peranan) { it.ctx.pin = S.ctx.pin; it.ctx.adminPin = S.ctx.adminPin; }
+      obUpdate(it.cid, function (x) { delete x.gagal; x.ctx = it.ctx; });
+    }
+    sendItem(it).then(function (r) { ok += r.disimpan; next(i + 1); }, function (e) {
+      if (obIsTransient(e)) { obBusy = false; renderOutbox(); if (manual) toast('Masih tiada sambungan. Rekod akan dihantar secara automatik.', true); if (ok) toast(ok + ' rekod tertunda berjaya dihantar'); return; }
+      next(i + 1);
+    });
+  })(0);
+}
+function renderOutbox() {
+  var l = obGet(), bar = $('obBar');
+  if (!bar) return;
+  if (!l.length) { bar.className = 'obbar hidden'; bar.innerHTML = ''; return; }
+  var n = l.reduce(function (a, x) { return a + (x.payload.ids || []).length; }, 0);
+  var gagal = l.filter(function (x) { return x.gagal; }).length;
+  bar.className = 'obbar' + (gagal ? ' err' : '');
+  bar.innerHTML = ic(gagal ? 'alert' : 'clock') + '<span class="tx"><b>' + n + ' rekod belum dihantar</b> (' + l.length + ' simpanan)' +
+    (obBusy ? ' · menghantar…' : gagal ? ' · ' + gagal + ' perlu tindakan' : ' · akan dihantar secara automatik') + '</span>' +
+    '<button class="btn sm" id="obInfo">Butiran</button><button class="btn sm pri" id="obSend"' + (obBusy ? ' disabled' : '') + '>Hantar sekarang</button>';
+  $('obSend').onclick = function () { flushOutbox(true); };
+  $('obInfo').onclick = outboxDialog;
+}
+function outboxDialog() {
+  var l = obGet();
+  if (!l.length) { closeModal(); return; }
+  modal('<h3>Rekod belum dihantar</h3><p class="muted" style="margin:0 0 10px">Rekod ini disimpan dalam telefon ini sahaja sehingga berjaya dihantar ke Google Sheet.</p><ul class="oblist">' +
+    l.map(function (x) {
+      var p = x.payload;
+      return '<li><div><span class="kd sev-x">' + esc(x.kod) + '</span> <b>' + esc(x.kesalahan || '') + '</b></div>' +
+        '<div class="st">' + dmy(p.tarikh) + (p.masa ? ' ' + esc(p.masa) : '') + ' · ' + p.ids.length + ' murid · ' + esc(x.ctx.nama || '') + '</div>' +
+        (x.gagal ? '<div class="st err">' + ic('alert', 'sm') + ' Gagal: ' + esc(x.gagal) + '</div>' : '<div class="st">Menunggu talian</div>') +
+        '<div class="tools" style="margin:0"><button class="btn sm danger" data-obdel="' + esc(x.cid) + '">Buang</button></div></li>';
+    }).join('') + '</ul><div class="actions"><button class="btn" onclick="closeModal()">Tutup</button><button class="btn pri" id="obSend2">Hantar sekarang</button></div>');
+  $('obSend2').onclick = function () { closeModal(); flushOutbox(true); };
+  $('modalBody').querySelectorAll('[data-obdel]').forEach(function (b) {
+    b.onclick = function () {
+      if (!confirm('Buang simpanan ini? Rekod tidak akan dihantar ke Google Sheet.')) return;
+      obRemove(b.dataset.obdel); outboxDialog();
+    };
+  });
+}
+window.addEventListener('online', function () { flushOutbox(false); });
+document.addEventListener('visibilitychange', function () { if (!document.hidden) flushOutbox(false); });
+setInterval(function () { if (obGet().length) flushOutbox(false); }, 60000);
+
 function undoBatch(batch, ids) {
   closeModal(); loading(true, 'Membatalkan…');
   api('deleteBatch', S.ctx, batch).then(function (r) {

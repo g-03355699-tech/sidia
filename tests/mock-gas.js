@@ -51,5 +51,9 @@ window.google = { script: { host: { close() { window.CLOSED = 1; } }, get run() 
     if (k === 'withSuccessHandler') return h => { ok = h; return o; };
     if (k === 'withFailureHandler') return h => { fail = h; return o; };
     return function () { const a = JSON.parse(JSON.stringify(Array.from(arguments)));
-      setTimeout(() => { try { ok(JSON.parse(JSON.stringify(window[k].apply(null, a)) ?? 'null')); } catch (e) { fail(e); } }, 30); };
+      // MOCK_NET: 'down' = gagal rangkaian, 'hang' = tiada jawapan, 'lost' = pelayan menyimpan tetapi jawapan hilang
+      const net = window.MOCK_NET || 'ok';
+      if (net === 'down') { setTimeout(() => fail(new Error('NetworkError: Connection failure due to HTTP 0')), 30); return; }
+      if (net === 'hang') return;
+      setTimeout(() => { try { const r = JSON.parse(JSON.stringify(window[k].apply(null, a)) ?? 'null'); if (net !== 'lost') ok(r); } catch (e) { if (net !== 'lost') fail(e); } }, 30); };
   } }); return o; } } };

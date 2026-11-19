@@ -144,5 +144,13 @@ Extension Chrome dalam folder [`infomurid-extension/`](infomurid-extension/) mem
 
 Panduan dijana daripada web app sebenar. Selepas paparan berubah, jana semula dengan `node panduan/jana.js` (perlu `cd tests && npm install` sekali).
 
+## Talian lemah: peti keluar
+Setiap simpanan disimpan dahulu dalam telefon (localStorage) dengan ID unik, kemudian dihantar ke Google Sheet.
+- Jika talian putus atau tiada jawapan dalam 30 saat, skrin memaparkan **Disimpan dalam telefon** dan guru boleh terus merekod.
+- Rekod tertunda **dihantar semula secara automatik**: apabila talian pulih, apabila app dibuka semula (walaupun selepas ditutup), apabila app kembali ke skrin, dan setiap minit. Status *rekod belum dihantar* dipaparkan di bahagian atas skrin dengan butang **Hantar sekarang** dan **Butiran**.
+- Pelayan menolak ID simpanan yang sudah diterima, jadi rekod **tidak berganda** walaupun dihantar dua kali (cth skrin tergantung tetapi rekod sebenarnya sudah sampai).
+- Ralat kekal (cth PIN telah ditukar, kesalahan dipadam) tidak dicuba tanpa henti: simpanan ditanda *perlu tindakan* dan boleh dihantar semula atau dibuang melalui **Butiran**.
+- Pilihan murid yang belum disimpan dipulihkan bersama **tarikh, masa, lokasi dan catatan** asal.
+
 ## Privasi
 Setiap sekolah menyimpan data dalam salinan Google Sheet sendiri, dalam Google Drive sekolah masing-masing. Pembangun SiDIA tidak boleh mengakses data mana-mana sekolah.

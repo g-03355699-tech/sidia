@@ -209,53 +209,53 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   const nD = await pilih('2 AMANAH', 'R16');
   await q.reload(); await q.waitForSelector('#vRekod:not(.hidden)'); await q.waitForTimeout(300);
   ok(await q.evaluate(() => S.sel.size) === nD && await q.inputValue('#inTarikh') === '2026-11-17', 'pilihan belum disimpan dipulihkan bersama tarikh asal');
-  // ---------- khidmat bakti ----------
+  // ---------- amalan baik ----------
   await q.evaluate(() => { window.MOCK_NET = 'ok'; });
   await q.selectOption('#fKelas', '2 BESTARI'); await q.click('[data-act=all]');
   const selRekod = await q.evaluate(() => S.sel.size);
-  await q.click('nav.tabs button[data-v=vKhidmat]'); await q.waitForSelector('#kbList .off');
-  ok(await q.isVisible('#kbForm') && await q.locator('#kbList .off').count() === 17, 'guru: tab Khidmat dengan 17 jenis khidmat bakti lalai');
-  ok(await q.isVisible('#vKhidmat #pickCard') && await q.evaluate(() => S.sel.size) === 0, 'pemilih murid dikongsi, pilihan berasingan daripada rekod kesalahan');
-  await q.click('#kbList [data-kb=KB01]');
-  ok(/Gotong-royong/i.test(await q.textContent('#kbChosen')), 'pilih jenis KB01');
+  await q.click('nav.tabs button[data-v=vAmalan]'); await q.waitForSelector('#abList .off');
+  ok(await q.isVisible('#abForm') && await q.locator('#abList .off').count() === 18, 'guru: tab Amalan Baik dengan 18 jenis amalan baik lalai');
+  ok(await q.isVisible('#vAmalan #pickCard') && await q.evaluate(() => S.sel.size) === 0, 'pemilih murid dikongsi, pilihan berasingan daripada rekod kesalahan');
+  await q.click('#abList [data-ab=AB01]');
+  ok(/Memulangkan barang tercicir/i.test(await q.textContent('#abChosen')), 'pilih jenis AB01');
   await q.selectOption('#fKelas', '3 AMANAH'); await q.click('[data-act=all]');
   const nK = await q.evaluate(() => S.sel.size);
-  await q.screenshot({ path: path.join(out, 'app-khidmat.png'), fullPage: true });
+  await q.screenshot({ path: path.join(out, 'app-amalan.png'), fullPage: true });
   await q.click('#btnSave'); await q.click('#btnDoSaveKb'); await q.waitForTimeout(400);
-  ok(new RegExp(nK + ' rekod khidmat bakti disimpan').test(await q.textContent('#modalBody')) && await q.evaluate(() => _ss.sheets.REKOD_KHIDMAT.d.length - 1) === nK, nK + ' rekod khidmat bakti disimpan ke tab REKOD_KHIDMAT');
+  ok(new RegExp(nK + ' rekod amalan baik disimpan').test(await q.textContent('#modalBody')) && await q.evaluate(() => _ss.sheets.REKOD_AMALAN.d.length - 1) === nK, nK + ' rekod amalan baik disimpan ke tab REKOD_AMALAN');
   await q.click('#modalBody .btn.pri'); await q.waitForTimeout(300);
-  ok(/Gotong-royong/i.test(await q.textContent('#kbRecent')) && /\+2 mata/.test(await q.textContent('#kbRecent')), 'rekod khidmat bakti terkini dipaparkan');
-  ok(await q.evaluate(() => KBD.rumah.reduce((a, x) => a + x.mata, 0)) === nK * 2, 'mata khidmat bakti mengikut rumah (tahun semasa)');
+  ok(/Memulangkan barang tercicir/i.test(await q.textContent('#abRecent')) && /\+3 mata/.test(await q.textContent('#abRecent')), 'rekod amalan baik terkini dipaparkan');
+  ok(await q.evaluate(() => ABD.rumah.reduce((a, x) => a + x.mata, 0)) === nK * 3, 'mata amalan baik mengikut rumah (tahun semasa)');
   await q.click('[data-act=all]'); await q.click('#btnSave'); await q.click('#btnDoSaveKb'); await q.waitForTimeout(400);
-  ok(/0 rekod khidmat bakti disimpan/.test(await q.textContent('#modalBody')), 'khidmat bakti berganda (murid + jenis + tarikh) dihalang');
+  ok(/0 rekod amalan baik disimpan/.test(await q.textContent('#modalBody')), 'amalan baik berganda (murid + jenis + tarikh) dihalang');
   await q.click('#modalBody .btn.pri');
-  await q.click('#btnKbJenis'); await q.click('#kbjBaru');
-  ok(await q.inputValue('#kjKod') === 'KB18', 'kod jenis baharu dicadangkan (KB18)');
+  await q.click('#btnAbJenis'); await q.click('#abjBaru');
+  ok(await q.inputValue('#kjKod') === 'AB19', 'kod jenis baharu dicadangkan (AB19)');
   await q.fill('#kjNama', 'MEMBANTU PROGRAM NILAM'); await q.fill('#kjMata', '4'); await q.click('#kjSimpan'); await q.waitForTimeout(400);
-  ok(await q.evaluate(() => KBD.jenis.some(j => j.kod === 'KB18' && j.mata === 4)) && await q.locator('#kbList [data-kb=KB18]').count() === 1, 'guru menambah jenis khidmat bakti baharu');
+  ok(await q.evaluate(() => ABD.jenis.some(j => j.kod === 'AB19' && j.mata === 4)) && await q.locator('#abList [data-ab=AB19]').count() === 1, 'guru menambah jenis amalan baik baharu');
   await q.evaluate(() => closeModal());
   await q.click('nav.tabs button[data-v=vRekod]'); await q.waitForTimeout(200);
   ok(await q.isVisible('#vRekod #pickCard') && await q.evaluate(() => S.sel.size) === selRekod, 'kembali ke Rekod: pilihan kesalahan dikekalkan');
-  await q.click('nav.tabs button[data-v=vKhidmat]'); await q.waitForTimeout(300);
+  await q.click('nav.tabs button[data-v=vAmalan]'); await q.waitForTimeout(300);
   await q.evaluate(() => { window.MOCK_NET = 'down'; });
-  await q.click('#kbList [data-kb=KB03]').catch(() => {}); await q.evaluate(() => setKbJenis(KBD.jenis.filter(j => j.kod === 'KB03')[0]));
+  await q.click('#abList [data-ab=AB03]').catch(() => {}); await q.evaluate(() => setAbJenis(ABD.jenis.filter(j => j.kod === 'AB03')[0]));
   await q.selectOption('#fKelas', '3 BESTARI'); await q.click('[data-act=all]'); const nK2 = await q.evaluate(() => S.sel.size);
   await q.click('#btnSave'); await q.click('#btnDoSaveKb'); await q.waitForTimeout(300);
-  ok(/Disimpan dalam telefon/.test(await q.textContent('#modalBody')) && await q.evaluate(() => obGet()[0].fn) === 'saveKhidmat', 'khidmat bakti juga melalui peti keluar semasa talian putus');
+  ok(/Disimpan dalam telefon/.test(await q.textContent('#modalBody')) && await q.evaluate(() => obGet()[0].fn) === 'saveAmalan', 'amalan baik juga melalui peti keluar semasa talian putus');
   await q.evaluate(() => { closeModal(); window.MOCK_NET = 'ok'; window.dispatchEvent(new Event('online')); }); await q.waitForTimeout(500);
-  ok(await q.evaluate(() => obGet().length) === 0 && await q.evaluate(() => _ss.sheets.REKOD_KHIDMAT.d.length - 1) === nK + nK2, 'khidmat bakti tertunda dihantar apabila talian pulih');
+  ok(await q.evaluate(() => obGet().length) === 0 && await q.evaluate(() => _ss.sheets.REKOD_AMALAN.d.length - 1) === nK + nK2, 'amalan baik tertunda dihantar apabila talian pulih');
   // pengawas: lihat sahaja
   await q.click('#hdrWho'); await q.waitForSelector('#vLogin:not(.hidden)');
   await q.fill('#inNama', 'Pengawas Ujian'); await q.selectOption('#inPeranan', 'Pengawas'); await q.fill('#inPin', '5678'); await q.click('#btnLogin'); await q.waitForSelector('#vRekod:not(.hidden)');
-  await q.click('nav.tabs button[data-v=vKhidmat]'); await q.waitForSelector('#kbRecent .batch'); await q.waitForTimeout(200);
+  await q.click('nav.tabs button[data-v=vAmalan]'); await q.waitForSelector('#abRecent .batch'); await q.waitForTimeout(200);
   ok(await q.evaluate(() => S.selD ? S.selD.size === 0 : S.sel.size === 0), 'draf guru tidak dipulihkan kepada pengawas');
-  ok(!(await q.isVisible('#kbForm')) && await q.isVisible('#kbViewOnly') && !(await q.isVisible('#saveBar')) && !(await q.isVisible('#vKhidmat #pickCard')), 'pengawas: tab Khidmat lihat sahaja (tiada borang & bar Simpan)');
-  ok(await q.locator('#kbRecent .batch').count() >= 2 && await q.locator('#kbRecent [data-kbdel]').count() === 0, 'pengawas melihat rekod khidmat bakti tanpa butang padam');
-  await q.screenshot({ path: path.join(out, 'app-khidmat-pengawas.png') });
+  ok(!(await q.isVisible('#abForm')) && await q.isVisible('#abViewOnly') && !(await q.isVisible('#saveBar')) && !(await q.isVisible('#vAmalan #pickCard')), 'pengawas: tab Amalan Baik lihat sahaja (tiada borang & bar Simpan)');
+  ok(await q.locator('#abRecent .batch').count() >= 2 && await q.locator('#abRecent [data-abdel]').count() === 0, 'pengawas melihat rekod amalan baik tanpa butang padam');
+  await q.screenshot({ path: path.join(out, 'app-amalan-pengawas.png') });
   ok(await q.evaluate(() => { const c = { nama: 'Pengawas Ujian', peranan: 'Pengawas', pin: '5678' }; let a = 0;
-    try { saveKhidmat(c, { kod: 'KB01', tarikh: '2026-11-19', ids: [S.students[0].id] }); } catch (e) { a += /Pengawas tidak boleh/.test(e.message); }
-    try { saveJenisKhidmat(c, { kod: 'KB99', nama: 'UJIAN', mata: 1 }, ''); } catch (e) { a += /Pengawas tidak boleh/.test(e.message); }
-    return a === 2; }), 'pelayan: pengawas tidak boleh menambah rekod atau jenis khidmat bakti');
+    try { saveAmalan(c, { kod: 'AB01', tarikh: '2026-11-19', ids: [S.students[0].id] }); } catch (e) { a += /Pengawas tidak boleh/.test(e.message); }
+    try { saveJenisAmalan(c, { kod: 'AB99', nama: 'UJIAN', mata: 1 }, ''); } catch (e) { a += /Pengawas tidak boleh/.test(e.message); }
+    return a === 2; }), 'pelayan: pengawas tidak boleh menambah rekod atau jenis amalan baik');
   await q.click('nav.tabs button[data-v=vRekod]'); await q.waitForTimeout(200);
   ok(await q.isVisible('#vRekod #pickCard') && await q.isVisible('#saveBar'), 'pengawas: skrin Rekod kesalahan masih berfungsi');
   await ctx2.close();

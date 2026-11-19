@@ -48,15 +48,15 @@ module.exports = async function tangkap() {
   await p.click('nav.tabs button[data-v=vTerkini]'); await p.waitForTimeout(500);
   await p.evaluate(() => { const d = document.querySelector('#recentList details'); if (d) d.open = true; });
   await top(); await shot('terkini');
-  // khidmat bakti
-  await p.click('nav.tabs button[data-v=vKhidmat]'); await p.waitForSelector('#kbList .off');
-  await top(); await shot('khidmat');
-  await p.click('#kbList [data-kb=KB01]'); await p.selectOption('#fKelas', '4 BESTARI'); await p.click('[data-act=all]');
-  await p.click('#btnSave'); await p.waitForTimeout(150); await shot('khidmat-sahkan');
+  // amalan baik
+  await p.click('nav.tabs button[data-v=vAmalan]'); await p.waitForSelector('#abList .off');
+  await top(); await shot('amalan');
+  await p.click('#abList [data-ab=AB01]'); await p.selectOption('#fKelas', '4 BESTARI'); await p.click('[data-act=all]');
+  await p.click('#btnSave'); await p.waitForTimeout(150); await shot('amalan-sahkan');
   await p.click('#btnDoSaveKb'); await p.waitForTimeout(500); await p.click('#modalBody .btn.pri');
   await p.selectOption('#fKelas', '');
-  await p.evaluate(() => { const d = document.querySelector('#kbRecent'); window.scrollTo(0, d.getBoundingClientRect().top + window.scrollY - 330); });
-  await shot('khidmat-rumah');
+  await p.evaluate(() => { const d = document.querySelector('#abRecent'); window.scrollTo(0, d.getBoundingClientRect().top + window.scrollY - 330); });
+  await shot('amalan-rumah');
   await p.click('nav.tabs button[data-v=vRekod]');
   // admin
   await p.click('nav.tabs button[data-v=vAdmin]'); await top(); await shot('admin-pin-masuk');
@@ -94,7 +94,7 @@ module.exports = async function tangkap() {
   await p.evaluate(() => { const f = document.querySelector('#list .item'); }); 
   await p.click('#btnSave'); await p.click('#btnDoSave'); await p.waitForTimeout(500); await p.click('text=Rekod seterusnya');
   await p.click('nav.tabs button[data-v=vTerkini]'); await p.waitForTimeout(500); await top(); await shot('pengawas-terkini');
-  await p.click('nav.tabs button[data-v=vKhidmat]'); await p.waitForSelector('#kbViewOnly:not(.hidden)'); await p.waitForTimeout(300); await top(); await shot('pengawas-khidmat');
+  await p.click('nav.tabs button[data-v=vAmalan]'); await p.waitForSelector('#abViewOnly:not(.hidden)'); await p.waitForTimeout(300); await top(); await shot('pengawas-amalan');
 
   // wizard (komputer)
   const w = await b.newPage({ viewport: { width: 920, height: 660 }, deviceScaleFactor: 2 });

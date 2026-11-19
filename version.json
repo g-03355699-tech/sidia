@@ -1,10 +1,11 @@
 {
-  "version": "1.6.1",
-  "ref": "cbce43e08cac00d662083dfb7b82054c13938d8e",
-  "tarikh": "2026-11-18",
+  "version": "1.8.0",
+  "ref": "30de1f757e81d84cc1568e20b0973eb8fe743a2e",
+  "tarikh": "2026-11-19",
   "nota": [
-    "Jumlah rekod kesalahan di sebelah nama murid kini dua lencana bulat: tahun semasa (hijau, merah jika lebih 3) dan keseluruhan (biru, jingga jika lebih 10)",
-    "Laporan Kesalahan Murid: cari murid, lihat semua kesalahannya, muat turun PDF atau CSV (dari 1.6.0)",
-    "Sunting senarai kesalahan di web app untuk guru, warden, guru disiplin dan admin (dari 1.5.0)"
+    "Tab baharu Amalan Baik: rekod amalan baik murid (mata merit) secara pukal oleh guru, warden dan admin; pengawas boleh melihat",
+    "18 jenis amalan baik lalai; guru dan admin boleh menambah jenis sendiri. Mata amalan baik mengikut rumah dipaparkan",
+    "Talian lemah? Rekod disimpan dahulu dalam telefon dan dihantar semula secara automatik, tanpa rekod berganda",
+    "Pilihan murid yang belum disimpan tidak lagi dipulihkan kepada pengguna lain pada telefon yang sama"
   ]
 }

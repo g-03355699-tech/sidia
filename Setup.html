@@ -101,7 +101,7 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
       <label class="f" for="namaSekolah">Nama sekolah *</label>
       <input type="text" id="namaSekolah" placeholder="cth: SMKA Sheikh Abdul Malek">
       <label class="f" style="margin-top:16px">PIN akses (4–8 digit, setiap peranan berbeza)</label>
-      <div class="grid3">
+      <div class="grid2">
         <div>
           <label class="f" for="kodGuru">PIN Guru & Warden</label>
           <input type="text" id="kodGuru" inputmode="numeric" maxlength="8" placeholder="cth: 4821" autocomplete="off">
@@ -111,11 +111,15 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
           <input type="text" id="kodMurid" inputmode="numeric" maxlength="8" placeholder="cth: 2650" autocomplete="off">
         </div>
         <div>
+          <label class="f" for="kodMt">PIN Majlis Tertinggi</label>
+          <input type="text" id="kodMt" inputmode="numeric" maxlength="8" placeholder="cth: 5193" autocomplete="off">
+        </div>
+        <div>
           <label class="f" for="kodAdmin">PIN Admin</label>
           <input type="text" id="kodAdmin" inputmode="numeric" maxlength="8" placeholder="cth: 7390" autocomplete="off">
         </div>
       </div>
-      <div class="hint">Pengawas hanya boleh merekod dan melihat rekod sendiri. Admin (Guru Disiplin / PK HEM) membuka laporan, tetapan dan boleh menukar PIN dari web app (tab <b>Admin</b>). PIN boleh dibiarkan kosong jika web app hanya dibuka kepada akaun sekolah, tetapi PIN Admin sangat disyorkan.</div>
+      <div class="hint">Pengawas hanya boleh merekod dan melihat rekod sendiri. Majlis Tertinggi (pengawas kanan) boleh merekod dan melihat laporan. Admin (Guru Disiplin / PK HEM) membuka laporan, tetapan dan boleh menukar PIN dari web app (tab <b>Admin</b>). PIN boleh dibiarkan kosong jika web app hanya dibuka kepada akaun sekolah, tetapi PIN Admin sangat disyorkan.</div>
       <label class="f" for="lokasi">Lokasi (pisahkan dengan koma)</label>
       <input type="text" id="lokasi">
     </section>
@@ -269,7 +273,7 @@ $('btnNext').onclick = function () {
 
 /* ---------- 1. sekolah ---------- */
 function saveSchool() {
-  var o = { NAMA_SEKOLAH: $('namaSekolah').value.trim(), KOD_GURU: $('kodGuru').value.trim(), KOD_MURID: $('kodMurid').value.trim(), KOD_ADMIN: $('kodAdmin').value.trim(), LOKASI: $('lokasi').value.trim() };
+  var o = { NAMA_SEKOLAH: $('namaSekolah').value.trim(), KOD_GURU: $('kodGuru').value.trim(), KOD_MURID: $('kodMurid').value.trim(), KOD_MT: $('kodMt').value.trim(), KOD_ADMIN: $('kodAdmin').value.trim(), LOKASI: $('lokasi').value.trim() };
   if (!o.NAMA_SEKOLAH) { $('namaSekolah').focus(); return Promise.reject(new Error('Sila isi nama sekolah.')); }
   loading(true, 'Menyimpan…');
   return api('wizSaveSchool', o).then(function () { loading(false); Object.assign(W.state.tetapan, o); });
@@ -595,7 +599,7 @@ function renderDeploy() {
   $('btnWa').href = 'https://wa.me/?text=' + encodeURIComponent(msg('guru & warden', t.KOD_GURU));
   $('btnWa').textContent = 'WhatsApp: guru & warden';
   $('btnWa2').href = 'https://wa.me/?text=' + encodeURIComponent(msg('pengawas', t.KOD_MURID));
-  $('codeInfo').innerHTML = 'PIN Guru & Warden: <b>' + esc(t.KOD_GURU || '—') + '</b><br>PIN Murid (Pengawas): <b>' + esc(t.KOD_MURID || '—') + '</b><br>' +
+  $('codeInfo').innerHTML = 'PIN Guru & Warden: <b>' + esc(t.KOD_GURU || '—') + '</b><br>PIN Murid (Pengawas): <b>' + esc(t.KOD_MURID || '—') + '</b><br>PIN Majlis Tertinggi: <b>' + esc(t.KOD_MT || '—') + '</b><br>' +
     'PIN Admin (rahsia): <b>' + esc(t.KOD_ADMIN || '—') + '</b><br><small>PIN boleh ditukar oleh admin dalam web app: tab <b>Admin › PIN akses</b>.</small>';
   $('qr').innerHTML = '';
   if (typeof QRCode !== 'undefined') new QRCode($('qr'), { text: url, width: 178, height: 178, correctLevel: QRCode.CorrectLevel.M });
@@ -658,6 +662,7 @@ api('wizGetState').then(function (st) {
   $('namaSekolah').value = t.NAMA_SEKOLAH || '';
   $('kodGuru').value = t.KOD_GURU || '';
   $('kodMurid').value = t.KOD_MURID || '';
+  $('kodMt').value = t.KOD_MT || '';
   $('kodAdmin').value = t.KOD_ADMIN || '';
   $('lokasi').value = t.LOKASI || '';
   if (t.NAMA_SEKOLAH) W.done[1] = 1;

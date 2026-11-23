@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.8.0';
+var SIDIA_VERSION = '1.9.0';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 /** Ikon web app (dihoskan di GitHub Pages). */
@@ -76,9 +76,10 @@ var DEFAULT_TETAPAN = [
   ['NAMA_SEKOLAH', 'SMK Contoh', 'Nama sekolah anda'],
   ['KOD_GURU', '', 'PIN untuk Guru, Warden & Guru Disiplin. Tukar melalui web app (Laporan › PIN akses) atau wizard'],
   ['KOD_MURID', '', 'PIN untuk Pengawas / murid bertugas'],
+  ['KOD_MT', '', 'PIN Majlis Tertinggi (pengawas kanan): merekod dan melihat laporan'],
   ['KOD_ADMIN', '', 'PIN Admin: laporan, padam rekod orang lain, tukar PIN. Jika kosong, semua pengguna boleh lihat laporan'],
   ['KOD_AKSES', '', 'Lama (sebelum v1.2). Digunakan untuk Guru & Pengawas hanya jika KOD_GURU / KOD_MURID kosong'],
-  ['PERANAN', 'Guru,Warden,Pengawas,Guru Disiplin,Admin', 'Senarai peranan (pisahkan dengan koma)'],
+  ['PERANAN', 'Guru,Warden,Pengawas,Majlis Tertinggi,Guru Disiplin,Admin', 'Senarai peranan (pisahkan dengan koma)'],
   ['PERANAN_ADMIN', 'Admin,Guru Disiplin', 'Peranan dalam tab PENGGUNA yang dianggap admin'],
   ['LOKASI', 'Surau,Asrama,Kelas,Dewan Makan,Kantin,Padang,Pintu Pagar,Dewan', 'Senarai lokasi (pisahkan dengan koma)'],
   ['HAD_PADAM_JAM', '24', 'Pengguna biasa boleh padam rekod sendiri dalam tempoh ini (jam)'],
@@ -349,7 +350,7 @@ function wizGetState() {
   return {
     tetapan: {
       NAMA_SEKOLAH: s.NAMA_SEKOLAH === 'SMK Contoh' ? '' : s.NAMA_SEKOLAH,
-      KOD_GURU: s.KOD_GURU || s.KOD_AKSES, KOD_MURID: s.KOD_MURID || s.KOD_AKSES, KOD_ADMIN: s.KOD_ADMIN,
+      KOD_GURU: s.KOD_GURU || s.KOD_AKSES, KOD_MURID: s.KOD_MURID || s.KOD_AKSES, KOD_MT: s.KOD_MT, KOD_ADMIN: s.KOD_ADMIN,
       LOKASI: s.LOKASI, PERANAN: s.PERANAN
     },
     murid: murid,
@@ -366,7 +367,7 @@ function wizSaveSchool(o) {
   o = o || {};
   var nama = String(o.NAMA_SEKOLAH || '').trim();
   if (!nama) throw new Error('Sila isi nama sekolah.');
-  savePins_({ guru: o.KOD_GURU, murid: o.KOD_MURID, admin: o.KOD_ADMIN }, false);
+  savePins_({ guru: o.KOD_GURU, murid: o.KOD_MURID, mt: o.KOD_MT, admin: o.KOD_ADMIN }, false);
   ['NAMA_SEKOLAH', 'LOKASI'].forEach(function (k) {
     if (o[k] != null) setSetting_(k, String(o[k]).trim());
   });
@@ -566,7 +567,7 @@ function getConfig() {
     namaSekolah: s.NAMA_SEKOLAH || '',
     peranan: splitList_(s.PERANAN || 'Guru,Warden,Pengawas'),
     lokasi: splitList_(s.LOKASI || ''),
-    needPin: !users.length && !!(pinFor_(s, 'guru') || pinFor_(s, 'murid') || pinFor_(s, 'admin')),
+    needPin: !users.length && !!(pinFor_(s, 'guru') || pinFor_(s, 'murid') || pinFor_(s, 'mt') || pinFor_(s, 'admin')),
     userListMode: users.length > 0,
     email: email,
     listedUser: me
@@ -756,7 +757,7 @@ function deleteBatch(ctx, batch, idMurid) {
 /** Laporan untuk web app (termasuk data mentah untuk eksport CSV). */
 function getReport(ctx, from, to) {
   var user = auth_(ctx);
-  if (!user.isAdmin) throw new Error('ADMIN_DIPERLUKAN: Laporan memerlukan kod admin.');
+  if (!user.canReport) throw new Error('ADMIN_DIPERLUKAN: Laporan hanya untuk Admin dan Majlis Tertinggi.');
   return buildReport_(from, to);
 }
 
@@ -897,11 +898,13 @@ function writeReportSheet_(rep) {
 function groupOf_(peranan) {
   var p = lower_(peranan);
   if (/admin/.test(p)) return 'admin';
+  if (/majlis tertinggi|^mt$/.test(p)) return 'mt';   // mesti sebelum 'pengawas'
   if (/pengawas|murid|pelajar|ketua|prefect|exco/.test(p)) return 'murid';
   return 'guru';
 }
 function pinFor_(s, group) {
   if (group === 'admin') return String(s.KOD_ADMIN || '').trim();
+  if (group === 'mt') return String(s.KOD_MT || '').trim();
   var k = group === 'murid' ? s.KOD_MURID : s.KOD_GURU;
   return String(k || s.KOD_AKSES || '').trim();
 }
@@ -926,9 +929,12 @@ function auth_(ctx) {
     var peranan = String(ctx.peranan || '').trim().slice(0, 40);
     var group = groupOf_(peranan);
     var pin = pinFor_(s, group);
-    var anyPin = pinFor_(s, 'guru') || pinFor_(s, 'murid') || kodAdmin;
+    var anyPin = pinFor_(s, 'guru') || pinFor_(s, 'murid') || pinFor_(s, 'mt') || kodAdmin;
     if (group === 'admin' && !kodAdmin && anyPin) {
       throw new Error('KOD_SALAH: PIN Admin belum ditetapkan. Log masuk sebagai Guru, atau tetapkan KOD_ADMIN dalam tab TETAPAN.');
+    }
+    if (group === 'mt' && !pinFor_(s, 'mt') && anyPin) {
+      throw new Error('KOD_SALAH: PIN Majlis Tertinggi belum ditetapkan. Minta admin menetapkannya di Admin › PIN akses.');
     }
     if (pin && String(ctx.pin || '').trim() !== pin) {
       throw new Error('KOD_SALAH: PIN tidak sah untuk peranan ' + (peranan || 'ini') + '.');
@@ -937,6 +943,7 @@ function auth_(ctx) {
     user.isAdmin = group === 'admin' || (kodAdmin ? adminByPin : true);
   }
   user.pinMode = !users.length;
+  user.canReport = user.isAdmin || user.group === 'mt';   // Majlis Tertinggi boleh melihat laporan
   return user;
 }
 
@@ -945,7 +952,7 @@ function getPins(ctx) {
   var user = auth_(ctx);
   if (!user.isAdmin) throw new Error('ADMIN_DIPERLUKAN: Hanya admin boleh melihat PIN.');
   var s = getSettings_();
-  return { guru: pinFor_(s, 'guru'), murid: pinFor_(s, 'murid'), admin: pinFor_(s, 'admin') };
+  return { guru: pinFor_(s, 'guru'), murid: pinFor_(s, 'murid'), mt: pinFor_(s, 'mt'), admin: pinFor_(s, 'admin') };
 }
 
 /** Admin: tukar PIN. pins = {guru, murid, admin}. Semua pengguna kumpulan itu perlu log masuk semula. */
@@ -974,7 +981,7 @@ function getAdminInfo(ctx) {
   try { terkini = latestRelease_().version; } catch (e) {}
   return {
     tetapan: { NAMA_SEKOLAH: s.NAMA_SEKOLAH, LOKASI: s.LOKASI, HAD_PADAM_JAM: s.HAD_PADAM_JAM },
-    pins: { guru: pinFor_(s, 'guru'), murid: pinFor_(s, 'murid'), admin: pinFor_(s, 'admin') },
+    pins: { guru: pinFor_(s, 'guru'), murid: pinFor_(s, 'murid'), mt: pinFor_(s, 'mt'), admin: pinFor_(s, 'admin') },
     stat: { murid: murid, kelas: Object.keys(kelas).length, rumah: Object.keys(rumah).sort(), rekod: rekod, kesalahan: readOffenses_().length },
     versi: SIDIA_VERSION, versiTerkini: terkini,
     sheetUrl: SpreadsheetApp.getActive().getUrl(),
@@ -1002,16 +1009,20 @@ function adminKemasKini(ctx) {
 }
 
 function savePins_(p, adminRequired) {
-  var v = { guru: String(p.guru || '').trim(), murid: String(p.murid || '').trim(), admin: String(p.admin || '').trim() };
-  var label = { guru: 'Guru & Warden', murid: 'Murid (Pengawas)', admin: 'Admin' };
+  var v = { guru: String(p.guru || '').trim(), murid: String(p.murid || '').trim(), admin: String(p.admin || '').trim(),
+    mt: p.mt == null ? pinFor_(getSettings_(), 'mt') : String(p.mt).trim() };   // kekalkan PIN MT jika tidak dihantar
+  var label = { guru: 'Guru & Warden', murid: 'Murid (Pengawas)', mt: 'Majlis Tertinggi', admin: 'Admin' };
   Object.keys(v).forEach(function (k) {
     if (v[k] && !/^\d{4,8}$/.test(v[k])) throw new Error('PIN ' + label[k] + ' mesti 4–8 digit nombor.');
   });
   if (adminRequired && !v.admin) throw new Error('PIN Admin tidak boleh kosong.');
-  if (v.guru && v.guru === v.murid) throw new Error('PIN Guru & Warden dan PIN Murid mesti berbeza.');
-  if (v.admin && (v.admin === v.guru || v.admin === v.murid)) throw new Error('PIN Admin mesti berbeza daripada PIN lain.');
+  var keys = ['guru', 'murid', 'mt', 'admin'];
+  for (var a = 0; a < keys.length; a++) for (var b = a + 1; b < keys.length; b++) {
+    if (v[keys[a]] && v[keys[a]] === v[keys[b]]) throw new Error('PIN ' + label[keys[a]] + ' dan PIN ' + label[keys[b]] + ' mesti berbeza.');
+  }
   setSetting_('KOD_GURU', v.guru);
   setSetting_('KOD_MURID', v.murid);
+  setSetting_('KOD_MT', v.mt);
   setSetting_('KOD_ADMIN', v.admin);
   setSetting_('KOD_AKSES', ''); // kod lama tidak lagi sah selepas PIN baharu ditetapkan
 }
@@ -1064,7 +1075,7 @@ function readOffenses_() {
 /** Guru, warden, guru disiplin dan admin boleh mengubah senarai kesalahan; pengawas tidak. */
 function requireEditor_(ctx, apa) {
   var user = auth_(ctx);
-  if (user.group === 'murid' && !user.isAdmin) throw new Error('AKSES_DITOLAK: Pengawas tidak boleh ' + (apa || 'mengubah senarai kesalahan') + '.');
+  if ((user.group === 'murid' || user.group === 'mt') && !user.isAdmin) throw new Error('AKSES_DITOLAK: Pengawas tidak boleh ' + (apa || 'mengubah senarai kesalahan') + '.');
   return user;
 }
 
@@ -1208,7 +1219,7 @@ function abOwner_(user, r) {
  */
 function getAmalan(ctx) {
   var user = auth_(ctx);
-  var boleh = user.group !== 'murid' || user.isAdmin;
+  var boleh = (user.group !== 'murid' && user.group !== 'mt') || user.isAdmin;
   var use = {};
   var sh = abSheet_(), last = sh.getLastRow();
   var vals = last >= 2 ? sh.getRange(2, 1, last - 1, AB_HEADERS.length).getValues() : [];
@@ -1682,6 +1693,15 @@ function nyahaktifKod_(kodList) {
   return n;
 }
 
+/** v1.9.0: tambah "Majlis Tertinggi" ke senarai PERANAN sekolah sedia ada (selepas Pengawas). */
+function tambahPerananMt_() {
+  var per = splitList_(getSettings_().PERANAN || '');
+  if (!per.length || per.some(function (x) { return groupOf_(x) === 'mt'; })) return;
+  var at = per.indexOf('Pengawas');
+  per.splice(at >= 0 ? at + 1 : per.length, 0, 'Majlis Tertinggi');
+  setSetting_('PERANAN', per.join(','));
+}
+
 function migrateIfNeeded_() {
   try {
     if (getSettings_().VERSI_DIPASANG === SIDIA_VERSION) return;
@@ -1692,6 +1712,7 @@ function migrateIfNeeded_() {
       if (dahulu === SIDIA_VERSION) return;
       ensureSetup_();
       if (dahulu && versiLebihRendah_(dahulu, '1.5.0')) nyahaktifKod_(KOD_DIBUANG_1_5);
+      if (dahulu && versiLebihRendah_(dahulu, '1.9.0')) tambahPerananMt_();
       setSetting_('VERSI_DIPASANG', SIDIA_VERSION);
     } finally { lock.releaseLock(); }
   } catch (e) { console.warn('migrasi: ' + e.message); }

@@ -43,9 +43,9 @@ Berdasarkan garis panduan **UI UX Pro Max** (github.com/nextlevelbuilder/ui-ux-p
 ## Konvensyen kod
 - Gaya ES5 (`var`, `function`) dalam `Code.gs` dan skrip klien, untuk konsisten dan selamat di pelayar lama.
 - Fungsi peribadi pelayan berakhir dengan `_` (tidak boleh dipanggil dari klien). Fungsi yang dipanggil melalui `google.script.run` tidak mempunyai `_`.
-- Pengesahan: setiap fungsi web app memanggil `auth_(ctx)`. Peranan → kumpulan melalui `groupOf_()`: `admin`, `murid` (Pengawas/murid/ketua…), `guru` (lain-lain). PIN setiap kumpulan: `KOD_ADMIN`, `KOD_MURID`, `KOD_GURU` (`KOD_AKSES` lama menjadi PIN guru/murid jika kosong; `savePins_` mengosongkannya). PIN 4–8 digit dan mesti berbeza. Fungsi khas admin memanggil `requireAdmin_(ctx)`.
+- Pengesahan: setiap fungsi web app memanggil `auth_(ctx)`. Peranan → kumpulan melalui `groupOf_()`: `admin`, `mt` (Majlis Tertinggi; disemak **sebelum** `murid`), `murid` (Pengawas/murid/ketua…), `guru` (lain-lain). PIN setiap kumpulan: `KOD_ADMIN`, `KOD_MT`, `KOD_MURID`, `KOD_GURU` (`KOD_AKSES` lama menjadi PIN guru/murid jika kosong; `savePins_` mengosongkannya). PIN 4–8 digit dan mesti berbeza. Fungsi khas admin memanggil `requireAdmin_(ctx)`. `user.canReport` (admin atau `mt`) membuka `getReport`; `writeReport` kekal admin sahaja. Untuk penyuntingan (`requireEditor_`, Amalan Baik), `mt` diperlakukan seperti `murid`. **Setiap semakan kumpulan baharu mesti mengambil kira `mt`.**
 - Klien: setiap log masuk/tukar pengguna mesti bermula dengan `ctx` bersih (tiada `adminPin`/`pin` lama). Pernah menjadi pepijat keselamatan: pengawas mewarisi akses Admin.
-- Web app ada 4 tab bawah: Rekod, Terkini, **Amalan Baik** (`vAmalan`), **Admin** (submenu: Laporan, PIN akses, Tetapan sekolah, Senarai kesalahan, Kongsi pautan, Sistem). Tab Admin disorok untuk kumpulan `murid`, dan pengawas hanya melihat rekod sendiri dalam Terkini. Amalan Baik: pengawas lihat sahaja; tambah rekod/jenis melalui `requireEditor_`.
+- Web app ada 4 tab bawah: Rekod, Terkini, **Amalan Baik** (`vAmalan`), **Admin** (submenu: Laporan, PIN akses, Tetapan sekolah, Senarai kesalahan, Kongsi pautan, Sistem). Tab Admin disorok untuk kumpulan `murid`, dan pengawas hanya melihat rekod sendiri dalam Terkini. Bagi `mt`, tab yang sama dilabel **Laporan** dan sentiasa membuka `#subLaporan` (`isMT()` dalam `initAdmin`/`showSub`). Amalan Baik: pengawas lihat sahaja; tambah rekod/jenis melalui `requireEditor_`.
 - Pemilih murid (`#pickCard`) dikongsi oleh Rekod dan Amalan: `setMode('d'|'k')` memindahkan kad dan menukar `S.sel`/`S.done`. Draf (`saveDraft`) hanya untuk mod kesalahan dan disimpan bersama pengguna (`draftUser()`).
 - Pustaka luar hanya dengan versi tetap, dimuat dari cdnjs: `xlsx@0.18.5`, `qrcodejs@1.0.0` (Setup.html & Index.html), dan `jspdf@2.5.1` + `jspdf-autotable@3.8.2` untuk Laporan PDF (`janaPdf()` dalam Index.html, dimuat apabila diperlukan, dengan jsDelivr sebagai sandaran). PDF menggunakan fon Helvetica (WinAnsi), jadi **jangan guna emoji atau aksara di luar Latin-1** dalam teks PDF.
 - Tulisan ke Sheet guna `LockService` + `setValues` pukal.
@@ -68,7 +68,8 @@ cd tests && npm install && node build.js && node smoke.js
 - `tests/build.js`: menjana `tests/out/app.html` (800 murid rawak, PIN Guru `1234`, PIN Murid `5678`, PIN Admin `9999`), `tests/out/setup.html` dan `tests/out/murid.xlsx`.
 - `tests/smoke.js`: ujian hujung-ke-hujung dengan Chromium (Playwright sudah dipasang, jangan pasang semula). Untuk paparan telefon, guna `devices['iPhone 13']`. WebKit tidak tersedia, jadi kelakuan khusus Safari tidak dapat diuji.
 - cdnjs/jsDelivr disekat dalam sesi awan; `build.js` dan `smoke.js` menghidangkan pustaka yang sama dari `tests/node_modules` (`ctx.route`). Ujian PDF menyimpan `tests/out/laporan.pdf`; semak dengan `pdftoppm`.
-- Selepas mengubah UI, ambil tangkapan skrin dan semak secara visual. Kemas kini `docs/img/` dan **jana semula panduan PDF** (`node panduan/jana.js`) jika paparan berubah ketara. Semak PDF dengan `pdftoppm -r 45` sebelum push.
+- Selepas mengubah UI, ambil tangkapan skrin dan semak secara visual.
+- **Panduan PDF: jangan jana semula atau ubah `panduan/` secara automatik.** Di akhir setiap perubahan, ingatkan pengguna sama ada panduan PDF perlu dikemas kini (nyatakan panduan mana dan sebabnya). Jana semula (`node panduan/jana.js`) hanya apabila pengguna meminta.
 
 ## Menerbitkan versi baharu
 1. Ubah kod dan jalankan ujian.
@@ -83,3 +84,4 @@ Updater (`pasangKemasKini_`) membatalkan kemas kini jika `SIDIA_VERSION` pada `r
 Selepas mengubah `Code.gs`, `Index.html`, `Setup.html` atau `appsscript.json`, ingatkan pengguna:
 - **sekolah**: klik *SiDIA › ⬆️ Semak kemas kini* (selepas keluaran diterbitkan), atau tampal manual kemudian **Deploy › Manage deployments › ✎ Edit › New version**
 - **Google Sheet templat** (`TEMPLATE_ID` dalam `docs/index.html`) juga perlu dikemas kini
+- **Panduan PDF**: sama ada perlu dikemas kini (jangan jana sendiri)

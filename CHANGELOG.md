@@ -1,5 +1,13 @@
 # Senarai Perubahan SiDIA
 
+## 1.9.0 (23 Nov 2026)
+- **Peranan baharu: Majlis Tertinggi** (pengawas kanan) dengan **PIN sendiri** (`KOD_MT`)
+  - boleh merekod, melihat semua rekod terkini, dan membuka **Laporan** (termasuk PDF, CSV & Laporan Kesalahan Murid)
+  - seperti pengawas untuk senarai kesalahan & Amalan Baik (lihat sahaja); tiada akses PIN, tetapan atau kemas kini (disekat juga di pelayan)
+  - admin menetapkan PIN di **Admin › PIN akses** atau dalam wizard; butang WhatsApp khas dalam Kongsi pautan
+  - sekolah sedia ada: peranan "Majlis Tertinggi" ditambah secara automatik ke senarai peranan
+- **Laporan: butang "Hari ini"**
+
 ## 1.8.0 (19 Nov 2026)
 - **Amalan baik**: tab baharu **Amalan Baik** di menu bawah untuk merekod amalan baik murid (mata merit)
   - guru, warden, guru disiplin dan admin boleh merekod; pengawas boleh melihat sahaja

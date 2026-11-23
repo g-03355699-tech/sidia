@@ -126,6 +126,7 @@ Jumlah mata ditolak bagi setiap rumah = jumlah lajur *Mata* dalam tab KESALAHAN.
 |---|---|---|
 | Guru, Warden, Guru Disiplin | **PIN Guru & Warden** (`KOD_GURU`) | Rekod, lihat semua rekod terkini, padam rekod sendiri, **sunting senarai kesalahan** |
 | Pengawas / murid bertugas | **PIN Murid** (`KOD_MURID`) | Rekod, lihat & padam **rekod sendiri** sahaja. Tiada menu Admin |
+| Majlis Tertinggi (pengawas kanan) | **PIN Majlis Tertinggi** (`KOD_MT`) | Rekod, lihat semua rekod terkini, **Laporan** (PDF & CSV). Seperti pengawas untuk senarai kesalahan & Amalan Baik (lihat sahaja). Tiada akses PIN/tetapan/kemas kini |
 | Admin | **PIN Admin** (`KOD_ADMIN`) | Semua, termasuk menu **🛡️ Admin**: laporan, tukar PIN, tetapan sekolah, senarai kesalahan, kongsi pautan, kemas kini |
 
 - PIN ialah 4–8 digit, dan setiap peranan mesti mempunyai PIN berbeza. Guru boleh membuka menu Admin dengan memasukkan PIN Admin.

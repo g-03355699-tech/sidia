@@ -150,6 +150,27 @@ let fails = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if
   await p.fill('#lmQ', topNama); await p.waitForSelector('#lmRes [data-lm]'); await p.click('#lmRes [data-lm="' + top + '"]'); await p.waitForSelector('#lmOut table');
   ok(await p.locator('#lmOut tbody tr').count() === topN, 'pengawas boleh melihat laporan kesalahan murid');
 
+  // ---------- Majlis Tertinggi ----------
+  await p.click('#hdrWho'); await p.waitForSelector('#vLogin:not(.hidden)');
+  ok((await p.locator('#inPeranan option').allTextContents()).includes('Majlis Tertinggi'), 'peranan Majlis Tertinggi dalam senarai');
+  await p.fill('#inNama', 'Aiman (MT)'); await p.selectOption('#inPeranan', 'Majlis Tertinggi');
+  await p.fill('#inPin', '2468'); await p.click('#btnLogin'); await p.waitForTimeout(300);
+  ok(/PIN tidak sah/.test(await p.textContent('#loginMsg')), 'Majlis Tertinggi tidak boleh guna PIN Pengawas');
+  await p.fill('#inPin', '4321'); await p.click('#btnLogin'); await p.waitForSelector('#vRekod:not(.hidden)'); await p.waitForTimeout(200);
+  ok(await p.isVisible('#tabAdmin') && /Laporan/.test(await p.textContent('#tabAdmin')), 'MT: tab Laporan kelihatan');
+  await p.click('#tabAdmin'); await p.waitForTimeout(300);
+  ok(await p.isVisible('#subLaporan') && !(await p.isVisible('#adminHome')) && !(await p.isVisible('#adminGate')) && !(await p.isVisible('#guruTools')) && !(await p.isVisible('#subLaporan .backbar')), 'MT: terus ke Laporan, tiada menu Admin/guru');
+  await p.click('[data-range=today]'); await p.waitForTimeout(400);
+  const td = await p.evaluate(() => ymd(new Date()));
+  ok(await p.inputValue('#rFrom') === td && await p.inputValue('#rTo') === td && /Mata demerit mengikut rumah/.test(await p.textContent('#reportOut')), 'butang Hari ini: laporan tarikh hari ini');
+  ok(!(await p.$('#toSheet')) && !!(await p.$('#btnPdf')), 'MT: PDF ada, Tulis ke Sheet (admin) tiada');
+  const deny = await p.evaluate(() => { const r = []; for (const f of ['getAdminInfo', 'getPins', 'getOffensesEdit']) { try { window[f](S.ctx); r.push(f + ':lepas'); } catch (e) { r.push(f + ':ditolak'); } }
+    try { tukarPin(S.ctx, { guru: '1111', murid: '2222', mt: '3333', admin: '4444' }); r.push('tukarPin:lepas'); } catch (e) { r.push('tukarPin:ditolak'); } return r.join(' '); });
+  ok(deny === 'getAdminInfo:ditolak getPins:ditolak getOffensesEdit:ditolak tukarPin:ditolak', 'MT: fungsi admin & sunting kesalahan ditolak di pelayan (' + deny + ')');
+  ok(await p.evaluate(() => getAmalan(S.ctx).bolehTambah === false), 'MT: Amalan Baik lihat sahaja (seperti pengawas)');
+  ok(await p.evaluate(() => { try { savePins_({ guru: '1234', murid: '2468', mt: '1234', admin: '9999' }, true); return false; } catch (e) { return /mesti berbeza/.test(e.message); } }), 'PIN MT mesti berbeza daripada PIN lain');
+  ok(await p.evaluate(() => { setSetting_('PERANAN', 'Guru,Warden,Pengawas,Admin'); setSetting_('VERSI_DIPASANG', '1.8.0'); migrateIfNeeded_(); return getSettings_().PERANAN; }) === 'Guru,Warden,Pengawas,Majlis Tertinggi,Admin', 'migrasi: Majlis Tertinggi ditambah selepas Pengawas');
+
   // ---------- wizard ----------
   const w = await b.newPage({ viewport: { width: 920, height: 660 } }); w.on('pageerror', e => errs.push('wizard: ' + e.message));
   w.on('dialog', d => d.accept());

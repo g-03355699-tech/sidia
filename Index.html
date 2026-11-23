@@ -347,7 +347,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
       <div id="loginPinWrap" class="hidden">
         <label class="f" for="inPin">PIN</label>
         <input type="password" id="inPin" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="••••">
-        <div class="muted" style="margin-top:4px">PIN berbeza mengikut peranan: <b>Guru/Warden</b>, <b>Pengawas</b> atau <b>Admin</b>. Dapatkan PIN daripada pentadbir sistem.</div>
+        <div class="muted" style="margin-top:4px">PIN berbeza mengikut peranan: <b>Guru/Warden</b>, <b>Pengawas</b>, <b>Majlis Tertinggi</b> atau <b>Admin</b>. Dapatkan PIN daripada pentadbir sistem.</div>
       </div>
       <div class="actions"><button class="btn pri" id="btnLogin">Masuk</button></div>
     </div>
@@ -473,6 +473,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
           <div><label class="f" for="rTo">Hingga</label><input type="date" id="rTo"></div>
         </div>
         <div class="tools">
+          <button class="btn sm" data-range="today">Hari ini</button>
           <button class="btn sm" data-range="week">Minggu ini</button>
           <button class="btn sm" data-range="month">Bulan ini</button>
           <button class="btn sm" data-range="year">Tahun ini</button>
@@ -500,6 +501,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
         <div id="pinListNote"></div>
         <div class="pinrow"><div><label class="f" for="pinGuru">PIN Guru & Warden</label><input type="text" id="pinGuru" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off"></div><button class="btn sm" data-gen="pinGuru"><svg class="ico sm" aria-hidden="true"><use href="#i-shuffle"/></svg>Jana</button></div>
         <div class="pinrow"><div><label class="f" for="pinMurid">PIN Murid (Pengawas)</label><input type="text" id="pinMurid" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off"></div><button class="btn sm" data-gen="pinMurid"><svg class="ico sm" aria-hidden="true"><use href="#i-shuffle"/></svg>Jana</button></div>
+        <div class="pinrow"><div><label class="f" for="pinMt">PIN Majlis Tertinggi</label><input type="text" id="pinMt" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off"></div><button class="btn sm" data-gen="pinMt"><svg class="ico sm" aria-hidden="true"><use href="#i-shuffle"/></svg>Jana</button></div>
         <div class="pinrow"><div><label class="f" for="pinAdmin">PIN Admin</label><input type="text" id="pinAdmin" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off"></div><button class="btn sm" data-gen="pinAdmin"><svg class="ico sm" aria-hidden="true"><use href="#i-shuffle"/></svg>Jana</button></div>
         <div class="alert warn" style="margin-top:12px">Simpan PIN Admin di tempat selamat. Jika terlupa, pemilik Google Sheet boleh melihatnya dalam tab <b>TETAPAN</b> (KOD_ADMIN).</div>
         <div class="actions"><button class="btn pri" id="btnSavePin">Simpan PIN</button></div>
@@ -781,6 +783,8 @@ function boot() {
     $('tabs').classList.remove('hidden');
     var isMurid = S.user.group === 'murid' && !S.user.isAdmin;
     $('tabAdmin').classList.toggle('hidden', isMurid);          // pengawas tiada menu Admin
+    // Majlis Tertinggi: tab yang sama tetapi hanya Laporan
+    $('tabAdmin').innerHTML = isMT() ? '<span class="pill">' + ic('bar') + '</span>Laporan' : '<span class="pill">' + ic('shield') + '</span>Admin';
     $('onlyMine').closest('label').classList.toggle('hidden', isMurid);
     A = null;
     if (d.warnings && d.warnings.length) toast('Amaran: ' + d.warnings[0], true);
@@ -1529,9 +1533,11 @@ function loadRecent() {
 /* ============ LAPORAN ============ */
 /* ============ ADMIN ============ */
 var adminInit = false, lastReport = null, A = null;
+function isMT() { return !!(S.user && S.user.group === 'mt' && !S.user.isAdmin); }
 function initAdmin() {
   var isAdmin = S.user && S.user.isAdmin;
-  if (!isAdmin) showSub(null);
+  if (isMT()) showSub('subLaporan');                        // Majlis Tertinggi: terus ke Laporan
+  else if (!isAdmin) showSub(null);
   else if (!A) loadAdmin(); else showSub(null);
   if (adminInit) return;
   adminInit = true;
@@ -1568,11 +1574,13 @@ function renderAdminHome() {
   $('updBadge').innerHTML = A.versiTerkini && cmpVer(A.versiTerkini, A.versi) > 0 ? '<span class="badge">Baharu</span>' : '';
 }
 function showSub(id) {
-  var isAdmin = !!(S.user && S.user.isAdmin);
-  var canEdit = isAdmin || !!(S.user && S.user.group !== 'murid');
+  var isAdmin = !!(S.user && S.user.isAdmin), mt = isMT();
+  var canEdit = isAdmin || !!(S.user && S.user.group !== 'murid' && S.user.group !== 'mt');
+  if (mt) id = 'subLaporan';                                // MT hanya boleh membuka Laporan
   if (id === 'subKesalahan' && !canEdit) id = null;
   $('adminHome').classList.toggle('hidden', !!id || !isAdmin || !A);
   $('adminGate').classList.toggle('hidden', !!id || isAdmin);
+  $('subLaporan').querySelector('.backbar').classList.toggle('hidden', mt);
   $('guruTools').classList.toggle('hidden', !!id || isAdmin || !canEdit);
   document.querySelectorAll('.adsub').forEach(function (e) { e.classList.toggle('hidden', e.id !== id); });
   if (id === 'subPin') renderPin();
@@ -1680,14 +1688,14 @@ function cmpVer(a, b) {
 }
 /* ---- PIN ---- */
 function renderPin() {
-  $('pinGuru').value = A.pins.guru || ''; $('pinMurid').value = A.pins.murid || ''; $('pinAdmin').value = A.pins.admin || '';
-  $('pinListNote').innerHTML = A.userListMode ? '<div class="alert warn">Tab PENGGUNA sedang digunakan: pengguna log masuk dengan emel, jadi PIN Guru & Murid tidak digunakan. PIN Admin masih membuka menu Admin.</div>' : '';
+  $('pinGuru').value = A.pins.guru || ''; $('pinMurid').value = A.pins.murid || ''; $('pinMt').value = A.pins.mt || ''; $('pinAdmin').value = A.pins.admin || '';
+  $('pinListNote').innerHTML = A.userListMode ? '<div class="alert warn">Tab PENGGUNA sedang digunakan: pengguna log masuk dengan emel, jadi PIN Guru, Murid & Majlis Tertinggi tidak digunakan. PIN Admin masih membuka menu Admin.</div>' : '';
 }
 function savePins() {
-  var p = { guru: $('pinGuru').value.trim(), murid: $('pinMurid').value.trim(), admin: $('pinAdmin').value.trim() };
-  var changed = ['guru', 'murid', 'admin'].filter(function (k) { return p[k] !== (A.pins[k] || ''); });
+  var p = { guru: $('pinGuru').value.trim(), murid: $('pinMurid').value.trim(), mt: $('pinMt').value.trim(), admin: $('pinAdmin').value.trim() };
+  var changed = ['guru', 'murid', 'mt', 'admin'].filter(function (k) { return p[k] !== (A.pins[k] || ''); });
   if (!changed.length) { toast('Tiada perubahan'); return; }
-  if (!confirm('Tukar PIN ' + changed.map(function (k) { return { guru: 'Guru & Warden', murid: 'Murid', admin: 'Admin' }[k]; }).join(', ') + '?\n\nPengguna kumpulan itu perlu log masuk semula dengan PIN baharu.')) return;
+  if (!confirm('Tukar PIN ' + changed.map(function (k) { return { guru: 'Guru & Warden', murid: 'Murid', mt: 'Majlis Tertinggi', admin: 'Admin' }[k]; }).join(', ') + '?\n\nPengguna kumpulan itu perlu log masuk semula dengan PIN baharu.')) return;
   loading(true, 'Menyimpan PIN…');
   api('tukarPin', S.ctx, p).then(function (pins) {
     loading(false);
@@ -1739,7 +1747,7 @@ function renderKongsi() {
   $('kongsiBody').innerHTML =
     '<div class="urlbox" style="display:flex;gap:8px"><input type="text" id="shareUrl" readonly value="' + esc(url) + '"><button class="btn sm" id="btnCopyUrl">Salin</button></div>' +
     '<div id="qrBox"></div><p class="muted" style="text-align:center;margin:0 0 12px">Imbas kod QR dengan kamera telefon</p>' +
-    waBtn('Guru & warden', p.guru, waMsg('guru & warden', p.guru)) + waBtn('Pengawas', p.murid, waMsg('pengawas', p.murid)) +
+    waBtn('Guru & warden', p.guru, waMsg('guru & warden', p.guru)) + waBtn('Pengawas', p.murid, waMsg('pengawas', p.murid)) + waBtn('Majlis Tertinggi', p.mt, waMsg('Majlis Tertinggi', p.mt)) +
     '<div class="alert info" style="margin-top:12px">PIN Admin <b>tidak</b> dimasukkan dalam mesej. Kongsi secara peribadi sahaja.</div>';
   $('btnCopyUrl').onclick = function () { $('shareUrl').select(); try { navigator.clipboard.writeText(url); } catch (e) { document.execCommand('copy'); } toast('Pautan disalin'); };
   loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js', function () {
@@ -1779,7 +1787,8 @@ function renderSistem() {
 }
 function setRange(k) {
   var d = new Date(), from;
-  if (k === 'week') { from = new Date(d); from.setDate(d.getDate() - ((d.getDay() + 6) % 7)); }
+  if (k === 'today') from = new Date(d);
+  else if (k === 'week') { from = new Date(d); from.setDate(d.getDate() - ((d.getDay() + 6) % 7)); }
   else if (k === 'month') from = new Date(d.getFullYear(), d.getMonth(), 1);
   else from = new Date(d.getFullYear(), 0, 1);
   $('rFrom').value = ymd(from); $('rTo').value = ymd(d);
@@ -1812,7 +1821,7 @@ function renderReport(r) {
     '<button class="btn sm" id="csvRumah">' + ic('download', 'sm') + 'CSV ringkasan rumah</button>' +
     '<button class="btn sm" id="csvMurid">' + ic('download', 'sm') + 'CSV mengikut murid</button>' +
     '<button class="btn sm" id="csvAll">' + ic('download', 'sm') + 'CSV semua rekod</button>' +
-    '<button class="btn sm" id="toSheet">' + ic('sheet', 'sm') + 'Tulis ke tab LAPORAN</button></div></div>' +
+    (S.user && S.user.isAdmin ? '<button class="btn sm" id="toSheet">' + ic('sheet', 'sm') + 'Tulis ke tab LAPORAN</button>' : '') + '</div></div>' +
     '<div class="card"><h2>Mengikut kesalahan</h2>' + tbl(['Kesalahan', 'Kes', 'Mata'], r.kesalahan.map(function (x) { return [x.kesalahan, x.kes, x.mata]; }), [1, 2], 1) + '</div>' +
     '<div class="card"><h2>Mengikut kelas</h2>' + tbl(['Kelas', 'Kes', 'Mata'], r.kelas.map(function (x) { return [x.kelas, x.kes, x.mata]; }), [1, 2], 1) + '</div>' +
     '<div class="card"><h2>Murid paling kerap (20 teratas)</h2>' + tbl(['Nama', 'Kelas', 'Rumah', 'Kes', 'Mata'], r.murid.slice(0, 20).map(function (x) { return [x.nama, x.kelas, x.rumah, x.kes, x.mata]; }), [3, 4]) + '</div>';
@@ -1832,7 +1841,7 @@ function renderReport(r) {
   $('csvRumah').onclick = function () { downloadCsv('mata_rumah_' + tag + '.csv', [['Rumah', 'Bil Kes', 'Bil Murid', 'Mata Ditolak']].concat(r.rumah.map(function (x) { return [x.rumah, x.kes, x.murid, x.mata]; }))); };
   $('csvMurid').onclick = function () { downloadCsv('ikut_murid_' + tag + '.csv', [['ID', 'Nama', 'Kelas', 'Rumah', 'Bil Kes', 'Mata']].concat(r.murid.map(function (x) { return [x.id, x.nama, x.kelas, x.rumah, x.kes, x.mata]; }))); };
   $('csvAll').onclick = function () { downloadCsv('rekod_disiplin_' + tag + '.csv', [r.rekodHeaders].concat(r.rekod)); };
-  $('toSheet').onclick = function () {
+  if ($('toSheet')) $('toSheet').onclick = function () {
     loading(true, 'Menulis ke Google Sheet…');
     api('writeReport', S.ctx, r.from, r.to).then(function (x) {
       loading(false);

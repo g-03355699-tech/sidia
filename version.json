@@ -1,11 +1,10 @@
 {
-  "version": "1.8.0",
-  "ref": "30de1f757e81d84cc1568e20b0973eb8fe743a2e",
-  "tarikh": "2026-11-19",
+  "version": "1.9.0",
+  "ref": "0a6423bc8a8b332152939a0d31e0d4d28aa3da26",
+  "tarikh": "2026-11-23",
   "nota": [
-    "Tab baharu Amalan Baik: rekod amalan baik murid (mata merit) secara pukal oleh guru, warden dan admin; pengawas boleh melihat",
-    "18 jenis amalan baik lalai; guru dan admin boleh menambah jenis sendiri. Mata amalan baik mengikut rumah dipaparkan",
-    "Talian lemah? Rekod disimpan dahulu dalam telefon dan dihantar semula secara automatik, tanpa rekod berganda",
-    "Pilihan murid yang belum disimpan tidak lagi dipulihkan kepada pengguna lain pada telefon yang sama"
+    "Peranan baharu: Majlis Tertinggi (pengawas kanan) dengan PIN sendiri, boleh melihat laporan",
+    "Laporan: butang Hari ini",
+    "Selepas kemas kini: buka Admin › PIN akses dan tetapkan PIN Majlis Tertinggi"
   ]
 }

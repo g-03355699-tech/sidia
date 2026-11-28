@@ -3,49 +3,58 @@
 <head>
 <base target="_blank">
 <meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#18212b;--muted:#5f6b78;--line:#dde2e7;--bg:#f6f8f9;--pri:#0f766e;--pri-d:#0b5a54;--pri-soft:#e3f3f1;
+/* Warna teal SiDIA (asal); bentuk & fon sepadan dengan web app (gaya Kelasku, Poppins). */
+:root{--ink:#18212b;--ink-2:#3a4652;--muted:#5f6b78;--line:#dde2e7;--line-strong:#b8c1ca;--bg:#f6f8f9;--tile:#f1f4f5;--chip:#e7ebee;--chip-h:#d9dfe4;
+  --pri:#0f766e;--pri-d:#0b5a54;--pri-soft:#e3f3f1;--info:#0b5a54;--info-soft:#e3f3f1;--wa:#25d366;
   --danger:#b42318;--danger-soft:#fdecea;--warn:#9a4a07;--warn-soft:#fff4e5;--ok:#147a3d;--ok-soft:#e7f6ec}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
+html,body{margin:0;height:100%;font:13.5px/1.5 "Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
 button,input,select,textarea{font:inherit;color:inherit}
 .wrap{display:flex;height:100%}
 aside{position:relative;width:200px;flex:0 0 auto;background:var(--bg);border-right:1px solid var(--line);padding:16px 10px}
-aside .logo{font-weight:800;font-size:20px;color:var(--pri);padding:0 8px 14px;display:flex;align-items:center;gap:8px}
-aside .logo span{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#16a093,#0b5a54);display:grid;place-items:center}
+aside .logo{font-weight:700;font-size:19px;color:var(--pri);padding:0 8px 14px;display:flex;align-items:center;gap:8px}
+aside .logo span{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#16a093,#0b5a54);display:grid;place-items:center}
 aside .logo svg{width:26px;height:26px}
-.stepbtn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:10px 8px;border-radius:8px;cursor:pointer;text-align:left;color:var(--muted)}
-.stepbtn .n{width:24px;height:24px;border-radius:50%;border:2px solid #b8c1ca;display:grid;place-items:center;font-size:12px;font-weight:700;flex:0 0 auto}
-.stepbtn.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.stepbtn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:10px 8px;border-radius:10px;cursor:pointer;text-align:left;color:var(--muted)}
+.stepbtn .n{width:24px;height:24px;border-radius:50%;border:2px solid var(--line-strong);display:grid;place-items:center;font-size:12px;font-weight:600;flex:0 0 auto}
+.stepbtn.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 2px 10px rgba(15,31,29,.08)}
 .stepbtn.on .n{border-color:var(--pri);color:var(--pri)}
 .stepbtn.done .n{background:var(--pri);border-color:var(--pri);color:#fff}
 main{flex:1;overflow:auto;padding:20px 24px 90px;position:relative}
-h2{margin:0 0 4px;font-size:20px}
+h2{margin:0 0 4px;font-size:19px;font-weight:600}
 p.lead{margin:0 0 16px;color:var(--muted)}
-label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:12px 0 4px}
-input[type=text],input[type=password],input[type=number],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;min-height:38px}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:-1px}
+label.f{display:block;font-size:12.5px;font-weight:500;color:var(--ink-2);margin:12px 0 4px}
+input[type=text],input[type=password],input[type=number],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line-strong);border-radius:10px;background:#fff;min-height:38px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(13,148,136,.22)}
+input[type=checkbox],input[type=radio]{accent-color:var(--pri)}
 .hint{font-size:12px;color:var(--muted);margin-top:3px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
-.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;min-height:38px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap}
-.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn{border:1px solid transparent;background:var(--chip);color:var(--ink-2);border-radius:10px;padding:8px 14px;min-height:38px;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--chip-h)}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff;font-weight:600;box-shadow:0 2px 4px rgba(15,118,110,.28)}
+.btn.pri:hover{background:var(--pri-d)}
+.btn.wa,.btn.wa:hover{background:var(--wa);border-color:var(--wa);color:#fff;font-weight:600}
 .btn:disabled{opacity:.5;cursor:default}
 .btn.sm{min-height:30px;padding:4px 10px;font-size:13px}
 .footer{position:fixed;left:200px;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 24px;display:flex;gap:8px;justify-content:flex-end;align-items:center}
 .footer .msg{margin-right:auto;font-size:13px;color:var(--muted)}
-.alert{padding:10px 12px;border-radius:8px;margin:10px 0;font-size:13px}
+.alert{padding:10px 12px;border-radius:10px;margin:10px 0;font-size:13px}
 .alert.ok{background:var(--ok-soft);color:var(--ok)}
 .alert.warn{background:var(--warn-soft);color:var(--warn)}
 .alert.err{background:var(--danger-soft);color:var(--danger)}
-.alert.info{background:var(--pri-soft);color:var(--pri-d)}
-.drop{border:2px dashed #b8c1ca;border-radius:12px;padding:26px;text-align:center;cursor:pointer;background:var(--bg);transition:.15s}
+.alert.info{background:var(--info-soft);color:var(--info)}
+.drop{border:1.5px dashed var(--line-strong);border-radius:12px;padding:26px;text-align:center;cursor:pointer;background:var(--tile);transition:.15s}
 .drop.over{border-color:var(--pri);background:var(--pri-soft)}
 .drop b{color:var(--pri)}
 .tabs2{display:flex;gap:4px;margin:14px 0 8px;border-bottom:1px solid var(--line)}
 .tabs2 button{border:0;background:none;padding:8px 12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
 .tabs2 button.on{color:var(--pri);border-bottom-color:var(--pri);font-weight:600}
-.block{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.block{background:var(--tile);border-left:4px solid var(--pri);border-radius:4px 10px 10px 4px;padding:10px 12px;margin:8px 0}
 .block .t{font-weight:600;display:flex;gap:8px;align-items:center}
 .block .t small{font-weight:400;color:var(--muted)}
 .maps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
@@ -55,8 +64,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:left}
 th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 .stats{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-.stat{background:var(--bg);border-radius:10px;padding:8px 14px}
-.stat b{display:block;font-size:20px;color:var(--pri)}
+.stat{background:var(--tile);border-radius:10px;padding:8px 14px}
+.stat b{display:block;font-size:19px;font-weight:700;color:var(--ink)}
 .stat span{font-size:12px;color:var(--muted)}
 .offtbl input{min-height:30px;padding:4px 6px;border-radius:6px}
 .offtbl td{padding:3px 4px}
@@ -66,18 +75,18 @@ th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03
 .offtbl select{min-height:30px;padding:2px 4px;border-radius:6px;font-size:13px}
 .offtools{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
 .offtools input{flex:1;min-width:180px}
-#offPaste{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--bg)}
+#offPaste{border-radius:10px;padding:12px;margin-bottom:10px;background:var(--tile)}
 ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:10px 0}
 ol.steps li{counter-increment:s;position:relative;padding:8px 0 8px 38px;border-bottom:1px solid var(--line)}
-ol.steps li:before{content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;background:var(--pri-soft);color:var(--pri);font-weight:700;display:grid;place-items:center}
-code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:12px}
+ol.steps li:before{content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;background:var(--pri-soft);color:var(--pri);font-weight:600;display:grid;place-items:center}
+code,.kbd{background:var(--tile);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:12px}
 .urlbox{display:flex;gap:8px;align-items:center;margin:10px 0}
 .urlbox input{font-family:ui-monospace,Menlo,monospace;font-size:12px}
 .share{display:flex;gap:20px;align-items:flex-start;margin-top:10px}
 #qr{padding:10px;background:#fff;border:1px solid var(--line);border-radius:10px;width:200px;height:200px}
 #qr img,#qr canvas{width:178px!important;height:178px!important}
-.loading{position:fixed;inset:0;background:rgba(255,255,255,.75);display:grid;place-items:center;z-index:9;font-weight:600;color:var(--pri)}
-.spin{width:30px;height:30px;border:4px solid var(--pri-soft);border-top-color:var(--pri);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 8px}
+.loading{position:fixed;inset:0;background:rgba(255,255,255,.78);display:grid;place-items:center;z-index:9;font-weight:500;color:var(--muted)}
+.spin{width:28px;height:28px;border:3px solid var(--pri-soft);border-top-color:var(--pri);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 8px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .hidden{display:none!important}
 </style>
@@ -212,8 +221,8 @@ code,.kbd{background:var(--bg);border:1px solid var(--line);border-radius:4px;pa
         <div class="share">
           <div id="qr"></div>
           <div style="flex:1">
-            <a class="btn" id="btnWa" href="#" style="background:#25d366;border-color:#25d366;color:#fff">WhatsApp: guru & warden</a>
-            <a class="btn" id="btnWa2" href="#" style="background:#25d366;border-color:#25d366;color:#fff;margin-top:6px">WhatsApp: pengawas</a>
+            <a class="btn wa" id="btnWa" href="#">WhatsApp: guru & warden</a>
+            <a class="btn wa" id="btnWa2" href="#" style="margin-top:6px">WhatsApp: pengawas</a>
             <div class="alert info" style="margin-top:12px" id="codeInfo"></div>
             <div class="hint" style="margin-bottom:8px"><b>Keluar "Sorry, unable to open the file"?</b> Pelayar sedang log masuk dengan akaun Google lain. Buka pautan dalam Incognito, atau tukar <b>Who has access</b> kepada <b>Anyone</b> (dilindungi kod akses).</div>
             <div class="hint">Jika anda mengubah kod Apps Script kemudian, pilih <b>Deploy › Manage deployments › ✎ Edit › Version: New version</b> supaya pautan kekal sama.</div>

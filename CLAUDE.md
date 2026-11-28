@@ -32,7 +32,7 @@ Pengguna dan penyelenggara berbahasa Melayu. **Semua teks UI, mesej ralat, dokum
 - `ensureSetup_()` mesti selamat dijalankan berulang kali. `migrateIfNeeded_()` menjalankannya sekali bagi setiap versi baharu (tetapan `VERSI_DIPASANG`).
 
 ## Reka bentuk UI (Index.html)
-Berdasarkan garis panduan **UI UX Pro Max** (github.com/nextlevelbuilder/ui-ux-pro-max-skill), produk "LMS / pendidikan":
+Warna tema ialah **teal SiDIA** (`--pri` #0f766e); **jangan tukar palet warna** tanpa diminta. Susun atur dan komponen sepadan dengan **Kelasku** (github.com/g-03355699-tech/kelasku) sejak v1.10: fon Poppins, kad putih tanpa sempadan (jejari 16px, bayang lembut) di atas latar `--bg`, jubin senarai `--surface-2` dengan jalur 4px di kiri (`--st-r/s/b/x` mengikut tahap; `--pri` apabila dipilih), cip pil, butang sekunder kelabu (`.btn`), utama (`.btn.pri`) dan garis putus (`.btn.dash`). `Setup.html` mengikut bentuk yang sama. Prinsip **UI UX Pro Max** (github.com/nextlevelbuilder/ui-ux-pro-max-skill) dikekalkan:
 - **Token semantik sahaja** dalam komponen (`--pri`, `--pri-ink`, `--surface`, `--surface-2`, `--line`, `--muted`, `--danger`…). Jangan tulis hex terus dalam komponen. Setiap token ada padanan mod gelap dalam `@media (prefers-color-scheme:dark)`.
 - `--pri` (#0f766e) untuk latar dengan teks putih; `--pri-ink` untuk teks/pautan berwarna jenama (lebih cerah dalam mod gelap).
 - **Ikon SVG** daripada sprite `<symbol id="i-…">` di atas `<header>`; dalam JS guna `ic('nama', 'sm|lg')`. **Jangan guna emoji sebagai ikon.**

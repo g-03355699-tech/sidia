@@ -1,5 +1,14 @@
 # Senarai Perubahan SiDIA
 
+## 1.10.0 (28 Nov 2026)
+- **Susun atur baharu sepadan dengan Kelasku** (warna teal SiDIA dikekalkan): fon Poppins, kad putih tanpa sempadan
+  - senarai kesalahan, murid dan rekod terkini dipaparkan sebagai jubin dengan jalur warna di kiri (hijau ringan, jingga sederhana, merah berat; teal apabila murid dipilih)
+  - header memaparkan nombor versi; menu bawah menanda tab aktif dengan warna teal
+  - butang sekunder kelabu, cip tapisan berbentuk pil, medan carian dengan ikon kanta
+  - menu Admin: jubin menu dan kad **Ringkasan** (murid, kelas, kesalahan, rekod)
+- Wizard persediaan (Google Sheet) menggunakan fon dan bentuk yang sama
+- Tiada perubahan pada warna tema, data, PIN atau cara merekod
+
 ## 1.9.0 (23 Nov 2026)
 - **Peranan baharu: Majlis Tertinggi** (pengawas kanan) dengan **PIN sendiri** (`KOD_MT`)
   - boleh merekod, melihat semua rekod terkini, dan membuka **Laporan** (termasuk PDF, CSV & Laporan Kesalahan Murid)

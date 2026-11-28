@@ -12,7 +12,7 @@
  */
 
 /** Versi SiDIA yang dipasang. Mesti sama dengan version.json di GitHub bagi setiap keluaran. */
-var SIDIA_VERSION = '1.9.0';
+var SIDIA_VERSION = '1.10.0';
 /** Sumber kemas kini (repo awam GitHub). */
 var SIDIA_REPO = 'g-03355699-tech/sidia';
 /** Ikon web app (dihoskan di GitHub Pages). */
@@ -565,6 +565,7 @@ function getConfig() {
   return {
     namaApp: s.NAMA_APP || 'SiDIA',
     namaSekolah: s.NAMA_SEKOLAH || '',
+    versi: SIDIA_VERSION,
     peranan: splitList_(s.PERANAN || 'Guru,Warden,Pengawas'),
     lokasi: splitList_(s.LOKASI || ''),
     needPin: !users.length && !!(pinFor_(s, 'guru') || pinFor_(s, 'murid') || pinFor_(s, 'mt') || pinFor_(s, 'admin')),

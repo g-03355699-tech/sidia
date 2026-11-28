@@ -1,10 +1,11 @@
 {
-  "version": "1.9.0",
-  "ref": "0a6423bc8a8b332152939a0d31e0d4d28aa3da26",
-  "tarikh": "2026-11-23",
+  "version": "1.10.0",
+  "ref": "6a31edc8d615b2752268e3968eaef1e7c3514d1a",
+  "tarikh": "2026-11-28",
   "nota": [
-    "Peranan baharu: Majlis Tertinggi (pengawas kanan) dengan PIN sendiri, boleh melihat laporan",
-    "Laporan: butang Hari ini",
-    "Selepas kemas kini: buka Admin › PIN akses dan tetapkan PIN Majlis Tertinggi"
+    "Susun atur baharu web app sepadan dengan Kelasku: fon Poppins, kad dan jubin senarai",
+    "Senarai kesalahan dan murid sebagai jubin dengan jalur warna mengikut tahap",
+    "Header memaparkan nombor versi; wizard menggunakan bentuk yang sama",
+    "Warna tema, data, PIN dan cara merekod tidak berubah"
   ]
 }
